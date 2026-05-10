@@ -1,112 +1,37 @@
 # Codex-Ready Writing Rules
 
-These rules apply to all generated project documents.
+## Core Rules
 
-## 1. Prefer Decisions Over Suggestions
+1. Prefer decisions over suggestions.
+2. Use `Must`, `Must not`, `Required`, `Forbidden`, and `Default`.
+3. Avoid vague words such as `maybe`, `could`, `as needed`, `consider`, and `if possible`.
+4. Add stable IDs to important items:
+   - requirements: `REQ-*`
+   - entities: `ENT-*`
+   - business rules: `BR-*`
+   - database objects: `DB-*`
+   - APIs: `API-*`
+   - validations: `VAL-*`
+   - tasks: `TASK-*`
+5. Define source-of-truth boundaries.
+6. Make validation explicit.
+7. Keep commands deterministic.
+8. Put repeated shared decisions in `project-decisions.md`.
+9. Use `traceability-matrix.md` for cross-document mappings.
+10. Respect document length budgets.
 
-Bad:
-
-```text
-You may consider using pnpm.
-```
-
-Good:
-
-```text
-Use pnpm. Do not use npm, yarn, or bun.
-```
-
-## 2. Use Must / Must Not Language
+## Good Style
 
 Use:
 
-- Must
-- Must not
-- Use
-- Do not use
-- Required
-- Forbidden
-- Default
-- Out of scope
+```text
+Use pnpm.
+Do not use npm.
+All server mutations must go through service layer.
+```
 
 Avoid:
 
-- maybe
-- could
-- should consider
-- if needed
-- as appropriate
-- optional
-- 可以
-- 可能
-- 建议
-- 尽量
-- 视情况
-
-## 3. Separate Assumptions and Open Questions
-
-Use `Assumptions` for non-blocking defaults.
-
-Use `Open Questions` for decisions that block implementation.
-
-## 4. Add IDs to Important Items
-
-Use stable IDs:
-
-- `REQ-*` for requirements
-- `BR-*` for business rules
-- `ENT-*` for entities
-- `DB-*` for database objects
-- `API-*` for APIs
-- `VAL-*` for validation items
-- `TASK-*` for tasks
-
-## 5. Make Documents Traceable
-
-A core requirement should ideally map across:
-
 ```text
-REQ → BR/ENT → DB → API → VAL → TASK
+You may consider pnpm or npm depending on the situation.
 ```
-
-## 6. Make Validation Explicit
-
-Every core feature must include:
-
-- acceptance criteria
-- required tests
-- validation command or manual check
-
-## 7. Make Commands Copy-Pasteable
-
-Commands must be exact.
-
-Bad:
-
-```text
-Run tests.
-```
-
-Good:
-
-```bash
-pnpm test
-```
-
-## 8. State Forbidden Alternatives
-
-When a tool choice is fixed, explicitly forbid common alternatives.
-
-Example:
-
-```text
-Use pnpm. Do not use npm install, npm run, yarn, or bun.
-```
-
-## 9. Define Source of Truth
-
-Each document must define what it owns and what it does not own.
-
-## 10. Optimize for Execution
-
-The goal is not elegant prose. The goal is to reduce Codex guessing, rework, and command mistakes.

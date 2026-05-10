@@ -2,106 +2,21 @@
 
 ## Purpose
 
-[TBD]
+[State the purpose of this document.]
 
 ## Source of Truth
 
-This document is the source of truth for:
-
-- [TBD]
-
-This document is not the source of truth for:
-
-- [TBD]
+[State what this document owns and what other documents own.]
 
 ## Codex Usage
 
-Codex should use this document to:
-
-- [TBD]
-
-Codex should not use this document to:
-
-- [TBD]
+[State how Codex should use this document.]
 
 ## Non-Goals
 
-- [TBD]
+[State what this document must not define.]
 
-## System Overview
 
-[TBD]
+## Content
 
-## Application Boundaries
-
-[TBD]
-
-## Module Boundaries
-
-[TBD]
-
-## Recommended Directory Structure
-
-```text
-[TBD]
-```
-
-## Layering Model
-
-[TBD]
-
-## Dependency Direction
-
-[TBD]
-
-## Request Lifecycle
-
-[TBD]
-
-## Authentication Flow
-
-[TBD]
-
-## Authorization Strategy
-
-[TBD]
-
-## Error Handling Strategy
-
-[TBD]
-
-## Logging Strategy
-
-[TBD]
-
-## Configuration Strategy
-
-[TBD]
-
-## Caching Strategy
-
-[TBD]
-
-## Background Jobs
-
-[TBD]
-
-## Third-Party Integration Boundaries
-
-[TBD]
-
-## Architecture Constraints
-
-[TBD]
-
-## Forbidden Architecture Patterns
-
-[TBD]
-
-## Assumptions
-
-[TBD]
-
-## Open Questions
-
-[TBD]
+[Generate using the matching prompt in `prompts/`.]

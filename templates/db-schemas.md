@@ -2,100 +2,21 @@
 
 ## Purpose
 
-[TBD]
+[State the purpose of this document.]
 
 ## Source of Truth
 
-This document is the source of truth for:
-
-- [TBD]
-
-This document is not the source of truth for:
-
-- [TBD]
+[State what this document owns and what other documents own.]
 
 ## Codex Usage
 
-Codex should use this document to:
-
-- [TBD]
-
-Codex should not use this document to:
-
-- [TBD]
+[State how Codex should use this document.]
 
 ## Non-Goals
 
-- [TBD]
+[State what this document must not define.]
 
-## Database Overview
 
-[TBD]
+## Content
 
-## Tables
-
-### DB-001: [table_name]
-
-Purpose: [TBD]
-
-| Field | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| id | [TBD] | Yes | [TBD] | Primary key |
-
-## Primary Keys
-
-[TBD]
-
-## Foreign Keys
-
-[TBD]
-
-## Unique Constraints
-
-[TBD]
-
-## Indexes
-
-[TBD]
-
-## Enums
-
-[TBD]
-
-## Soft Delete Policy
-
-[TBD]
-
-## Cascade Delete Policy
-
-[TBD]
-
-## Migration Policy
-
-[TBD]
-
-## Seed Data Requirements
-
-[TBD]
-
-## Sensitive Data Handling
-
-[TBD]
-
-## Data Integrity Rules
-
-[TBD]
-
-## Mapping to Domain Entities
-
-| Domain Entity | Database Object |
-|---|---|
-| ENT-001 | DB-001 |
-
-## Assumptions
-
-[TBD]
-
-## Open Questions
-
-[TBD]
+[Generate using the matching prompt in `prompts/`.]

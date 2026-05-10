@@ -2,113 +2,21 @@
 
 ## Purpose
 
-[TBD]
+[State the purpose of this document.]
 
 ## Source of Truth
 
-This document is the source of truth for:
-
-- [TBD]
-
-This document is not the source of truth for:
-
-- [TBD]
+[State what this document owns and what other documents own.]
 
 ## Codex Usage
 
-Codex should use this document to:
-
-- [TBD]
-
-Codex should not use this document to:
-
-- [TBD]
+[State how Codex should use this document.]
 
 ## Non-Goals
 
-- [TBD]
+[State what this document must not define.]
 
-## Global Definition of Done
 
-- [ ] Required lint command passes.
-- [ ] Required typecheck command passes.
-- [ ] Required test command passes.
-- [ ] Required build command passes.
-- [ ] Critical user flows are validated.
-- [ ] `codex-execution-report.md` is updated.
-- [ ] `codex-metrics.json` is updated.
+## Content
 
-## Required Validation Commands
-
-| Check | Command | Required |
-|---|---|---|
-| Lint | [TBD] | Yes |
-| Typecheck | [TBD] | Yes |
-| Tests | [TBD] | Yes |
-| Build | [TBD] | Yes |
-
-## Feature Acceptance Criteria
-
-### VAL-001: [Feature]
-
-#### Related Requirements
-
-- REQ-001
-
-#### Related APIs
-
-- API-001
-
-#### Acceptance Criteria
-
-- Given [TBD]
-- When [TBD]
-- Then [TBD]
-
-#### Required Tests
-
-[TBD]
-
-#### Validation Commands
-
-[TBD]
-
-#### Manual Checks
-
-[TBD]
-
-## Error Scenario Coverage
-
-[TBD]
-
-## Boundary Conditions
-
-[TBD]
-
-## Security Validation
-
-[TBD]
-
-## Authorization Validation
-
-[TBD]
-
-## Accessibility Baseline
-
-[TBD]
-
-## Performance Baseline
-
-[TBD]
-
-## Regression Checklist
-
-[TBD]
-
-## Assumptions
-
-[TBD]
-
-## Open Questions
-
-[TBD]
+[Generate using the matching prompt in `prompts/`.]

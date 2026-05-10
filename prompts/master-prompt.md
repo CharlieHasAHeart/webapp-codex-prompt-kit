@@ -1,63 +1,50 @@
-# Master Prompt
+# Master Prompt: Generate Codex-Ready Web App Documentation
 
-Use this prompt at the beginning of a new Web project conversation with ChatGPT.
+I want to use ChatGPT to generate a Codex-ready documentation package for a Web App project.
 
-```markdown
-I want to prepare a complete Web development task for Codex.
+Your job is not to write production code. Your job is to help me clarify the project, make decisions, and generate compact, deterministic Markdown documents that Codex can later use to implement the project.
 
-Before Codex starts implementation, I want to generate the following 10 Codex-ready project documents:
+## Documents to Generate
 
-## What Codex should build
+Generate the following documents in order:
+
 1. `prd.md`
 2. `domain-model.md`
+3. `project-decisions.md`
+4. `tech-stack.md`
+5. `architecture.md`
+6. `db-schemas.md`
+7. `api-design.md`
+8. `dev-environment.md`
+9. `acceptance-and-validation.md`
+10. `execution-plan.md`
+11. `traceability-matrix.md`
+12. `AGENTS.md`
 
-## How Codex should design it
-3. `tech-stack.md`
-4. `architecture.md`
-5. `db-schemas.md`
-6. `api-design.md`
+## Required Behavior
 
-## How Codex should execute and prove completion
-7. `AGENTS.md`
-8. `execution-plan.md`
-9. `dev-environment.md`
-10. `acceptance-and-validation.md`
+- Ask clarifying questions before generating documents if critical information is missing.
+- Prefer clear decisions over suggestions.
+- Use stable IDs such as `REQ-*`, `ENT-*`, `BR-*`, `DB-*`, `API-*`, `VAL-*`, and `TASK-*`.
+- Add `Purpose`, `Source of Truth`, `Codex Usage`, and `Non-Goals` sections to each document.
+- Put repeated canonical decisions into `project-decisions.md` instead of copying them into every file.
+- Keep documents within the length budgets from `standards/document-length-budgets.md`.
+- Generate `traceability-matrix.md` after the source documents have stable IDs.
+- Generate `AGENTS.md` last.
 
-Your role is not to write application code. Your role is to help me convert this project idea into Codex-ready engineering context.
+## Project Brief
 
-Follow these rules:
+Paste the project idea here:
 
-1. Prefer decisions over suggestions.
-2. Avoid vague wording such as: maybe, could, should consider, as needed, if appropriate, possibly, later, optional, 可以, 可能, 建议, 尽量, 视情况.
-3. Use strong execution language: Must, Must not, Use, Do not use, Required, Forbidden, Default, Out of scope.
-4. If information is missing but not blocking, create an `Assumptions` section.
-5. If information is missing and blocks implementation, create an `Open Questions` section.
-6. Add IDs to important items where useful:
-   - requirements: `REQ-*`
-   - business rules: `BR-*`
-   - entities: `ENT-*`
-   - database objects: `DB-*`
-   - APIs: `API-*`
-   - validation items: `VAL-*`
-   - tasks: `TASK-*`
-7. Every document must include:
-   - `Purpose`
-   - `Source of Truth`
-   - `Codex Usage`
-   - `Non-Goals`
-8. Optimize for Codex execution, not human presentation.
-9. Do not include UI design documents unless I explicitly ask for them.
-10. If a decision is required, propose a default decision and clearly mark it.
-
-Project background:
-
-[PASTE PROJECT IDEA HERE]
-
-First, do not generate all 10 documents yet. Start by producing:
-
-1. Project Understanding
-2. Key Assumptions
-3. Blocking Questions
-4. Recommended Defaults
-5. Proposed Document Generation Plan
+```text
+[PROJECT IDEA]
 ```
+
+## First Output
+
+Before generating documents, output:
+
+1. Project understanding
+2. Assumptions
+3. Blocking questions
+4. Recommended generation plan

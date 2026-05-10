@@ -1,48 +1,40 @@
-# Dev Environment Prompt
+# Prompt: Generate `dev-environment.md`
 
-```markdown
-Please generate `dev-environment.md` based on `tech-stack.md` and `architecture.md`.
+Generate `dev-environment.md`.
 
-Responsibility:
-`dev-environment.md` tells Codex exactly how to install, run, test, migrate, seed, and validate the project.
+## Responsibility
 
-This document must remove command-choice ambiguity.
+`dev-environment.md` defines how Codex installs, runs, tests, builds, migrates, and validates the project.
 
-Required sections:
+## Include
 
-1. Purpose
-2. Source of Truth
-3. Codex Usage
-4. Non-Goals
-5. Operating System Assumptions
-6. Runtime Versions
-7. Package Manager Policy
-8. Dependency Installation
-9. Local Development Commands
-10. Build Commands
-11. Lint Commands
-12. Typecheck Commands
-13. Test Commands
-14. E2E Commands
-15. Database Startup
-16. Migration Commands
-17. Seed Commands
-18. Code Generation Commands
-19. Environment Variables
-20. `.env.example` Requirements
-21. Mock and Local Services
-22. Allowed Commands
-23. Forbidden Commands
-24. Common Errors and Fixes
-25. Assumptions
-26. Open Questions
+- Purpose
+- Source of Truth
+- Codex Usage
+- Non-Goals
+- Operating system assumptions
+- Runtime versions
+- Package manager policy
+- Canonical command table
+- Allowed commands
+- Forbidden commands
+- Install commands
+- Dev commands
+- Build commands
+- Lint commands
+- Typecheck commands
+- Test commands
+- E2E commands
+- Migration and seed commands
+- Environment variables
+- Command substitution policy
 
-Rules:
-- If the project uses pnpm, explicitly forbid npm install, npm run, yarn, and bun.
-- If the project uses uv, explicitly forbid direct `python3 script.py` execution unless an exception is documented.
-- If Docker Compose is used, state exact docker compose commands.
-- Every required validation command must be exact and copy-pasteable.
-- Do not include product requirements, API contracts, database fields, business rules, or task breakdown.
+## Rules
 
-Output complete Markdown that can be saved directly as `dev-environment.md`.
-```
+- Put a short `Canonical Commands` table near the top.
+- Do not let Codex choose between multiple package managers.
+- Do not include product requirements or API contracts.
+- Reference `project-decisions.md` for shared validation policy.
+- Keep within the dev environment length budget.
+
+Output complete Markdown suitable for `docs/dev-environment.md`.

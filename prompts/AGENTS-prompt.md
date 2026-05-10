@@ -1,51 +1,50 @@
-# AGENTS Prompt
+# Prompt: Generate `AGENTS.md`
 
-```markdown
-Please generate `AGENTS.md` based on these documents:
+Generate `AGENTS.md`.
 
-- `prd.md`
-- `domain-model.md`
-- `tech-stack.md`
-- `architecture.md`
-- `db-schemas.md`
-- `api-design.md`
-- `execution-plan.md`
-- `dev-environment.md`
-- `acceptance-and-validation.md`
+## Responsibility
 
-Responsibility:
-`AGENTS.md` tells Codex how to work inside this repository.
+`AGENTS.md` tells Codex how to work in the target project repository.
 
-Required sections:
+## Include
 
-1. Purpose
-2. Instruction Priority
-3. Required Reading Order
-4. Work Process
-5. Planning Rules
-6. Implementation Rules
-7. File Modification Rules
-8. Dependency Management Rules
-9. Database Change Rules
-10. API Change Rules
-11. Testing and Validation Rules
-12. Documentation Sync Rules
-13. Security Rules
-14. Environment Variable Rules
-15. Metrics and Reporting Rules
-16. Assumption Policy
-17. Blocker Policy
-18. Completion Procedure
-19. Final Response Format
+- Required reading order
+- Source-of-truth hierarchy
+- Work process
+- Coding rules
+- Dependency rules
+- Command rules
+- Validation rules
+- Documentation update rules
+- Traceability rules
+- Metrics reporting rules
+- Safety rules
+- Conflict handling rules
+- Final response format
 
-Rules:
-- Make `AGENTS.md` strong and operational.
-- Require Codex to follow `dev-environment.md` for all commands.
-- Require Codex to follow `execution-plan.md` for task order.
-- Require Codex to follow `acceptance-and-validation.md` for completion standards.
-- Require Codex to maintain `codex-execution-report.md` and `codex-metrics.json`.
-- Explicitly forbid changing package manager, adding unnecessary dependencies, committing secrets, skipping validation, and silently changing API/DB behavior without updating documents.
-- Do not include full product requirements, full API details, full DB schema, or long business explanations.
+## Required Reading Order
 
-Output complete Markdown that can be saved directly as `AGENTS.md`.
-```
+Codex should read:
+
+1. `AGENTS.md`
+2. `docs/project-decisions.md`
+3. `docs/prd.md`
+4. `docs/domain-model.md`
+5. `docs/tech-stack.md`
+6. `docs/architecture.md`
+7. `docs/db-schemas.md`
+8. `docs/api-design.md`
+9. `docs/dev-environment.md`
+10. `docs/acceptance-and-validation.md`
+11. `docs/execution-plan.md`
+12. `docs/traceability-matrix.md`
+
+## Rules
+
+- `AGENTS.md` should be firm and concise.
+- It should not duplicate full product, API, DB, or acceptance content.
+- It must require Codex to maintain `codex-execution-report.md` and `codex-metrics.json`.
+- It must require Codex to use `traceability-matrix.md` before implementing product behavior.
+- It must require Codex to follow `dev-environment.md` for commands.
+
+Output complete Markdown suitable for root-level `AGENTS.md`.

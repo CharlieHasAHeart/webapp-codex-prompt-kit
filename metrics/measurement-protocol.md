@@ -1,65 +1,45 @@
 # Measurement Protocol
 
-This file describes how to collect metrics during a Codex implementation run.
+## When to Measure
 
-## Before Codex Starts
+Measure at three moments:
 
-1. Record prompt kit version.
-2. Record docs version.
-3. Initialize `codex-execution-report.md`.
-4. Initialize `codex-metrics.json`.
+1. After document generation
+2. After cross-document review
+3. After Codex implementation
 
-## During Codex Work
+## Document Review
 
-Codex must update metrics when:
+Check:
 
-- a milestone starts
-- a task starts
-- a command runs
-- a command fails
-- validation runs
-- validation fails
-- an assumption is made
-- a blocker is found
-- rework happens
-- an instruction violation is found
-- a document is updated
+- all required documents exist
+- source-of-truth sections exist
+- project decisions are centralized
+- traceability matrix is present
+- no missing IDs in traceability matrix
+- commands are deterministic
+- documents fit length budgets
 
-## After Each Milestone
+## Codex Execution Review
 
-Codex must update:
+Use:
 
-- Metrics Summary
-- Milestone Progress
-- Task Progress
-- Validation Log
+- `codex-execution-report.md`
 - `codex-metrics.json`
 
-## Before Final Response
+Record:
 
-Codex must ensure:
+- clarification count
+- command error count
+- rework count
+- instruction violations
+- validation pass rate
+- manual prompt count
 
-- required validation commands are recorded
-- validation statuses are updated
-- final metrics are updated
-- known limitations are documented
+## Prompt Evolution
 
-## Human Review
+If a failure is caused by document ambiguity, update the relevant prompt.
 
-After the run, the human should review:
+If a failure is caused by duplicated or conflicting decisions, update `project-decisions-prompt.md`.
 
-1. Did Codex follow the documents?
-2. Were errors caused by Codex ability or document ambiguity?
-3. Which prompt should be improved?
-4. Which metric changed compared to previous runs?
-
-## Suggested Post-Run Questions
-
-- Did Codex ask unnecessary clarification questions?
-- Did Codex use wrong commands?
-- Did Codex violate package manager policy?
-- Did Codex miss validation?
-- Did Codex implement APIs inconsistent with `api-design.md`?
-- Did Codex implement database schema inconsistent with `db-schemas.md`?
-- Did Codex follow `execution-plan.md` order?
-- Did the generated documents contain ambiguity?
+If a failure is caused by missing cross-document mapping, update `traceability-matrix-prompt.md`.

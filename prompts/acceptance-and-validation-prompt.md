@@ -1,52 +1,32 @@
-# Acceptance and Validation Prompt
+# Prompt: Generate `acceptance-and-validation.md`
 
-```markdown
-Please generate `acceptance-and-validation.md` based on `prd.md`, `domain-model.md`, `api-design.md`, and `dev-environment.md`.
+Generate `acceptance-and-validation.md`.
 
-Responsibility:
-`acceptance-and-validation.md` tells Codex what completed means and how to prove correctness.
+## Responsibility
 
-Required sections:
+`acceptance-and-validation.md` defines what completion means and how correctness is proven.
 
-1. Purpose
-2. Source of Truth
-3. Codex Usage
-4. Non-Goals
-5. Global Definition of Done
-6. Required Validation Commands
-7. Feature Acceptance Criteria
-8. Given / When / Then Scenarios
-9. Unit Test Requirements
-10. Integration Test Requirements
-11. E2E Test Requirements
-12. Manual Validation Steps
-13. Error Scenario Coverage
-14. Boundary Conditions
-15. Security Validation
-16. Authorization Validation
-17. Accessibility Baseline
-18. Performance Baseline
-19. Regression Checklist
-20. Mapping to Requirements and APIs
-21. Assumptions
-22. Open Questions
+## Include
 
-For each validation item, use this structure:
+- Purpose
+- Source of Truth
+- Codex Usage
+- Non-Goals
+- Global Definition of Done
+- Required validation commands
+- Feature acceptance criteria with stable `VAL-*` IDs
+- Required tests
+- Manual validation checks
+- Error and edge cases
+- Security and authorization checks
+- Regression checklist
 
-## VAL-XXX: Feature or behavior name
+## Rules
 
-### Related Requirements
-### Related APIs
-### Acceptance Criteria
-### Required Tests
-### Validation Commands
-### Manual Checks
+- Every core feature should have a `VAL-*` ID.
+- Reference exact commands from `dev-environment.md`.
+- Do not include implementation task order.
+- Reference `project-decisions.md` for shared thresholds or policies.
+- Keep within the acceptance length budget.
 
-Rules:
-- Use validation IDs such as `VAL-001`.
-- Every core feature must have acceptance criteria and validation method.
-- Use exact commands from `dev-environment.md`.
-- Do not include technology rationale, full database schema, complete API request/response details, setup commands, or task order.
-
-Output complete Markdown that can be saved directly as `acceptance-and-validation.md`.
-```
+Output complete Markdown suitable for `docs/acceptance-and-validation.md`.

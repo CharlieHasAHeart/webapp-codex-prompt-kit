@@ -1,55 +1,32 @@
-# API Design Prompt
+# Prompt: Generate `api-design.md`
 
-```markdown
-Please generate `api-design.md` based on `prd.md`, `domain-model.md`, `architecture.md`, and `db-schemas.md`.
+Generate `api-design.md`.
 
-Responsibility:
-`api-design.md` tells Codex the API contract between client and server or between services.
+## Responsibility
 
-Required sections:
+`api-design.md` defines API contracts.
 
-1. Purpose
-2. Source of Truth
-3. Codex Usage
-4. Non-Goals
-5. API Style
-6. Authentication
-7. Authorization Rules
-8. Common Request Rules
-9. Common Response Rules
-10. Error Format
-11. Endpoint List
-12. Endpoint Details
-13. Pagination
-14. Filtering
-15. Sorting
-16. Idempotency
-17. Rate Limiting, if applicable
-18. API Versioning, if applicable
-19. Sensitive Field Policy
-20. Mapping to Requirements and Domain Entities
-21. Assumptions
-22. Open Questions
+## Include
 
-For each endpoint, use this structure:
+- Purpose
+- Source of Truth
+- Codex Usage
+- Non-Goals
+- API style
+- Auth and permission rules
+- Endpoint list with stable `API-*` IDs
+- Request params and body
+- Response body
+- Error envelope and error codes
+- Pagination, filtering, sorting when needed
+- Sensitive fields that must not be returned
 
-## API-XXX: METHOD /path
+## Rules
 
-### Purpose
-### Related Requirements
-### Related Domain Entities
-### Auth
-### Request Params
-### Request Body
-### Response Body
-### Errors
-### Notes
+- Keep request and response examples compact.
+- Do not include database implementation details.
+- Do not include task order.
+- Reference `project-decisions.md` for rollout decisions.
+- Keep within the API design length budget.
 
-Rules:
-- Use API IDs such as `API-001`.
-- Define exact request and response shapes.
-- Define error codes and HTTP status codes.
-- Do not include ORM code, UI component design, local commands, or task order.
-
-Output complete Markdown that can be saved directly as `api-design.md`.
-```
+Output complete Markdown suitable for `docs/api-design.md`.

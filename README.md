@@ -1,6 +1,6 @@
 # webapp-codex-prompt-kit
 
-Version: v0.1.0
+Version: v0.2.0
 
 A lightweight prompt and template kit for generating **Codex-ready documentation for Web App development**.
 
@@ -13,18 +13,21 @@ Use Codex to implement, validate, and record execution metrics.
 
 ---
 
-## What This Kit Is
+## What Changed in v0.2.0
 
-This repository helps you turn a Web App idea into a structured documentation package that Codex can execute.
+v0.2.0 adds three major improvements:
 
-It is optimized for:
+1. `project-decisions.md`
+   - Extracts repeated canonical decisions into one shared source.
+   - Reduces duplicated blocks across generated documents.
 
-- reducing Codex uncertainty
-- fixing product and engineering decisions before implementation
-- defining exact commands and validation rules
-- tracking whether Codex execution improves over time
+2. `traceability-matrix.md`
+   - Maps core flows across `REQ → Domain Entity/Rule → DB → API → VAL → TASK`.
+   - Helps Codex avoid implementation drift.
 
-It is not optimized for long or beautiful documents.
+3. Document length budgets
+   - Keeps generated documents compact.
+   - Prevents `execution-plan.md` and other files from becoming oversized super-documents.
 
 ---
 
@@ -38,6 +41,7 @@ my-web-project/
 ├── codex-execution-report.md
 ├── codex-metrics.json
 └── docs/
+    ├── project-decisions.md
     ├── prd.md
     ├── domain-model.md
     ├── tech-stack.md
@@ -46,7 +50,8 @@ my-web-project/
     ├── api-design.md
     ├── dev-environment.md
     ├── acceptance-and-validation.md
-    └── execution-plan.md
+    ├── execution-plan.md
+    └── traceability-matrix.md
 ```
 
 ---
@@ -57,18 +62,22 @@ Generate documents in this order:
 
 1. `prd.md`
 2. `domain-model.md`
-3. `tech-stack.md`
-4. `architecture.md`
-5. `db-schemas.md`
-6. `api-design.md`
-7. `dev-environment.md`
-8. `acceptance-and-validation.md`
-9. `execution-plan.md`
-10. `AGENTS.md`
+3. `project-decisions.md`
+4. `tech-stack.md`
+5. `architecture.md`
+6. `db-schemas.md`
+7. `api-design.md`
+8. `dev-environment.md`
+9. `acceptance-and-validation.md`
+10. `execution-plan.md`
+11. `traceability-matrix.md`
+12. `AGENTS.md`
 
 Notes:
 
-- Generate `execution-plan.md` late because it depends on the previous documents.
+- Generate `project-decisions.md` early enough for later documents to reference it.
+- Generate `execution-plan.md` late because it depends on product, design, environment, and validation decisions.
+- Generate `traceability-matrix.md` after the source documents have stable IDs.
 - Generate `AGENTS.md` last because it tells Codex how to use the full documentation set.
 
 ---
@@ -88,7 +97,7 @@ webapp-codex-prompt-kit/
 |---|---|
 | `prompts/` | Prompts used with ChatGPT to generate and review project documents. |
 | `templates/` | Target document templates for Web App project repositories. |
-| `standards/` | Writing rules and document responsibility definitions. |
+| `standards/` | Writing rules, document responsibilities, generation order, and length budgets. |
 | `metrics/` | Metric definitions and measurement protocols. |
 | `examples/` | Example project brief for testing the workflow. |
 
@@ -101,7 +110,7 @@ webapp-codex-prompt-kit/
 3. Generate the project documents in order.
 4. Save the generated files into the target project repository.
 5. Run `prompts/cross-document-review-prompt.md`.
-6. Fix document conflicts or missing decisions.
+6. Fix document conflicts, missing decisions, oversized documents, or traceability gaps.
 7. Hand the project to Codex with `prompts/final-codex-handoff-prompt.md`.
 8. Let Codex maintain:
    - `codex-execution-report.md`
@@ -121,6 +130,7 @@ Generated documents should be:
 - verifiable
 - command-safe
 - conflict-aware
+- compact enough to be usable
 
 Important rules:
 
@@ -130,20 +140,19 @@ Important rules:
 - Make validation explicit.
 - Avoid vague language.
 - Do not let Codex guess package managers, runtimes, commands, or test tools.
+- Extract repeated shared decisions into `project-decisions.md`.
+- Use `traceability-matrix.md` as the cross-document mapping index.
+- Respect the length budgets in `standards/document-length-budgets.md`.
 
 ---
 
 ## Key Metrics
 
-Use metrics to judge whether the prompt kit is improving Codex execution.
-
-Important metrics:
-
 | Metric | Meaning |
 |---|---|
 | Constraint Coverage | Key engineering choices are fixed. |
 | Command Determinism | Commands are unambiguous. |
-| Traceability Coverage | Requirements map to implementation and validation. |
+| Traceability Coverage | Requirements map to domain, DB, API, validation, and tasks. |
 | Acceptance Coverage | Core features have validation criteria. |
 | Clarification Count | Codex needs less extra information. |
 | Command Error Count | Codex runs fewer wrong commands. |
@@ -153,8 +162,6 @@ Important metrics:
 ---
 
 ## Release Process
-
-Use this process to publish a new version.
 
 ### 1. Update version notes
 
@@ -168,15 +175,15 @@ CHANGELOG.md
 
 ```bash
 git add .
-git commit -m "Prepare release v0.1.0"
+git commit -m "Prepare release v0.2.0"
 ```
 
 ### 3. Create and push tag
 
 ```bash
-git tag -a v0.1.0 -m "Release v0.1.0"
+git tag -a v0.2.0 -m "Release v0.2.0"
 git push origin main
-git push origin v0.1.0
+git push origin v0.2.0
 ```
 
 ### 4. Create release notes locally
@@ -185,36 +192,34 @@ git push origin v0.1.0
 cat > RELEASE_NOTES.md <<'EOF'
 ## Overview
 
-Initial lightweight release of `webapp-codex-prompt-kit`.
+v0.2.0 improves the kit with traceability, shared project decisions, and document length controls.
 
-## Included
+## Added
 
-- Prompt templates for Codex-ready Web App documentation.
-- Document templates for target project repositories.
-- Standards for Codex-ready writing.
-- Metrics for measuring Codex execution quality.
-- Example project brief.
-
-## Planned
-
-- traceability matrix support
-- project decision extraction
+- project-decisions prompt and template
+- traceability-matrix prompt and template
 - document length budgets
+- updated generation order
+- updated review criteria
+
+## Goal
+
+Reduce duplicated decisions, reduce document bloat, and improve Codex implementation traceability.
 EOF
 ```
 
 ### 5. Create GitHub release
 
 ```bash
-gh release create v0.1.0 \
-  --title "v0.1.0 - Initial Lightweight WebApp Codex Prompt Kit" \
+gh release create v0.2.0 \
+  --title "v0.2.0 - Traceability and Document Slimming" \
   --notes-file RELEASE_NOTES.md
 ```
 
 ### 6. Verify release
 
 ```bash
-gh release view v0.1.0 --web
+gh release view v0.2.0 --web
 ```
 
 `RELEASE_NOTES.md` may be ignored by Git if it is only used as a local release draft.
@@ -224,7 +229,5 @@ gh release view v0.1.0 --web
 ## Current Version
 
 ```text
-v0.1.0
+v0.2.0
 ```
-
-This release focuses on a lightweight daily workflow for generating Codex-ready Web App project documentation.

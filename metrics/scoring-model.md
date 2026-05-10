@@ -1,61 +1,41 @@
 # Scoring Model
 
-Use this lightweight scoring model to compare prompt versions.
-
 Total: 100 points
 
-## Document Quality Score: 40 points
+## Document Quality Score: 40
 
-| Metric | Points |
-|---|---:|
-| Constraint Coverage | 8 |
-| Command Determinism | 8 |
-| Traceability Coverage | 8 |
-| Acceptance Coverage | 8 |
-| Ambiguity Control | 8 |
+- Constraint Coverage: 8
+- Command Determinism: 8
+- Traceability Coverage: 8
+- Acceptance Coverage: 8
+- Length Budget Compliance: 8
 
-## Codex Execution Score: 30 points
+## Codex Execution Score: 30
 
-| Metric | Points |
-|---|---:|
-| First Run Success | 8 |
-| Low Clarification Count | 6 |
-| Low Rework Count | 6 |
-| Low Command Error Rate | 5 |
-| Low Instruction Violations | 5 |
+- First run success: 8
+- Low clarification count: 6
+- Low rework count: 6
+- Low command error count: 5
+- Low instruction violations: 5
 
-## Delivery Quality Score: 20 points
+## Delivery Quality Score: 20
 
-| Metric | Points |
-|---|---:|
-| Validation Pass Rate | 8 |
-| Acceptance Pass Rate | 5 |
-| API Contract Match | 4 |
-| DB Schema Match | 3 |
+- Validation pass rate: 8
+- Acceptance pass rate: 5
+- API contract match: 4
+- DB schema match: 3
 
-## Human Cost Score: 10 points
+## Human Cost Score: 10
 
-| Metric | Points |
-|---|---:|
-| Low Manual Prompt Count | 5 |
-| Low Doc Fix Count | 3 |
-| Low Human Code Edit Ratio | 2 |
+- Low manual prompt count: 5
+- Low document fix count: 3
+- Low human code edit ratio: 2
 
-## Score Bands
+## Rating
 
-| Score | Meaning |
+| Score | Rating |
 |---:|---|
 | 90-100 | Codex-ready |
 | 75-89 | Mostly ready |
 | 60-74 | Usable but risky |
-| < 60 | Not ready |
-
-## Minimum Daily Metrics
-
-For lightweight daily use, track only:
-
-1. Clarification Count
-2. Command Error Count
-3. Rework Count
-4. Validation Pass Rate
-5. Manual Prompt Count
+| <60 | Not ready |

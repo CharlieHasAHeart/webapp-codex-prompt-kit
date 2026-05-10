@@ -2,78 +2,21 @@
 
 ## Purpose
 
-[TBD]
+[State the purpose of this document.]
 
 ## Source of Truth
 
-This document is the source of truth for:
-
-- [TBD]
-
-This document is not the source of truth for:
-
-- [TBD]
+[State what this document owns and what other documents own.]
 
 ## Codex Usage
 
-Codex should use this document to:
-
-- [TBD]
-
-Codex should not use this document to:
-
-- [TBD]
+[State how Codex should use this document.]
 
 ## Non-Goals
 
-- [TBD]
+[State what this document must not define.]
 
-## Domain Glossary
 
-| Term | Definition |
-|---|---|
-| [TBD] | [TBD] |
+## Content
 
-## Core Entities
-
-| ID | Entity | Description |
-|---|---|---|
-| ENT-001 | [TBD] | [TBD] |
-
-## Entity Relationships
-
-[TBD]
-
-## Entity Lifecycles
-
-[TBD]
-
-## State Machines
-
-[TBD]
-
-## Business Rules
-
-| ID | Rule | Scope | Enforcement Notes |
-|---|---|---|---|
-| BR-001 | [TBD] | [TBD] | [TBD] |
-
-## Business Invariants
-
-[TBD]
-
-## Ownership and Permission Semantics
-
-[TBD]
-
-## Edge Cases
-
-[TBD]
-
-## Assumptions
-
-[TBD]
-
-## Open Questions
-
-[TBD]
+[Generate using the matching prompt in `prompts/`.]

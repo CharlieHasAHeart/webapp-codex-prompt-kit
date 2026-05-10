@@ -1,30 +1,28 @@
 {
-  "project": "TBD",
-  "promptKitVersion": "v0.1",
-  "docsVersion": "v0",
-  "status": "not_started",
+  "prompt_kit_version": "v0.2.0",
+  "docs_version": "",
+  "project": "",
   "metrics": {
-    "clarificationCount": 0,
-    "assumptionCount": 0,
-    "commandRunCount": 0,
-    "commandErrorCount": 0,
-    "reworkCount": 0,
-    "instructionViolationCount": 0,
-    "validationCommandCount": 0,
-    "validationPassCount": 0,
-    "validationFailCount": 0,
-    "filesModifiedCount": 0,
-    "documentsUpdatedCount": 0,
-    "manualPromptCount": 0
+    "clarification_count": 0,
+    "assumption_count": 0,
+    "command_run_count": 0,
+    "command_error_count": 0,
+    "rework_count": 0,
+    "instruction_violation_count": 0,
+    "validation_pass_count": 0,
+    "validation_fail_count": 0,
+    "files_modified_count": 0,
+    "documents_updated_count": 0
+  },
+  "traceability": {
+    "traceability_matrix_present": false,
+    "traceability_coverage": null,
+    "missing_ids": []
   },
   "validation": {
-    "lint": "not_run",
-    "typecheck": "not_run",
-    "unitTests": "not_run",
-    "integrationTests": "not_run",
-    "e2eTests": "not_run",
-    "build": "not_run",
-    "manualAcceptance": "not_run"
+    "last_task_id": "",
+    "last_validation_commands": [],
+    "last_validation_status": ""
   },
-  "milestones": []
+  "known_blockers": []
 }

@@ -1,35 +1,39 @@
 # Sample Project Brief
 
-Use this brief to test the prompt kit.
-
-## Project Idea
-
-Build a simple project management Web app for small teams.
+Build a lightweight issue tracker for small software teams.
 
 ## Users
 
-- Team owner
-- Team member
+- indie hackers
+- small engineering teams
+- solo developers
 
-## Core Features
+## MVP
 
-- Users can sign up and sign in.
-- A signed-in user can create a workspace.
-- A workspace can contain projects.
-- A project can contain tasks.
-- A task can be created, updated, completed, and archived.
-- Workspace owners can invite members by email.
-- Workspace owners can remove members.
+- create project
+- create issue
+- list issues
+- update issue status
+- assign issue
+- comment on issue
+- basic dashboard
+- email notification for assignment
+
+## Preferred Stack
+
+- Next.js
+- TypeScript
+- PostgreSQL
+- Prisma
+- Auth.js
+- pnpm
+- Playwright
 
 ## Constraints
 
-- Build as a Web app.
-- Start with an MVP.
-- UI design details are out of scope for the first documentation pass.
-- Prefer a modern TypeScript stack.
-- Prefer PostgreSQL.
-- Prefer commands that are deterministic and easy for Codex to follow.
+- no enterprise SSO
+- no billing in MVP
+- no mobile app
+- no complex workflow automation
 
-## Expected Output
-
-Use this brief with `prompts/master-prompt.md`, then generate the 10 project documents in the recommended order.
+Use this brief to test the prompt kit.

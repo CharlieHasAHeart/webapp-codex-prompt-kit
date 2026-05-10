@@ -2,140 +2,21 @@
 
 ## Purpose
 
-[TBD]
+[State the purpose of this document.]
 
 ## Source of Truth
 
-This document is the source of truth for:
-
-- [TBD]
-
-This document is not the source of truth for:
-
-- [TBD]
+[State what this document owns and what other documents own.]
 
 ## Codex Usage
 
-Codex should use this document to:
-
-- [TBD]
-
-Codex should not use this document to:
-
-- [TBD]
+[State how Codex should use this document.]
 
 ## Non-Goals
 
-- [TBD]
+[State what this document must not define.]
 
-## Operating System Assumptions
 
-[TBD]
+## Content
 
-## Runtime Versions
-
-[TBD]
-
-## Package Manager Policy
-
-[TBD]
-
-## Dependency Installation
-
-```bash
-[TBD]
-```
-
-## Local Development Commands
-
-```bash
-[TBD]
-```
-
-## Build Commands
-
-```bash
-[TBD]
-```
-
-## Lint Commands
-
-```bash
-[TBD]
-```
-
-## Typecheck Commands
-
-```bash
-[TBD]
-```
-
-## Test Commands
-
-```bash
-[TBD]
-```
-
-## E2E Commands
-
-```bash
-[TBD]
-```
-
-## Database Startup
-
-```bash
-[TBD]
-```
-
-## Migration Commands
-
-```bash
-[TBD]
-```
-
-## Seed Commands
-
-```bash
-[TBD]
-```
-
-## Code Generation Commands
-
-```bash
-[TBD]
-```
-
-## Environment Variables
-
-| Variable | Required | Description | Example |
-|---|---|---|---|
-| [TBD] | Yes | [TBD] | [TBD] |
-
-## `.env.example` Requirements
-
-[TBD]
-
-## Mock and Local Services
-
-[TBD]
-
-## Allowed Commands
-
-[TBD]
-
-## Forbidden Commands
-
-[TBD]
-
-## Common Errors and Fixes
-
-[TBD]
-
-## Assumptions
-
-[TBD]
-
-## Open Questions
-
-[TBD]
+[Generate using the matching prompt in `prompts/`.]

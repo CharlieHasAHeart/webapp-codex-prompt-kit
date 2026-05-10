@@ -1,83 +1,22 @@
-# PRD
+# Product Requirements Document
 
 ## Purpose
 
-[TBD]
+[State the purpose of this document.]
 
 ## Source of Truth
 
-This document is the source of truth for:
-
-- [TBD]
-
-This document is not the source of truth for:
-
-- [TBD]
+[State what this document owns and what other documents own.]
 
 ## Codex Usage
 
-Codex should use this document to:
-
-- [TBD]
-
-Codex should not use this document to:
-
-- [TBD]
+[State how Codex should use this document.]
 
 ## Non-Goals
 
-- [TBD]
+[State what this document must not define.]
 
-## Product Background
 
-[TBD]
+## Content
 
-## Target Users
-
-[TBD]
-
-## User Problems
-
-[TBD]
-
-## Product Goals
-
-[TBD]
-
-## MVP Scope
-
-[TBD]
-
-## Out of Scope
-
-[TBD]
-
-## Requirements
-
-| ID | Requirement | Priority | Notes |
-|---|---|---|---|
-| REQ-001 | [TBD] | Must |  |
-
-## User Stories
-
-[TBD]
-
-## Core Workflows
-
-[TBD]
-
-## Business Constraints
-
-[TBD]
-
-## Success Criteria
-
-[TBD]
-
-## Assumptions
-
-[TBD]
-
-## Open Questions
-
-[TBD]
+[Generate using the matching prompt in `prompts/`.]
