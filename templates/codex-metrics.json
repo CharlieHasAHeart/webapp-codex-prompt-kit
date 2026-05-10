@@ -1,0 +1,30 @@
+{
+  "project": "TBD",
+  "promptKitVersion": "v0.1",
+  "docsVersion": "v0",
+  "status": "not_started",
+  "metrics": {
+    "clarificationCount": 0,
+    "assumptionCount": 0,
+    "commandRunCount": 0,
+    "commandErrorCount": 0,
+    "reworkCount": 0,
+    "instructionViolationCount": 0,
+    "validationCommandCount": 0,
+    "validationPassCount": 0,
+    "validationFailCount": 0,
+    "filesModifiedCount": 0,
+    "documentsUpdatedCount": 0,
+    "manualPromptCount": 0
+  },
+  "validation": {
+    "lint": "not_run",
+    "typecheck": "not_run",
+    "unitTests": "not_run",
+    "integrationTests": "not_run",
+    "e2eTests": "not_run",
+    "build": "not_run",
+    "manualAcceptance": "not_run"
+  },
+  "milestones": []
+}
