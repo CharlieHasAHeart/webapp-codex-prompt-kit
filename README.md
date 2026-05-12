@@ -1,84 +1,44 @@
-# webapp-codex-prompt-kit
+# WebApp Codex Prompt Kit
 
-Version: v0.2.0
+A lightweight prompt kit for generating **Codex-ready Web App project documents**.
 
-A lightweight prompt and template kit for generating **Codex-ready documentation for Web App development**.
+The workflow is simple:
 
-The goal is simple:
+1. Discuss the project with ChatGPT.
+2. Use the prompts in order to generate the project documents.
+3. Run cross-document review.
+4. Fix the documents.
+5. Hand the repository to Codex for implementation.
+
+This kit is designed for Web App projects using a clear frontend/backend boundary, typically:
 
 ```text
-Use ChatGPT to think, clarify, and generate project documents.
-Use Codex to implement, validate, and record execution metrics.
+apps/web
+apps/api
+packages/*
 ```
 
 ---
 
-## What Changed in v0.2.0
+## What This Kit Produces
 
-v0.2.0 adds three major improvements:
-
-1. `project-decisions.md`
-   - Extracts repeated canonical decisions into one shared source.
-   - Reduces duplicated blocks across generated documents.
-
-2. `traceability-matrix.md`
-   - Maps core flows across `REQ → Domain Entity/Rule → DB → API → VAL → TASK`.
-   - Helps Codex avoid implementation drift.
-
-3. Document length budgets
-   - Keeps generated documents compact.
-   - Prevents `execution-plan.md` and other files from becoming oversized super-documents.
-
----
-
-## Target Project Output
-
-For each Web App project, generate this structure:
+The generated project documents are meant to help Codex answer:
 
 ```text
-my-web-project/
-├── AGENTS.md
-├── codex-execution-report.md
-├── codex-metrics.json
-└── docs/
-    ├── project-decisions.md
-    ├── prd.md
-    ├── domain-model.md
-    ├── tech-stack.md
-    ├── architecture.md
-    ├── db-schemas.md
-    ├── api-design.md
-    ├── dev-environment.md
-    ├── acceptance-and-validation.md
-    ├── execution-plan.md
-    └── traceability-matrix.md
+What should be built?
+How should it be designed?
+Where should it be implemented?
+How should completion be proven?
 ```
 
----
+The core idea is:
 
-## Document Generation Order
+```text
+One background document, implementation-facing specs everywhere else.
+```
 
-Generate documents in this order:
-
-1. `prd.md`
-2. `domain-model.md`
-3. `project-decisions.md`
-4. `tech-stack.md`
-5. `architecture.md`
-6. `db-schemas.md`
-7. `api-design.md`
-8. `dev-environment.md`
-9. `acceptance-and-validation.md`
-10. `execution-plan.md`
-11. `traceability-matrix.md`
-12. `AGENTS.md`
-
-Notes:
-
-- Generate `project-decisions.md` early enough for later documents to reference it.
-- Generate `execution-plan.md` late because it depends on product, design, environment, and validation decisions.
-- Generate `traceability-matrix.md` after the source documents have stable IDs.
-- Generate `AGENTS.md` last because it tells Codex how to use the full documentation set.
+`product-spec.md` provides product context.  
+Every other document should directly affect code, APIs, data, UI, commands, tasks, validation, or Codex execution.
 
 ---
 
@@ -86,148 +46,192 @@ Notes:
 
 ```text
 webapp-codex-prompt-kit/
+├── README.md
+├── CHANGELOG.md
+│
 ├── prompts/
-├── templates/
-├── standards/
-├── metrics/
-└── examples/
+│   ├── product-spec-prompt.md
+│   ├── project-decisions-prompt.md
+│   ├── domain-model-prompt.md
+│   ├── architecture-prompt.md
+│   ├── data-api-contract-prompt.md
+│   ├── ui-page-prompt.md
+│   ├── frontend-design-prompt.md
+│   ├── backend-design-prompt.md
+│   ├── dev-environment-prompt.md
+│   ├── ui-tokens-prompt.md
+│   ├── ui-visual-spec-prompt.md
+│   ├── execution-validation-prompt.md
+│   ├── implementation-map-prompt.md
+│   ├── AGENTS-prompt.md
+│   └── cross-document-review-prompt.md
+│
+└── standards/
+    ├── document-system.md
+    ├── document-responsibilities.md
+    ├── document-generation-order.md
+    ├── document-length-budgets.md
+    ├── codex-ready-writing-rules.md
+    ├── frontend-backend-boundary.md
+    ├── validation-strategy.md
+    ├── codex-execution-report-format.md
+    ├── ui-authoring-strategy.md
+    └── ui-authoring-specs/
+        ├── UI_PAGE.authoring-spec.md
+        ├── UI_TOKENS.authoring-spec.md
+        ├── UI_VISUAL_SPEC.authoring-spec.md
+        └── shadcn-tailwind-implementation-standard.md
 ```
 
-| Directory | Purpose |
-|---|---|
-| `prompts/` | Prompts used with ChatGPT to generate and review project documents. |
-| `templates/` | Target document templates for Web App project repositories. |
-| `standards/` | Writing rules, document responsibilities, generation order, and length budgets. |
-| `metrics/` | Metric definitions and measurement protocols. |
-| `examples/` | Example project brief for testing the workflow. |
-
 ---
 
-## Daily Workflow
+## Prompt Usage Order
 
-1. Start with `prompts/master-prompt.md`.
-2. Discuss the Web App idea with ChatGPT.
-3. Generate the project documents in order.
-4. Save the generated files into the target project repository.
-5. Run `prompts/cross-document-review-prompt.md`.
-6. Fix document conflicts, missing decisions, oversized documents, or traceability gaps.
-7. Hand the project to Codex with `prompts/final-codex-handoff-prompt.md`.
-8. Let Codex maintain:
-   - `codex-execution-report.md`
-   - `codex-metrics.json`
-9. Use the execution metrics to improve this kit.
-
----
-
-## Codex-Ready Rules
-
-Generated documents should be:
-
-- deterministic
-- actionable
-- bounded
-- traceable
-- verifiable
-- command-safe
-- conflict-aware
-- compact enough to be usable
-
-Important rules:
-
-- Prefer decisions over suggestions.
-- Use stable IDs such as `REQ-*`, `ENT-*`, `DB-*`, `API-*`, `VAL-*`, and `TASK-*`.
-- Define source-of-truth boundaries.
-- Make validation explicit.
-- Avoid vague language.
-- Do not let Codex guess package managers, runtimes, commands, or test tools.
-- Extract repeated shared decisions into `project-decisions.md`.
-- Use `traceability-matrix.md` as the cross-document mapping index.
-- Respect the length budgets in `standards/document-length-budgets.md`.
-
----
-
-## Key Metrics
-
-| Metric | Meaning |
-|---|---|
-| Constraint Coverage | Key engineering choices are fixed. |
-| Command Determinism | Commands are unambiguous. |
-| Traceability Coverage | Requirements map to domain, DB, API, validation, and tasks. |
-| Acceptance Coverage | Core features have validation criteria. |
-| Clarification Count | Codex needs less extra information. |
-| Command Error Count | Codex runs fewer wrong commands. |
-| Rework Count | Codex redoes less work. |
-| Validation Pass Rate | Required checks pass more reliably. |
-
----
-
-## Release Process
-
-### 1. Update version notes
-
-Update:
+Use prompts in this order:
 
 ```text
-CHANGELOG.md
+1. product-spec-prompt.md
+2. project-decisions-prompt.md
+3. domain-model-prompt.md
+4. architecture-prompt.md
+5. data-api-contract-prompt.md
+6. ui-page-prompt.md
+7. frontend-design-prompt.md
+8. backend-design-prompt.md
+9. dev-environment-prompt.md
+10. ui-tokens-prompt.md
+11. ui-visual-spec-prompt.md
+12. execution-validation-prompt.md
+13. implementation-map-prompt.md
+14. AGENTS-prompt.md
+15. cross-document-review-prompt.md
 ```
 
-### 2. Commit changes
+`ui-page-prompt.md` is placed before `frontend-design-prompt.md` because `UI_PAGE.yaml` defines routes, pages, sections, actions, and UI states.
+
+`ui-tokens-prompt.md` and `ui-visual-spec-prompt.md` can be generated after `frontend-design.md`, because they are more directly tied to final UI implementation.
+
+---
+
+## Generated Project Document Set
+
+The recommended generated project structure is:
+
+```text
+AGENTS.md
+docs/
+├── product-spec.md
+├── project-decisions.md
+├── domain-model.md
+├── architecture.md
+├── data-api-contract.md
+├── frontend-design.md
+├── backend-design.md
+├── dev-environment.md
+├── execution-validation.md
+└── implementation-map.md
+docs/ui/
+├── UI_PAGE.yaml
+├── UI_TOKENS.yaml
+└── UI_VISUAL_SPEC.yaml
+codex-execution-report.md
+```
+
+The UI YAML files are separate from the core engineering document count.
+
+---
+
+## Document Roles
+
+| Generated File | Role |
+|---|---|
+| `product-spec.md` | Product context, MVP scope, requirements, and candidate project decisions. |
+| `project-decisions.md` | Formal shared `DEC-*` decisions. |
+| `domain-model.md` | Business entities, relationships, rules, states, and invariants. |
+| `architecture.md` | System boundaries and repository-level structure. |
+| `data-api-contract.md` | Database objects and API contracts between frontend and backend. |
+| `UI_PAGE.yaml` | Semantic pages, routes, navigation, sections, actions, and UI states. |
+| `frontend-design.md` | How the frontend consumes API/UI contracts and implements workflows. |
+| `backend-design.md` | How the backend implements API contracts and enforces domain rules. |
+| `dev-environment.md` | Container-first command source of truth. |
+| `UI_TOKENS.yaml` | Design tokens for the UI layer. |
+| `UI_VISUAL_SPEC.yaml` | Visual usage rules for layout, components, states, and responsiveness. |
+| `execution-validation.md` | `TASK-*`, `VAL-*`, dependencies, and validation commands. |
+| `implementation-map.md` | ID registry and traceability map. |
+| `AGENTS.md` | Codex execution protocol. |
+| `codex-execution-report.md` | Runtime report maintained by Codex. |
+
+---
+
+## Validation Philosophy
+
+Validation should be:
+
+```text
+container-first
+task-scoped
+evidence-driven
+minimal but meaningful
+```
+
+Do not require full lint, full typecheck, mypy, full build, or full E2E for every task by default.
+
+Use targeted tests for tasks, broader checks for milestones, and release checks before handoff.
+
+---
+
+## UI Strategy
+
+The UI prompts are intentionally lightweight.
+
+The detailed UI generation rules live in:
+
+```text
+standards/ui-authoring-specs/
+```
+
+Use those standards together with the short UI prompts when generating:
+
+```text
+UI_PAGE.yaml
+UI_TOKENS.yaml
+UI_VISUAL_SPEC.yaml
+```
+
+Future UI work may introduce MCP or Skill-based workflows, but this version keeps UI authoring standard-based and lightweight.
+
+---
+
+## Recommended Release Flow
 
 ```bash
+git status
 git add .
-git commit -m "Prepare release v0.2.0"
-```
-
-### 3. Create and push tag
-
-```bash
-git tag -a v0.2.0 -m "Release v0.2.0"
+git commit -m "Release v0.3.0"
+git tag -a v0.3.0 -m "Release v0.3.0"
 git push origin main
-git push origin v0.2.0
+git push origin v0.3.0
 ```
 
-### 4. Create release notes locally
+Then create a GitHub Release from the tag.
+
+If using GitHub CLI:
 
 ```bash
-cat > RELEASE_NOTES.md <<'EOF'
-## Overview
-
-v0.2.0 improves the kit with traceability, shared project decisions, and document length controls.
-
-## Added
-
-- project-decisions prompt and template
-- traceability-matrix prompt and template
-- document length budgets
-- updated generation order
-- updated review criteria
-
-## Goal
-
-Reduce duplicated decisions, reduce document bloat, and improve Codex implementation traceability.
-EOF
+gh release create v0.3.0 --title "v0.3.0" --notes-file CHANGELOG.md
 ```
-
-### 5. Create GitHub release
-
-```bash
-gh release create v0.2.0 \
-  --title "v0.2.0 - Traceability and Document Slimming" \
-  --notes-file RELEASE_NOTES.md
-```
-
-### 6. Verify release
-
-```bash
-gh release view v0.2.0 --web
-```
-
-`RELEASE_NOTES.md` may be ignored by Git if it is only used as a local release draft.
 
 ---
 
-## Current Version
+## Current Direction
 
-```text
-v0.2.0
-```
+This version focuses on:
+
+- prompt-first workflow
+- fewer generated project documents
+- stronger frontend/backend boundaries
+- earlier data/API contract definition
+- lighter UI prompts
+- task-scoped validation
+- implementation-map based traceability
+- no default `codex-metrics.json`
