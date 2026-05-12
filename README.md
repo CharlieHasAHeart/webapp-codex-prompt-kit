@@ -85,34 +85,6 @@ webapp-codex-prompt-kit/
 
 ---
 
-## Prompt Usage Order
-
-Use prompts in this order:
-
-```text
-1. product-spec-prompt.md
-2. project-decisions-prompt.md
-3. domain-model-prompt.md
-4. architecture-prompt.md
-5. data-api-contract-prompt.md
-6. ui-page-prompt.md
-7. frontend-design-prompt.md
-8. backend-design-prompt.md
-9. dev-environment-prompt.md
-10. ui-tokens-prompt.md
-11. ui-visual-spec-prompt.md
-12. execution-validation-prompt.md
-13. implementation-map-prompt.md
-14. AGENTS-prompt.md
-15. cross-document-review-prompt.md
-```
-
-`ui-page-prompt.md` is placed before `frontend-design-prompt.md` because `UI_PAGE.yaml` defines routes, pages, sections, actions, and UI states.
-
-`ui-tokens-prompt.md` and `ui-visual-spec-prompt.md` can be generated after `frontend-design.md`, because they are more directly tied to final UI implementation.
-
----
-
 ## Generated Project Document Set
 
 The recommended generated project structure is:
@@ -138,6 +110,82 @@ codex-execution-report.md
 ```
 
 The UI YAML files are separate from the core engineering document count.
+
+---
+
+## Prompt Usage Order
+
+After discussing the project with ChatGPT, use prompts in this order:
+
+```text
+1. product-spec-prompt.md
+2. project-decisions-prompt.md
+3. domain-model-prompt.md
+4. architecture-prompt.md
+5. data-api-contract-prompt.md
+6. ui-page-prompt.md
+7. frontend-design-prompt.md
+8. backend-design-prompt.md
+9. dev-environment-prompt.md
+10. ui-tokens-prompt.md
+11. ui-visual-spec-prompt.md
+12. execution-validation-prompt.md
+13. implementation-map-prompt.md
+14. AGENTS-prompt.md
+15. cross-document-review-prompt.md
+```
+
+`ui-page-prompt.md` is placed before `frontend-design-prompt.md` because `UI_PAGE.yaml` defines routes, pages, sections, actions, and UI states.
+
+`ui-tokens-prompt.md` and `ui-visual-spec-prompt.md` can be generated after `frontend-design.md`, because they are stronger dependencies for final UI implementation than for frontend design structure.
+
+---
+
+## What to Provide ChatGPT at Each Step
+
+Do **not** provide every standard file every time.
+
+For each generation step, provide:
+
+```text
+current prompt
++ standards required by that prompt
++ upstream project documents required by that prompt
+```
+
+The prompt file states its own required upstream documents and relevant standards. The table below gives the recommended practical input order.
+
+| Step | Prompt | Standards to Provide | Upstream Project Documents |
+|---:|---|---|---|
+| 1 | `product-spec-prompt.md` | `document-system.md`, `document-responsibilities.md`, `document-length-budgets.md`, `codex-ready-writing-rules.md` | Current project discussion/context |
+| 2 | `project-decisions-prompt.md` | `document-system.md`, `document-responsibilities.md`, `document-length-budgets.md`, `codex-ready-writing-rules.md`, `frontend-backend-boundary.md`, `validation-strategy.md` | `docs/product-spec.md` |
+| 3 | `domain-model-prompt.md` | `document-responsibilities.md`, `document-length-budgets.md`, `codex-ready-writing-rules.md` | `docs/product-spec.md`, `docs/project-decisions.md` |
+| 4 | `architecture-prompt.md` | `document-system.md`, `document-responsibilities.md`, `document-length-budgets.md`, `codex-ready-writing-rules.md`, `frontend-backend-boundary.md` | `docs/product-spec.md`, `docs/project-decisions.md`, `docs/domain-model.md` |
+| 5 | `data-api-contract-prompt.md` | `document-responsibilities.md`, `document-length-budgets.md`, `codex-ready-writing-rules.md`, `frontend-backend-boundary.md` | `docs/product-spec.md`, `docs/project-decisions.md`, `docs/domain-model.md`, `docs/architecture.md` |
+| 6 | `ui-page-prompt.md` | `ui-authoring-strategy.md`, `ui-authoring-specs/UI_PAGE.authoring-spec.md` | `docs/product-spec.md`, `docs/project-decisions.md`, `docs/domain-model.md`, `docs/architecture.md`, `docs/data-api-contract.md` |
+| 7 | `frontend-design-prompt.md` | `document-responsibilities.md`, `document-length-budgets.md`, `codex-ready-writing-rules.md`, `frontend-backend-boundary.md`, `ui-authoring-strategy.md`, `ui-authoring-specs/shadcn-tailwind-implementation-standard.md` | `docs/product-spec.md`, `docs/project-decisions.md`, `docs/domain-model.md`, `docs/architecture.md`, `docs/data-api-contract.md`, `docs/ui/UI_PAGE.yaml` |
+| 8 | `backend-design-prompt.md` | `document-responsibilities.md`, `document-length-budgets.md`, `codex-ready-writing-rules.md`, `frontend-backend-boundary.md` | `docs/product-spec.md`, `docs/project-decisions.md`, `docs/domain-model.md`, `docs/architecture.md`, `docs/data-api-contract.md`, `docs/frontend-design.md` |
+| 9 | `dev-environment-prompt.md` | `document-responsibilities.md`, `document-length-budgets.md`, `codex-ready-writing-rules.md`, `frontend-backend-boundary.md`, `validation-strategy.md` | `docs/product-spec.md`, `docs/project-decisions.md`, `docs/domain-model.md`, `docs/architecture.md`, `docs/data-api-contract.md`, `docs/frontend-design.md`, `docs/backend-design.md` |
+| 10 | `ui-tokens-prompt.md` | `ui-authoring-strategy.md`, `ui-authoring-specs/UI_TOKENS.authoring-spec.md`, `ui-authoring-specs/shadcn-tailwind-implementation-standard.md` | `docs/product-spec.md`, `docs/project-decisions.md`, `docs/architecture.md`, `docs/frontend-design.md`, `docs/ui/UI_PAGE.yaml` |
+| 11 | `ui-visual-spec-prompt.md` | `ui-authoring-strategy.md`, `ui-authoring-specs/UI_VISUAL_SPEC.authoring-spec.md`, `ui-authoring-specs/shadcn-tailwind-implementation-standard.md` | `docs/product-spec.md`, `docs/project-decisions.md`, `docs/architecture.md`, `docs/frontend-design.md`, `docs/ui/UI_PAGE.yaml`, `docs/ui/UI_TOKENS.yaml` |
+| 12 | `execution-validation-prompt.md` | `document-responsibilities.md`, `document-length-budgets.md`, `codex-ready-writing-rules.md`, `validation-strategy.md`, `codex-execution-report-format.md` | `docs/product-spec.md`, `docs/project-decisions.md`, `docs/domain-model.md`, `docs/architecture.md`, `docs/data-api-contract.md`, `docs/frontend-design.md`, `docs/backend-design.md`, `docs/dev-environment.md`, UI YAML files if available |
+| 13 | `implementation-map-prompt.md` | `document-system.md`, `document-responsibilities.md`, `document-length-budgets.md`, `codex-ready-writing-rules.md` | All generated project docs, including `docs/execution-validation.md` and UI YAML files if available |
+| 14 | `AGENTS-prompt.md` | `document-system.md`, `document-responsibilities.md`, `document-length-budgets.md`, `codex-ready-writing-rules.md`, `frontend-backend-boundary.md`, `validation-strategy.md`, `codex-execution-report-format.md`, `ui-authoring-strategy.md` | All generated project docs, including `docs/implementation-map.md` |
+| 15 | `cross-document-review-prompt.md` | All standards, including UI authoring specs when UI docs exist | All generated project docs |
+
+A concise command to ChatGPT for each step can be:
+
+```text
+Please generate the target file using the current project context, the upstream documents below, the relevant standards below, and this prompt.
+```
+
+Then provide:
+
+```text
+1. the prompt
+2. only the relevant standards
+3. only the upstream documents for that prompt
+```
 
 ---
 
@@ -219,6 +267,12 @@ If using GitHub CLI:
 
 ```bash
 gh release create v0.3.0 --title "v0.3.0" --notes-file CHANGELOG.md
+```
+
+Open the release page:
+
+```bash
+gh release view v0.3.0 --web
 ```
 
 ---
