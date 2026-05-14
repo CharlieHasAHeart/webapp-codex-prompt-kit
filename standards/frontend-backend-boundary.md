@@ -1,574 +1,440 @@
-# Frontend / Backend Boundary
+# Frontend Backend Boundary Standard
 
 ## Purpose
 
-Define the default frontend/backend boundary for Codex-ready Web App development.
+This standard defines the boundary between frontend and backend code in a Codex-ready Web App project.
 
-This standard explains:
+It supports the v0.4.0 document model:
 
-- where frontend code should live
-- where backend code should live
-- where shared code should live
-- what each layer may import
-- what each layer must not import
-- which project document owns detailed design for each layer
+```text
+reference catalogs
+execution spine
+task-scoped reading
+```
 
-This file defines boundary rules, not a full project directory tree.
-
-The concrete directory structure for a specific project belongs in `architecture.md`.
+The goal is to prevent Codex from mixing frontend, backend, shared package, API, and database responsibilities while executing `TASK-*`.
 
 ---
 
 ## Default Repository Layout
 
-Use this default monorepo layout unless the project explicitly decides otherwise.
+The recommended default layout is:
 
 ```text
-apps/
-├── web/
-└── api/
-packages/
+apps/web
+apps/api
+packages/*
 ```
+
+Default responsibilities:
 
 | Path | Responsibility |
 |---|---|
-| `apps/web` | Frontend Web application. |
-| `apps/api` | Backend API application. |
-| `packages/*` | Shared packages used by one or more apps. |
+| `apps/web` | Frontend Web app, routes, pages, components, frontend API clients, browser-side behavior. |
+| `apps/api` | Backend API app, handlers, services, repositories, data access, server-side auth, business rule enforcement. |
+| `packages/*` | Shared app-agnostic code, such as API types, schemas, shared constants, and shared config. |
 
-The default directory name is:
-
-```text
-packages/
-```
-
-not:
+Project-specific layout decisions belong in:
 
 ```text
-package/
-```
-
-Use `packages/` because a Web App monorepo often grows into multiple shared packages.
-
-Examples:
-
-```text
-packages/shared
-packages/types
-packages/api-contract
-packages/config
-packages/ui
-```
-
-Only create shared packages that are actually needed.
-
----
-
-## Boundary Summary
-
-```text
-apps/web     = frontend implementation
-apps/api     = backend API implementation
-packages/*   = shared types, schemas, utilities, config, or UI primitives
+docs/project-decisions.md#DEC-*
+docs/architecture.md#ARCH-*
 ```
 
 ---
 
-## `architecture.md` Responsibility
+## Core Boundary Rules
 
-`architecture.md` owns the project-level system boundary.
+### Frontend Rules
 
-It should define:
-
-- actual repository layout
-- frontend/backend/data boundaries
-- dependency direction
-- deployment/runtime shape
-- request lifecycle
-- auth boundary
-- error boundary
-- shared package usage
-- top-level module ownership
-
-It should not define all frontend component details or all backend service details.
-
----
-
-## `frontend-design.md` Responsibility
-
-`frontend-design.md` owns frontend implementation design inside:
+Frontend code may:
 
 ```text
-apps/web
+render UI
+own routes and pages
+own browser-side state
+call backend APIs through API client modules
+use shared app-agnostic contract types
+render loading, empty, error, permission, and success states
+perform client-side validation for UX
 ```
 
-It should define:
-
-- routing strategy
-- page composition
-- component organization
-- frontend state management
-- form handling
-- API client strategy
-- loading/empty/error conventions
-- auth guard behavior
-- permission rendering
-- UI YAML consumption
-- shadcn/ui + Tailwind usage
-- lucide icon policy
-
-It must not define backend services, repository logic, database schema, or API response contracts.
-
----
-
-## `backend-design.md` Responsibility
-
-`backend-design.md` owns backend implementation design inside:
+Frontend code must not:
 
 ```text
-apps/api
+import backend handlers, services, repositories, or database clients
+access the database directly
+own authoritative business rule enforcement
+own authoritative permission enforcement
+define API response contracts
+store server-only secrets
 ```
 
-It should define:
+---
 
-- API application module structure
-- service layer
-- repository/data access layer
-- validation placement
-- permission enforcement
-- transaction boundaries
-- concurrency/idempotency
-- background jobs
-- integration adapters
-- structured error implementation
-- logging and observability
+### Backend Rules
 
-It must not define frontend routes, frontend components, UI visual rules, or frontend state management.
+Backend code may:
+
+```text
+own API handlers
+own request validation
+own service/business workflow logic
+own repositories and data access
+own transactions
+own authoritative auth and permission checks
+own structured error generation
+own background jobs and integration adapters
+```
+
+Backend code must not:
+
+```text
+import frontend components
+import frontend routes/pages
+depend on browser-only code
+define UI page structure
+define UI visual tokens
+return frontend component-specific shapes unless documented as API contracts
+```
 
 ---
 
-## `data-api-contract.md` Responsibility
+### Shared Package Rules
 
-`data-api-contract.md` owns data and API contracts.
+Shared packages may contain:
 
-It should define:
-
-- database objects `DB-*`
-- fields
-- relationships
-- constraints
-- indexes
-- migrations
-- API endpoints `API-*`
-- request schemas
-- response schemas
-- error envelope
-- auth and permission requirements
-- DB/API mapping
-
-It may also define which schemas or types should be shared through `packages/*`.
-
-It must not define frontend API client implementation or backend service internals.
-
----
-
-## `packages/*` Responsibility
-
-Shared packages may contain code used by both frontend and backend.
-
-Allowed shared package contents:
-
-- shared TypeScript types
-- API request/response schemas
-- validation schemas
-- shared constants
-- shared utility functions
-- shared configuration
-- generated API contract types
-- reusable UI primitives if the project intentionally owns them
+```text
+API contract types
+shared request/response schemas
+shared error envelope types
+shared pagination types
+shared enums/value sets
+shared constants
+shared app-agnostic utilities
+shared test utilities when app-agnostic
+```
 
 Shared packages must not contain:
 
-- frontend route files
-- frontend page components
-- backend services
-- backend repositories
-- database connection code
-- server-only secrets
-- app-specific runtime behavior
-- code that creates circular dependency between `apps/web` and `apps/api`
+```text
+frontend components
+backend services
+API handlers
+repositories
+database clients
+server-only secrets
+browser-only code unless the package is explicitly browser-only
+business workflows that belong in apps/api
+```
 
 ---
 
-## Import Rules
+## Source-of-Truth Ownership
 
-## Allowed Imports
+The boundary is enforced through these owner documents:
 
-`apps/web` may import from:
+| Concern | Owner |
+|---|---|
+| Product requirements | `docs/product-spec.md` |
+| Project decisions | `docs/project-decisions.md` |
+| Domain rules | `docs/domain-model.md` |
+| Architecture boundaries | `docs/architecture.md` |
+| DB/API/error/shared contracts | `docs/data-api-contract.md` |
+| UI page structure | `docs/ui/UI_PAGE.yaml` |
+| Frontend implementation entries | `docs/frontend-design.md` |
+| Backend implementation entries | `docs/backend-design.md` |
+| Environment commands | `docs/dev-environment.md` |
+| Execution tasks and validation | `docs/execution-validation.md` |
 
-```text
-packages/*
-```
-
-`apps/api` may import from:
-
-```text
-packages/*
-```
-
-`packages/*` may import from:
-
-```text
-other packages/*
-```
-
-only when dependency direction is explicit and acyclic.
-
-## Forbidden Imports
-
-`apps/web` must not import from:
-
-```text
-apps/api
-```
-
-`apps/api` must not import from:
-
-```text
-apps/web
-```
-
-`packages/*` must not import from:
-
-```text
-apps/web
-apps/api
-```
-
-This keeps shared packages app-agnostic.
+Frontend and backend catalogs should reference owner IDs instead of redefining them.
 
 ---
 
-## Dependency Direction
+## API Contract Boundary
 
-Use this dependency direction:
-
-```text
-apps/web  ─┐
-           ├──> packages/*
-apps/api  ─┘
-```
-
-Avoid this:
+`docs/data-api-contract.md` owns:
 
 ```text
-apps/web <──> apps/api
-packages/* ──> apps/web
-packages/* ──> apps/api
+DB-*
+API-*
+ERR-*
+TYPE-*
 ```
 
-Shared packages should sit below applications, not above them.
+Frontend and backend must consume these contracts.
+
+Frontend must not invent API shapes inside `frontend-design.md`.
+
+Backend must not redefine API contracts inside `backend-design.md`.
+
+Correct pattern:
+
+```text
+data-api-contract.md#API-001 defines request/response/errors
+frontend-design.md#FE-003 references API-001
+backend-design.md#BE-005 references API-001
+execution-validation.md#TASK-* references API-001, FE-003, and BE-005
+```
+
+Incorrect pattern:
+
+```text
+frontend-design.md writes a new response shape
+backend-design.md writes a different response shape
+execution-validation.md leaves Codex to reconcile them
+```
 
 ---
 
-## Frontend / Backend Communication
+## Business Rule Boundary
 
-Frontend and backend should communicate through API contracts, not direct imports.
+`docs/domain-model.md` owns business rules as `BR-*`.
 
-Allowed:
+Backend is authoritative for enforcing business rules.
 
-```text
-apps/web -> HTTP/RPC/fetch/API client -> apps/api
-```
+Frontend may provide UX guardrails but must not be the only enforcement point.
 
-Forbidden:
+Correct pattern:
 
 ```text
-apps/web imports service from apps/api
-apps/web imports repository from apps/api
-apps/api imports frontend route or component
+domain-model.md#BR-001 defines the rule
+backend-design.md#BE-* states where the rule is enforced
+frontend-design.md#FE-* may render disabled states or warnings
+execution-validation.md#TASK-* validates backend enforcement
 ```
 
-If both sides need shared types or schemas, place them in `packages/*`.
+Incorrect pattern:
+
+```text
+BR-* is only enforced by hiding a frontend button
+```
 
 ---
 
-## API Contract Sharing
+## Data Access Boundary
 
-When type sharing is useful, prefer one of these patterns:
+Database access belongs to backend by default.
 
-```text
-packages/api-contract
-packages/shared
-packages/types
-```
+Frontend must never access the database directly.
 
-Possible contents:
-
-- request schemas
-- response schemas
-- error envelope types
-- enum definitions
-- generated API types
-- shared validation schemas
-
-Rules:
-
-- Shared API contracts must not expose database internals unnecessarily.
-- Shared types must not contain server-only secrets.
-- Shared schemas must not require frontend code to import backend runtime modules.
-
----
-
-## Database Boundary
-
-Database access belongs to the backend.
-
-Allowed:
+Data access rules should be defined in:
 
 ```text
-apps/api -> database
-apps/api -> ORM/client
-apps/api -> migrations
+docs/architecture.md#ARCH-*
+docs/backend-design.md#BE-*
+docs/data-api-contract.md#DB-*
 ```
 
-Forbidden:
+Correct pattern:
+
+```text
+apps/web -> API client -> apps/api API handler -> service -> repository -> database
+```
+
+Incorrect patterns:
 
 ```text
 apps/web -> database
-apps/web -> ORM/client
-apps/web -> migration code
-packages/* -> live database connection
+apps/web -> apps/api repository import
+packages/shared -> database client
 ```
-
-Shared packages may contain schema types, but they should not own live database access by default.
-
----
-
-## Authentication Boundary
-
-`architecture.md` should define the overall auth strategy.
-
-Default boundary:
-
-- `apps/api` enforces server-side authentication and permissions.
-- `apps/web` handles session-aware rendering and client-side guards.
-- frontend guards improve UX but do not replace backend permission checks.
-
-Rules:
-
-- Backend must not trust frontend-only permission checks.
-- Frontend may hide unavailable actions, but backend must still enforce permissions.
-- Shared packages may contain permission constants or role types, but not server-only auth secrets.
-
----
-
-## Validation Boundary
-
-Validation should be placed at the correct layer.
-
-| Validation Type | Owner |
-|---|---|
-| UI form feedback | `apps/web` |
-| API request validation | `apps/api` |
-| Business rule validation | backend service layer in `apps/api` |
-| Database constraint validation | database / ORM / migration layer |
-| Shared schema validation | `packages/*` when used by both apps |
-
-Rules:
-
-- Frontend validation improves user experience.
-- Backend validation is authoritative.
-- Business rules must not exist only in frontend validation.
-- Shared schemas may reduce duplication but must not replace backend enforcement.
 
 ---
 
 ## Error Boundary
 
-`data-api-contract.md` should define the API error envelope.
+`docs/data-api-contract.md` owns `ERR-*`.
 
-Default boundary:
+Backend creates structured errors.
 
-- `apps/api` creates structured API errors.
-- `apps/web` renders errors according to frontend and UI specs.
-- shared error types may live in `packages/*`.
+Frontend renders documented error behavior.
+
+Correct pattern:
+
+```text
+backend service/handler maps known failure to ERR-*
+frontend API client parses ERR-*
+frontend UI renders state defined by UI_PAGE.yaml and FE-*
+```
+
+Incorrect pattern:
+
+```text
+frontend parses arbitrary backend message strings as business logic
+```
+
+---
+
+## Auth and Permission Boundary
+
+Backend is authoritative for auth and permissions.
+
+Frontend permission rendering is UX only.
 
 Rules:
 
-- Backend errors should be stable and machine-readable.
-- Frontend should not parse arbitrary backend strings as business logic.
-- Error codes should be documented in `data-api-contract.md`.
+```text
+Frontend route guards do not replace backend permission checks.
+Frontend disabled buttons do not replace backend permission checks.
+Backend API handlers or services must enforce permission rules when auth is in scope.
+```
+
+If auth is out of scope for MVP, documents should state the explicit assumption and preserve a path for adding auth later.
 
 ---
 
 ## UI Boundary
 
-UI structure and visual rules belong to the UI layer.
+UI page structure belongs to:
 
-| Concern | Owner |
-|---|---|
-| Page structure | `UI_PAGE.yaml` |
-| Design tokens | `UI_TOKENS.yaml` |
-| Visual rules | `UI_VISUAL_SPEC.yaml` |
-| Frontend implementation of UI specs | `frontend-design.md` and `apps/web` |
+```text
+docs/ui/UI_PAGE.yaml
+```
+
+UI tokens belong to:
+
+```text
+docs/ui/UI_TOKENS.yaml
+```
+
+UI visual rules belong to:
+
+```text
+docs/ui/UI_VISUAL_SPEC.yaml
+```
+
+Frontend implementation belongs to:
+
+```text
+docs/frontend-design.md#FE-*
+```
 
 Rules:
 
-- `frontend-design.md` may explain how `apps/web` consumes UI YAML.
-- `frontend-design.md` must not duplicate full UI YAML content.
-- UI YAML must not contain JSX, backend logic, API code, or database schema.
-
----
-
-## Where Common Decisions Belong
-
-| Decision | Document |
-|---|---|
-| Use `apps/web`, `apps/api`, `packages/*` | `architecture.md` or `project-decisions.md` |
-| Frontend routing structure | `frontend-design.md` |
-| Backend service/repository structure | `backend-design.md` |
-| Shared schema package choice | `data-api-contract.md` and `architecture.md` |
-| Package manager | `project-decisions.md` and `dev-environment.md` |
-| Docker service names | `dev-environment.md` |
-| API request/response shapes | `data-api-contract.md` |
-| UI page routes | `UI_PAGE.yaml` |
-| UI implementation in React | `frontend-design.md` |
-
----
-
-## Good Patterns
-
-### Shared API Contract
-
 ```text
-packages/api-contract
-├── cases.ts
-├── errors.ts
-└── pagination.ts
-```
-
-Used by:
-
-```text
-apps/web
-apps/api
-```
-
-### Frontend API Client
-
-```text
-apps/web/lib/api/cases-client.ts
-```
-
-May import shared types from:
-
-```text
-packages/api-contract
-```
-
-Must not import:
-
-```text
-apps/api/services/case-service.ts
-```
-
-### Backend Service
-
-```text
-apps/api/services/case-service.ts
-```
-
-May import shared schemas from:
-
-```text
-packages/api-contract
-```
-
-Must not import:
-
-```text
-apps/web/components/cases/case-form.tsx
+UI_PAGE.yaml should not include React code or Tailwind classes.
+UI_TOKENS.yaml should not include page structure.
+UI_VISUAL_SPEC.yaml should not include React code.
+frontend-design.md should consume UI references and define FE-* implementation entries.
 ```
 
 ---
 
-## Anti-Patterns
+## Task-Level Boundary Requirements
 
-### Direct Frontend-to-Backend Import
+Each `TASK-*` that touches frontend or backend should include task-scoped source references.
 
-Bad:
+Frontend task example:
 
-```ts
-// apps/web
-import { createCase } from "../../api/services/case-service"
+```markdown
+Read before this task:
+| Source | Required? | Why |
+|---|---:|---|
+| `docs/frontend-design.md#FE-003` | yes | Frontend page implementation rules. |
+| `docs/ui/UI_PAGE.yaml#cases_list` | yes | Page structure and states. |
+| `docs/data-api-contract.md#API-001` | yes | API contract consumed by the page. |
+| `docs/dev-environment.md#ENV-010` | yes | Frontend test command pattern. |
 ```
 
-Good:
+Backend task example:
 
-```ts
-// apps/web
-import { createCase } from "@/lib/api/cases-client"
-```
-
-### Shared Package Imports App Code
-
-Bad:
-
-```ts
-// packages/shared
-import { CasePage } from "../../apps/web/app/cases/page"
-```
-
-Good:
-
-```ts
-// packages/shared
-export type CaseStatus = "draft" | "running" | "completed"
-```
-
-### Frontend Owns Business Rule
-
-Bad:
-
-```text
-Duplicate run prevention exists only in frontend button disabled state.
-```
-
-Good:
-
-```text
-Frontend disables duplicate submission for UX.
-Backend service enforces duplicate run prevention authoritatively.
+```markdown
+Read before this task:
+| Source | Required? | Why |
+|---|---:|---|
+| `docs/backend-design.md#BE-005` | yes | Backend API handler rules. |
+| `docs/data-api-contract.md#API-001` | yes | API contract implemented by the handler. |
+| `docs/domain-model.md#BR-002` | yes | Business rule enforced by the service. |
+| `docs/dev-environment.md#ENV-011` | yes | Backend test command pattern. |
 ```
 
 ---
 
-## Boundary Health Checks
+## Code Impact Guidance
 
-A project respects frontend/backend boundaries when:
+Frontend `FE-*` and frontend tasks may reference paths such as:
 
-- `apps/web` does not import from `apps/api`
-- `apps/api` does not import from `apps/web`
-- `packages/*` does not import from either app
-- shared packages contain app-agnostic types, schemas, constants, or utilities
-- database access exists only in backend code
-- backend enforces permissions and business rules
-- frontend handles UX state but not authoritative business enforcement
-- API contracts are defined in `data-api-contract.md`
-- UI structure and visual rules remain in UI documents
-- implementation tasks reference the correct layer
+```text
+apps/web/app/...
+apps/web/components/...
+apps/web/lib/api/...
+apps/web/hooks/...
+apps/web/tests/...
+```
+
+Backend `BE-*` and backend tasks may reference paths such as:
+
+```text
+apps/api/src/routes/...
+apps/api/src/services/...
+apps/api/src/repositories/...
+apps/api/src/schemas/...
+apps/api/src/errors/...
+apps/api/src/jobs/...
+apps/api/src/integrations/...
+apps/api/src/tests/...
+```
+
+Shared package tasks may reference paths such as:
+
+```text
+packages/api-contract/...
+packages/shared/...
+packages/config/...
+```
+
+Paths may vary by project decisions, but boundaries should remain clear.
 
 ---
 
-## Final Rule
+## Boundary Review Checklist
 
-Use this default boundary unless a project explicitly decides otherwise:
+During cross-document review, check:
 
 ```text
-apps/web   = frontend app
-apps/api   = backend API app
-packages/* = shared app-agnostic code
+[ ] frontend-design.md does not define API response shapes.
+[ ] backend-design.md does not define DB schema fields.
+[ ] frontend tasks do not import backend internals.
+[ ] backend tasks do not import frontend code.
+[ ] shared packages remain app-agnostic.
+[ ] database access is backend-only unless explicitly decided otherwise.
+[ ] business rules have backend enforcement tasks.
+[ ] UI YAML files contain no React code or backend logic.
+[ ] TASK-* entries reference both implementation catalog entries and source contracts.
+[ ] validation proves boundary-sensitive behavior where relevant.
 ```
 
-The boundary should make it obvious where Codex should write code.
+---
+
+## Common Boundary Failures
+
+Avoid these patterns:
+
+```text
+frontend calls database directly
+frontend imports backend service code
+backend imports frontend component code
+packages/* imports app-specific code
+frontend-design.md defines API payloads
+backend-design.md defines API payloads differently
+business rule exists only as disabled UI
+API errors are arbitrary strings
+UI_PAGE.yaml includes Tailwind classes
+execution-validation.md asks Codex to infer boundary rules from all docs
+```
+
+---
+
+## Quality Checklist
+
+Before accepting frontend/backend-related documents, verify:
+
+```text
+[ ] Boundaries are defined in ARCH-* entries.
+[ ] FE-* entries reference API/UI/ARCH sources without redefining them.
+[ ] BE-* entries reference API/DB/domain/ARCH sources without redefining them.
+[ ] TASK-* entries use task-scoped references for boundary-sensitive work.
+[ ] Validation commands prove the relevant frontend/backend behavior.
+[ ] Codex can execute without reading unrelated frontend/backend documents.
+```

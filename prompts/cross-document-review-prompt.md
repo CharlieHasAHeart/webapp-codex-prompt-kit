@@ -8,7 +8,7 @@ cross-document-review-report.md
 
 This prompt does not generate a core project document by default.
 
-It generates a review report that identifies inconsistencies, missing links, duplicated ownership, and Codex-readiness problems across the existing document set.
+It generates a review report that checks whether the reference catalogs, execution spine, and AGENTS runtime policy are consistent and ready for Codex execution.
 
 ---
 
@@ -16,14 +16,16 @@ It generates a review report that identifies inconsistencies, missing links, dup
 
 Review the Codex-ready Web App document set before handing it to Codex.
 
-The review should check whether the documents are:
+The review should check whether:
 
-- consistent
-- implementation-facing
-- properly scoped
-- traceable
-- free of source-of-truth conflicts
-- ready for Codex execution
+```text
+reference catalogs are compact and heading-addressable
+execution-validation.md is complete enough to build a full Web App
+TASK-* entries use task-scoped source references
+AGENTS.md enforces execution-validation-first execution
+validation is task-scoped and container-first
+documents do not conflict or duplicate ownership
+```
 
 This prompt should not rewrite all documents unless the user explicitly asks.
 
@@ -42,14 +44,13 @@ docs/project-decisions.md
 docs/domain-model.md
 docs/architecture.md
 docs/data-api-contract.md
+docs/ui/UI_PAGE.yaml
 docs/frontend-design.md
 docs/backend-design.md
 docs/dev-environment.md
-docs/execution-validation.md
-docs/implementation-map.md
-docs/ui/UI_PAGE.yaml
 docs/ui/UI_TOKENS.yaml
 docs/ui/UI_VISUAL_SPEC.yaml
+docs/execution-validation.md
 codex-execution-report.md
 ```
 
@@ -70,6 +71,7 @@ standards/codex-ready-writing-rules.md
 standards/frontend-backend-boundary.md
 standards/validation-strategy.md
 standards/codex-execution-report-format.md
+standards/webapp-execution-spine.md
 standards/ui-authoring-strategy.md
 ```
 
@@ -98,11 +100,13 @@ Do not silently fix conflicts.
 
 When a fix is needed, identify:
 
-- affected document
-- affected section or ID
-- issue
-- recommended change
-- severity
+```text
+affected document
+affected section or ID
+issue
+recommended change
+severity
+```
 
 ---
 
@@ -121,11 +125,15 @@ Use this structure:
 
 ## Blocking Issues
 
-## Source-of-Truth Conflicts
+## Reference Catalog Review
 
-## Missing or Weak IDs
+## Execution Spine Review
 
-## Traceability Review
+## Task-Scoped Reading Review
+
+## Source-of-Truth Conflict Review
+
+## Missing or Weak ID Review
 
 ## Frontend / Backend Boundary Review
 
@@ -135,9 +143,9 @@ Use this structure:
 
 ## Validation Review
 
-## Document Length and Bloat Review
+## AGENTS Runtime Policy Review
 
-## Codex Execution Readiness
+## Document Length and Bloat Review
 
 ## Recommended Fix Order
 
@@ -154,10 +162,12 @@ Give a concise summary of the review result.
 
 Include:
 
-- number of blocking issues
-- number of high-priority issues
-- whether the document set is ready for Codex
-- whether Codex can begin implementation safely
+```text
+number of blocking issues
+number of high-priority issues
+whether the document set is ready for Codex
+whether Codex can begin implementation safely
+```
 
 ---
 
@@ -170,8 +180,8 @@ Recommended format:
 ```markdown
 | File | Present? | Notes |
 |---|---:|---|
-| docs/product-spec.md | yes | reviewed |
-| docs/domain-model.md | yes | reviewed |
+| AGENTS.md | yes | reviewed |
+| docs/execution-validation.md | yes | reviewed |
 | docs/ui/UI_PAGE.yaml | no | UI page coverage unavailable |
 ```
 
@@ -201,7 +211,7 @@ Recommended format:
 ```markdown
 | Severity | Issue | Affected Files | Required Fix |
 |---|---|---|---|
-| blocking | API-003 is referenced by frontend-design.md but not defined in data-api-contract.md. | frontend-design.md, data-api-contract.md | Define API-003 or update the reference. |
+| blocking | TASK-014 references API-003, but API-003 is not defined. | execution-validation.md, data-api-contract.md | Define API-003 or update the task reference. |
 ```
 
 Severity values:
@@ -215,33 +225,169 @@ low
 
 ---
 
-### Source-of-Truth Conflicts
+## Reference Catalog Review
+
+Check whether non-execution documents are compact reference catalogs.
+
+Review:
+
+```text
+product-spec.md as REQ catalog
+project-decisions.md as DEC catalog
+domain-model.md as ENT/REL/BR/STATE catalog
+architecture.md as ARCH catalog
+data-api-contract.md as DB/API/ERR/TYPE catalog
+frontend-design.md as FE catalog
+backend-design.md as BE catalog
+dev-environment.md as ENV catalog
+UI YAML files as UI references
+```
+
+Check:
+
+```text
+IDs are heading-addressable
+entries are independently readable
+entries are compact
+catalogs avoid long narrative
+catalogs do not redefine other catalogs
+catalogs include open questions where needed
+```
+
+Recommended format:
+
+```markdown
+| File | Catalog Role | Status | Issues |
+|---|---|---|---|
+| docs/data-api-contract.md | DB/API/ERR/TYPE | pass | None |
+| docs/frontend-design.md | FE | partial | FE-003 lacks code impact. |
+```
+
+---
+
+## Execution Spine Review
+
+This is the most important review section.
+
+Check whether `docs/execution-validation.md` is a complete execution spine.
+
+Review:
+
+```text
+P0 Project Bootstrap
+P1 Development Environment
+P2 Shared Contracts and Types
+P3 Data Layer
+P4 Backend API Foundation
+P5 Backend Feature Workflows
+P6 Frontend App Shell
+P7 Frontend Feature Workflows
+P8 UI System and Interaction States
+P9 Cross-Cutting Hardening
+P10 Final Validation and Handoff
+```
+
+Check:
+
+```text
+every phase is evaluated
+not-applicable phases have reasons
+foundation tasks exist
+product workflow tasks exist
+task dependencies are practical
+TASK-* coverage is enough to build a full Web App
+tasks do not require Codex to infer missing engineering work
+```
+
+Recommended format:
+
+```markdown
+| Phase | Status | Coverage | Issue |
+|---|---|---|---|
+| P0 Project Bootstrap | required | covered | None |
+| P3 Data Layer | required | partial | DB migrations are listed, but seed data task is missing. |
+| P8 UI System and Interaction States | required | weak | Error/empty/permission states are not task-covered. |
+```
+
+Also list missing task categories:
+
+```markdown
+| Missing Task Category | Impact | Recommended Fix |
+|---|---|---|
+| API client base | Frontend pages may duplicate fetch logic. | Add a P6 task for frontend API client base. |
+```
+
+---
+
+## Task-Scoped Reading Review
+
+Check every `TASK-*`.
+
+Each implementation task should include:
+
+```text
+Read scope
+Read before this task
+Do not read unless needed, when useful
+Implementation Scope
+Expected Code Impact, when possible
+Out of Scope
+Required Validation
+Completion Rule
+```
+
+Check source references:
+
+```text
+references point to specific headings, IDs, or YAML keys
+references avoid full-document reads
+sources are relevant to the task
+required vs optional reading is clear
+```
+
+Recommended format:
+
+```markdown
+| Task | Status | Issue | Recommended Fix |
+|---|---|---|---|
+| TASK-012 | pass | None | None |
+| TASK-018 | partial | Reads full `docs/backend-design.md`. | Replace with `docs/backend-design.md#BE-004`. |
+```
+
+---
+
+## Source-of-Truth Conflict Review
 
 Check for duplicated or conflicting ownership.
 
 Examples:
 
-- `frontend-design.md` defines API response shapes that conflict with `data-api-contract.md`
-- `backend-design.md` defines DB fields that conflict with `data-api-contract.md`
-- `execution-validation.md` contains full frontend/backend design
-- `implementation-map.md` redefines requirement text
-- UI YAML defines Tailwind classes or visual tokens in the wrong file
+```text
+frontend-design.md defines API response shapes
+backend-design.md defines DB fields
+execution-validation.md redefines API contracts
+architecture.md defines command catalogs
+dev-environment.md defines task-specific validation
+UI_PAGE.yaml includes Tailwind classes
+UI_TOKENS.yaml includes page structure
+UI_VISUAL_SPEC.yaml includes React code
+```
 
 Recommended format:
 
 ```markdown
 | Conflict | Source of Truth | Conflicting Location | Recommendation |
 |---|---|---|---|
-| API response shape duplicated | data-api-contract.md | frontend-design.md | Keep shape only in data-api-contract.md and reference API ID from frontend-design.md. |
+| API response shape duplicated | data-api-contract.md | frontend-design.md#FE-003 | Keep shape only in API-001 and reference it from FE-003. |
 ```
 
 ---
 
-### Missing or Weak IDs
+## Missing or Weak ID Review
 
 Check ID ownership and references.
 
-Review:
+Review these IDs:
 
 ```text
 REQ-*
@@ -249,179 +395,197 @@ DEC-*
 ENT-*
 REL-*
 BR-*
-FE-*
-BE-*
+STATE-*
+ARCH-*
 DB-*
 API-*
-VAL-*
+ERR-*
+TYPE-*
+FE-*
+BE-*
+ENV-*
 TASK-*
+VAL-*
 UI IDs
 ```
 
 Report:
 
-- undefined referenced IDs
-- IDs defined in the wrong file
-- duplicate IDs
-- orphan IDs
-- missing links between important IDs
+```text
+undefined referenced IDs
+IDs defined in the wrong file
+duplicate IDs
+orphan IDs
+missing links between important IDs
+weak entries that are too vague for task execution
+```
 
 Recommended format:
 
 ```markdown
 | Issue | ID | Location | Recommendation |
 |---|---|---|---|
-| Referenced but undefined | API-004 | frontend-design.md | Define in data-api-contract.md or remove reference. |
+| Referenced but undefined | ERR-004 | TASK-022 | Define ERR-004 or update the task reference. |
+| Weak entry | BE-003 | backend-design.md | Add Code Impact and Rules. |
 ```
 
 ---
 
-### Traceability Review
-
-Check whether important product flows map across:
-
-```text
-REQ -> ENT/BR -> DEC -> FE -> BE -> DB -> API -> UI -> VAL -> TASK
-```
-
-Report weak or missing mappings.
-
-Recommended format:
-
-```markdown
-| Flow | Missing Link | Impact | Recommendation |
-|---|---|---|---|
-| Case detail | VAL missing | Codex cannot prove completion. | Add VAL-* and map to relevant TASK-*. |
-```
-
----
-
-### Frontend / Backend Boundary Review
+## Frontend / Backend Boundary Review
 
 Check:
 
-- `apps/web` does not import backend internals
-- `apps/api` does not import frontend code
-- `packages/*` stays app-agnostic
-- frontend consumes `API-*` contracts rather than inventing API shapes
-- backend implements `API-*` contracts rather than redefining them
-- database access is backend-only by default
+```text
+apps/web does not import backend internals
+apps/api does not import frontend code
+packages/* stays app-agnostic
+frontend consumes API-* contracts rather than inventing API shapes
+backend implements API-* contracts rather than redefining them
+database access is backend-only by default
+```
 
 Report boundary problems.
 
 ---
 
-### Data / API Contract Review
+## Data / API Contract Review
 
 Check:
 
-- core DB objects exist for persisted data
-- core API endpoints exist for frontend workflows
-- request shapes are explicit
-- response shapes are explicit
-- error envelope is explicit
-- auth/permission rules are explicit
-- pagination/filtering/sorting are defined where needed
-- sensitive data exposure rules exist
-- DB/API mapping exists
+```text
+core DB objects exist for persisted data
+core API endpoints exist for frontend workflows
+request shapes are explicit
+response shapes are explicit
+error contracts are explicit
+auth/permission expectations are explicit
+pagination/filtering/sorting are defined where needed
+sensitive data exposure rules exist where needed
+DB/API entries reference related domain and requirement IDs
+```
 
-Report missing contract elements.
+Recommended format:
+
+```markdown
+| Area | Status | Issue | Recommendation |
+|---|---|---|---|
+| API response shapes | pass | None | None |
+| Error contracts | partial | Missing conflict error for duplicate run. | Add ERR-* and reference it from API-* and TASK-*. |
+```
 
 ---
 
-### UI Document Review
+## UI Document Review
 
 If UI docs exist, check:
 
-- `UI_PAGE.yaml` defines semantic routes, pages, sections, actions, states
-- `UI_TOKENS.yaml` defines semantic reusable tokens
-- `UI_VISUAL_SPEC.yaml` references token names instead of raw values
-- UI docs do not include JSX, React hooks, backend logic, DB schema, or full Tailwind class strings
-- frontend-design.md consumes UI docs without duplicating them
+```text
+UI_PAGE.yaml defines semantic routes, pages, sections, actions, states
+UI_TOKENS.yaml defines semantic reusable tokens
+UI_VISUAL_SPEC.yaml references token names instead of raw values
+UI docs do not include JSX, React hooks, backend logic, DB schema, or full Tailwind class strings
+frontend-design.md consumes UI docs without duplicating them
+execution-validation.md references UI docs only for UI tasks
+```
 
 If UI docs are missing, say whether that blocks implementation.
 
 ---
 
-### Validation Review
+## Validation Review
 
 Check:
 
-- every must-priority task has required validation
-- every validation command has a claim proven
-- commands are container-first
-- validation is task-scoped
-- broad checks are reserved for milestone/release validation
-- `dev-environment.md` supports the commands used by `execution-validation.md`
-- `codex-execution-report.md` rules are present
+```text
+every must-priority implementation task has required validation
+every validation command has a claim proven
+commands are container-first
+validation is task-scoped
+broad checks are reserved for milestone/release validation
+dev-environment.md supports commands used by execution-validation.md
+codex-execution-report rules include sources read
+```
 
-Report validation issues.
+Recommended format:
+
+```markdown
+| Task / VAL | Status | Issue | Recommendation |
+|---|---|---|---|
+| TASK-010 / VAL-004 | pass | None | None |
+| TASK-021 | fail | No required validation. | Add targeted frontend test or review validation. |
+```
 
 ---
 
-### Document Length and Bloat Review
+## AGENTS Runtime Policy Review
+
+Check whether `AGENTS.md` supports the execution-spine model.
+
+It must say:
+
+```text
+Codex primary runtime docs are AGENTS.md and execution-validation.md
+other docs are task-scoped reference catalogs
+Codex must not read the full document set by default
+Codex must not infer tasks from reference catalogs
+Codex must follow TASK-* dependencies and scopes
+Codex must update codex-execution-report.md
+```
+
+Recommended format:
+
+```markdown
+| Policy Area | Status | Issue | Recommendation |
+|---|---|---|---|
+| Primary runtime docs | pass | None | None |
+| Task-scoped reading | partial | Does not forbid full-document reads. | Add explicit reading policy. |
+```
+
+---
+
+## Document Length and Bloat Review
 
 Check whether documents are too long, too vague, or duplicative.
 
 Report:
 
-- narrative that should be removed
-- sections that should be moved
-- duplicated definitions
-- source-of-truth drift
-- documents that should be split or merged
+```text
+narrative that should be removed
+sections that should be moved
+duplicated definitions
+source-of-truth drift
+entries that should be split
+catalogs that are not compact enough
+```
 
 Recommended format:
 
 ```markdown
 | File | Issue | Recommendation |
 |---|---|---|
-| execution-validation.md | Contains detailed API schema. | Move schema to data-api-contract.md and reference API IDs. |
+| frontend-design.md | Contains long routing strategy narrative. | Convert to FE-* entries and reference UI_PAGE.yaml. |
 ```
 
 ---
 
-### Codex Execution Readiness
-
-Evaluate whether Codex can safely start.
-
-Check:
-
-- `AGENTS.md` has clear reading order
-- `execution-validation.md` has clear tasks
-- `dev-environment.md` has runnable commands
-- `implementation-map.md` helps find related IDs
-- blockers are explicit
-- missing decisions are marked
-
-Recommended status:
-
-```text
-ready
-needs_minor_fixes
-needs_major_fixes
-blocked
-```
-
----
-
-### Recommended Fix Order
+## Recommended Fix Order
 
 Give a practical fix order.
 
 Example:
 
 ```markdown
-1. Fix undefined API references.
-2. Add missing validation for must-priority tasks.
-3. Remove duplicated API shapes from frontend-design.md.
-4. Update implementation-map.md coverage rows.
-5. Regenerate AGENTS.md after fixes.
+1. Fix undefined ID references in execution-validation.md.
+2. Add missing P0-P10 task coverage.
+3. Add missing task-scoped reading references.
+4. Remove duplicated API shapes from frontend/backend catalogs.
+5. Update AGENTS.md reading policy.
+6. Re-run this review.
 ```
 
 ---
 
-### Final Verdict
+## Final Verdict
 
 End with one of:
 
@@ -446,6 +610,8 @@ Include a concise explanation.
 - Keep recommendations actionable.
 - Identify source-of-truth owner for each issue.
 - Distinguish blocking issues from improvement suggestions.
+- Focus strongly on execution spine completeness.
+- Focus strongly on task-scoped reading.
 - Do not include long commentary.
 
 ---
@@ -457,11 +623,15 @@ Before finalizing, verify:
 ```text
 [ ] Missing files are listed.
 [ ] Blocking issues are separated from non-blocking issues.
-[ ] Source-of-truth conflicts are identified.
+[ ] Reference catalog format is reviewed.
+[ ] Execution spine completeness is reviewed.
+[ ] P0-P10 phase coverage is reviewed.
+[ ] Task-scoped reading is reviewed.
 [ ] Undefined or duplicate IDs are identified.
-[ ] Traceability gaps are identified.
+[ ] Source-of-truth conflicts are identified.
 [ ] Validation command issues are identified.
 [ ] UI boundary issues are identified when UI docs exist.
+[ ] AGENTS runtime policy is reviewed.
 [ ] Final readiness verdict is clear.
 [ ] Recommendations are actionable.
 ```

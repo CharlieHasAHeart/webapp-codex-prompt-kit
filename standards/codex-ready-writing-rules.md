@@ -2,569 +2,465 @@
 
 ## Purpose
 
-Define how to write project documents so Codex can implement from them with minimal guessing.
+This standard defines how to write documents that are easy for Codex to execute from with minimal context.
 
-This standard applies to all generated Web App project documents.
-
-It exists to prevent:
-
-- vague guidance
-- duplicated source-of-truth content
-- non-actionable prose
-- overlong documents
-- unclear validation
-- command ambiguity
-- frontend/backend design being hidden in execution tasks
-- traceability without implementation value
-
----
-
-## Core Principle
+The document system uses:
 
 ```text
-Write for implementation, not explanation.
+reference catalogs
+execution spine
+task-scoped reading
+container-first validation
 ```
 
-A document is Codex-ready when Codex can answer:
+Codex-ready writing should make each task executable without requiring Codex to read the entire document set.
+
+---
+
+## Core Rule
+
+Write for execution, not for storytelling.
+
+Good Codex-ready writing is:
 
 ```text
-What should I build?
-Where should I build it?
-What rules must I follow?
-What command proves it works?
-What source document owns this decision?
+explicit
+compact
+heading-addressable
+task-scoped
+implementation-facing
+source-of-truth aware
+```
+
+Avoid:
+
+```text
+long narrative
+hidden assumptions
+duplicated definitions
+vague instructions
+broad references to whole documents
+requirements mixed with implementation tasks
 ```
 
 ---
 
-## Background Rule
+## Heading-Addressable IDs
 
-Only `product-spec.md` may contain broad product background.
+Every Markdown ID that may be referenced by a task must be a heading.
 
-All other documents should focus on implementation-facing content.
+Use this format:
 
-If a section outside `product-spec.md` only explains why the project matters, remove it or move it to `product-spec.md`.
+```markdown
+### REQ-001: Create Case
+### DEC-001: Repository Layout
+### ENT-001: Case
+### REL-001: Case Owns Results
+### BR-001: No Concurrent Active Run
+### STATE-001: Case Status
+### ARCH-001: Repository Layout
+### DB-001: cases
+### API-001: List Cases
+### ERR-001: Validation Error
+### TYPE-001: Pagination Response
+### FE-001: Case List Page
+### BE-001: Case Query Service
+### ENV-001: Container-First Command Policy
+### TASK-001: Initialize Repository Structure
+### VAL-001: Case List API Contract Validation
+```
 
----
-
-## Implementation Impact Rule
-
-Every section outside `product-spec.md` should affect at least one of:
-
-- source code
-- directory structure
-- frontend routes
-- frontend components
-- frontend state
-- backend services
-- backend repositories
-- database schema
-- API contracts
-- UI behavior
-- commands
-- tests
-- task order
-- validation evidence
-- Codex execution rules
-
-If a section does not affect any of these, it is probably not Codex-ready.
+Do not bury IDs inside paragraphs or table cells if they need to be referenced directly.
 
 ---
 
-## Normative Language
+## Task-Scoped Reference Style
 
-Use direct, enforceable language.
+`TASK-*` entries should reference specific sections, IDs, or YAML keys.
+
+Good:
+
+```text
+docs/data-api-contract.md#API-001
+docs/domain-model.md#BR-001
+docs/backend-design.md#BE-004
+docs/dev-environment.md#ENV-010
+docs/ui/UI_PAGE.yaml#cases_list
+```
+
+Avoid:
+
+```text
+docs/data-api-contract.md
+docs/domain-model.md
+docs/backend-design.md
+all UI docs
+all standards
+```
+
+Full-document references should be rare and must be justified by the task.
+
+---
+
+## Reference Catalog Entry Style
+
+Reference catalog entries should be short enough to read independently.
+
+A good entry usually includes:
+
+```text
+ID
+short purpose or meaning
+rules or constraints
+related IDs
+open questions if needed
+```
+
+A good implementation catalog entry may also include:
+
+```text
+code impact
+inputs
+out of scope
+```
+
+Avoid entries that require reading the whole document to understand them.
+
+---
+
+## Use IDs Instead of Repeating Definitions
+
+When a definition already exists, reference its ID.
+
+Good:
+
+```markdown
+Inputs:
+- API-001
+- ERR-001
+- BR-002
+```
+
+Avoid:
+
+```markdown
+This task should use the API that lists cases with page and status filters, and should also return validation errors in the shape defined earlier...
+```
+
+The detailed definition belongs in the owner catalog.
+
+---
+
+## Source-of-Truth Ownership
+
+Write each fact in its owner document only.
+
+Ownership examples:
+
+```text
+REQ-* -> product-spec.md
+DEC-* -> project-decisions.md
+ENT/REL/BR/STATE -> domain-model.md
+ARCH-* -> architecture.md
+DB/API/ERR/TYPE -> data-api-contract.md
+FE-* -> frontend-design.md
+BE-* -> backend-design.md
+ENV-* -> dev-environment.md
+TASK/VAL -> execution-validation.md
+UI pages/routes/actions/states -> UI_PAGE.yaml
+UI tokens -> UI_TOKENS.yaml
+UI visual rules -> UI_VISUAL_SPEC.yaml
+Codex runtime policy -> AGENTS.md
+```
+
+If another document needs the fact, it should reference the owner ID.
+
+---
+
+## Writing Requirements
+
+Use direct, testable language.
 
 Prefer:
 
-- `Must`
-- `Must not`
-- `Required`
-- `Forbidden`
-- `Default`
-- `Use`
-- `Do not use`
+```text
+must
+must not
+required
+forbidden
+allowed
+out of scope
+```
 
 Avoid:
-
-- `maybe`
-- `could`
-- `consider`
-- `as needed`
-- `if possible`
-- `etc.`
-- `ideally`
-- `probably`
-- `nice to have`
-- `clean`
-- `robust`
-- `user-friendly`
-
-These words are allowed only when the document explicitly marks something as optional or future scope.
-
----
-
-## Stable ID Rules
-
-Use stable IDs for anything that must be referenced across documents.
-
-| ID | Owner |
-|---|---|
-| `REQ-*` | `product-spec.md` |
-| `ENT-*` | `domain-model.md` |
-| `REL-*` | `domain-model.md` |
-| `BR-*` | `domain-model.md` |
-| `DEC-*` | `project-decisions.md` |
-| `FE-*` | `frontend-design.md` |
-| `BE-*` | `backend-design.md` |
-| `DB-*` | `data-api-contract.md` |
-| `API-*` | `data-api-contract.md` |
-| `VAL-*` | `execution-validation.md` |
-| `TASK-*` | `execution-validation.md` |
-
-Rules:
-
-- Do not reuse an ID for a different meaning.
-- Do not rename an ID casually once referenced.
-- Do not define the same ID in multiple documents.
-- Register mapped IDs in `implementation-map.md`.
-- If a referenced ID is missing, mark it as `MISSING-ID` instead of inventing it silently.
-
----
-
-## Source-of-Truth Rule
-
-Each detail should have one source of truth.
-
-Use this pattern:
 
 ```text
-Source document defines meaning.
-Implementation map registers identity and relationships.
-Dependent documents reference by ID.
+should probably
+might want to
+consider
+maybe
+as appropriate
+etc.
 ```
 
-Example:
+Use uncertainty explicitly:
 
-```markdown
-Related:
-- REQ-004
-- ENT-CASE
-- API-002
-- VAL-004
+```text
+unknown
+provisional
+deferred
+open question
 ```
 
-Do not copy the full text of `REQ-004` into every related document.
+Do not hide uncertainty inside confident language.
 
 ---
 
-## Good vs Bad Writing
+## Task Writing Rules
 
-### Product Requirement
+Every implementation task in `execution-validation.md` should include:
 
-Bad:
-
-```markdown
-The case list should be easy to use and show useful information.
+```text
+Phase
+Type
+Priority
+Depends On
+Goal
+Read scope
+Read before this task
+Implementation Scope
+Expected Code Impact
+Out of Scope
+Required Validation
+Completion Rule
 ```
+
+Task writing must avoid:
+
+```text
+broad implementation instructions without boundaries
+missing validation
+missing source references
+full-document reads
+future-scope work
+silent assumptions
+```
+
+---
+
+## Validation Writing Rules
+
+Every required validation command should include a claim proven.
 
 Good:
 
 ```markdown
-REQ-004: Case List
-
-Users must be able to view a paginated list of cases with status, owner, updated time, and latest result summary.
-```
-
----
-
-### Domain Rule
-
-Bad:
-
-```markdown
-Risk runs should be handled carefully.
-```
-
-Good:
-
-```markdown
-BR-003: No Concurrent Active Run
-
-A case must not have more than one active risk run.
-
-Enforced by:
-- backend service guard
-- transaction boundary
-- validation test
-```
-
----
-
-### Frontend Design
-
-Bad:
-
-```markdown
-The frontend should have a clean filter experience.
-```
-
-Good:
-
-```markdown
-FE-004: Case List Filtering
-
-Code impact:
-- `app/cases/page.tsx`
-- `components/cases/case-filter-bar.tsx`
-- `lib/api/cases-client.ts`
-
-Rules:
-- Filter state must be stored in URL query params.
-- Empty state must render when the filtered result count is zero.
-- Loading state must use the shared table skeleton.
-```
-
----
-
-### Backend Design
-
-Bad:
-
-```markdown
-The backend should be modular and robust.
-```
-
-Good:
-
-```markdown
-BE-006: Risk Run Service
-
-Code impact:
-- `services/risk-run-service.ts`
-- `repositories/risk-run-repository.ts`
-
-Responsibilities:
-- validate case exists
-- prevent duplicate active runs
-- create parameter snapshot
-- create risk run record
-- return structured domain errors
-```
-
----
-
-### Validation
-
-Bad:
-
-```markdown
-Run all checks and make sure everything works.
-```
-
-Good:
-
-```markdown
-Required validation:
-- `docker compose exec backend pytest tests/api/test_risk_runs.py`
-
-Claim proven:
-- Run trigger API prevents duplicate active runs and returns structured errors.
-```
-
----
-
-## Code Impact Pattern
-
-Implementation-facing sections should include code impact when possible.
-
-Recommended format:
-
-```markdown
-## FE-004: Case List Filtering
-
-Code impact:
-- `app/cases/page.tsx`
-- `components/cases/case-filter-bar.tsx`
-- `lib/api/cases-client.ts`
-
-Rules:
-- Filter state must be URL-backed.
-- Pagination state must be URL-backed.
-- Loading state must use shared skeleton.
-```
-
-Code impact may include:
-
-- files
-- directories
-- modules
-- components
-- services
-- repositories
-- routes
-- tests
-- migrations
-- schemas
-
-Do not force exact filenames if the project structure is not known yet. In that case, specify module ownership instead.
-
----
-
-## Reference Pattern
-
-Use references instead of duplication.
-
-Recommended:
-
-```markdown
-References:
-- REQ-004
-- ENT-CASE
-- FE-004
-- BE-002
-- DB-CASES
-- API-002
-- VAL-004
+| Command | Claim Proven |
+|---|---|
+| `docker compose exec api npm run test -- cases-api.test.ts` | API-001 returns paginated cases and documented errors. |
 ```
 
 Avoid:
 
 ```markdown
-This task implements the case list, which is a feature where users can browse a paginated list of cases with status, owner, updated time...
+| Command | Claim Proven |
+|---|---|
+| `npm test` | Tests pass. |
 ```
 
-The full requirement belongs in `product-spec.md`.
+Validation should be:
 
----
-
-## Decision Writing Pattern
-
-Decisions should be explicit.
-
-Recommended:
-
-```markdown
-DEC-002: Package Manager
-
-Decision:
-- Use `npm`.
-
-Forbidden:
-- pnpm
-- yarn
-- bun
-
-Applies to:
-- `dev-environment.md`
-- `AGENTS.md`
-- frontend package scripts
-```
-
-Avoid:
-
-```markdown
-npm is probably fine for now.
+```text
+container-first
+task-scoped
+evidence-driven
+minimal but meaningful
 ```
 
 ---
 
 ## Command Writing Rules
 
-Commands must be deterministic.
+Commands should come from `docs/dev-environment.md`.
 
-Use:
+Use exact command patterns.
+
+Good:
 
 ```bash
-docker compose exec backend pytest tests/services/test_case_service.py
+docker compose exec api npm run test -- cases-api.test.ts
 ```
 
-Avoid:
+Avoid host commands by default:
 
 ```bash
-run tests
+npm test
+npm install
+pytest
+mypy
+```
+
+unless explicitly allowed by `ENV-*`.
+
+---
+
+## Code Impact Writing Rules
+
+When possible, include expected code impact.
+
+Good:
+
+```markdown
+Expected Code Impact:
+- `apps/api/src/routes/cases.ts`
+- `apps/api/src/services/case-query-service.ts`
+- `apps/api/src/repositories/case-repository.ts`
+- `apps/api/src/tests/cases-api.test.ts`
 ```
 
 Rules:
 
-- Prefer container-first commands.
-- Do not provide multiple equivalent commands unless one is clearly marked as canonical.
-- Do not let Codex choose between `npm`, `pnpm`, `yarn`, and `bun`.
-- Do not let Codex choose between host and container commands.
-- Mark forbidden host commands explicitly in `dev-environment.md`.
+- Code impact should guide Codex.
+- Code impact should not over-specify every helper file.
+- Code impact may be approximate when the repo is not initialized.
+- If approximate, mark it as assumed.
 
 ---
 
-## Validation Writing Rules
+## Out-of-Scope Writing Rules
 
-Validation should be task-scoped and evidence-driven.
+Use `Out of Scope` to prevent overbuilding.
 
-Each required validation command should state what it proves.
-
-Recommended table:
+Good:
 
 ```markdown
-| Command | Claim Proven |
-|---|---|
-| `docker compose exec backend pytest tests/services/test_case_service.py` | Case service enforces required business rules. |
-| `docker compose exec frontend npm run test -- CaseList.test.tsx` | Case list renders loading, empty, error, and ready states. |
+Out of Scope:
+- Do not implement export.
+- Do not change API-001 response shape.
+- Do not add authentication if MVP auth is deferred.
 ```
 
-Avoid requiring broad checks for every task:
+Every complex task should include out-of-scope boundaries.
+
+---
+
+## Open Question Writing Rules
+
+Open questions should be compact and marked blocking or non-blocking.
+
+Recommended format:
+
+```markdown
+| Question | Blocking? | Affected Area |
+|---|---:|---|
+| Is authentication required in MVP? | yes | API, backend, frontend |
+```
+
+Rules:
+
+- Use open questions for real uncertainty.
+- Do not create fake certainty.
+- Blocking questions should stop execution if they affect a current task.
+
+---
+
+## YAML Writing Rules
+
+YAML documents should use stable keys.
+
+For UI YAML:
 
 ```text
-full lint
-full typecheck
-full mypy
-full build
-full E2E
+page IDs
+route IDs
+section IDs
+action IDs
+state IDs
+token keys
+visual rule keys
 ```
 
-These belong to milestone or release validation unless task-specific.
-
----
-
-## UI Writing Rules
-
-UI-related project documents must respect the UI layer.
-
-Use:
-
-- `UI_PAGE.yaml` for page structure, routes, sections, actions, states
-- `UI_TOKENS.yaml` for design tokens
-- `UI_VISUAL_SPEC.yaml` for visual rules
-- `frontend-design.md` for how frontend code consumes the UI specs
-
-Do not put these in `frontend-design.md`:
-
-- raw color values
-- full token definitions
-- full page DSL
-- visual class strings from `UI_VISUAL_SPEC.yaml`
-
-Do not put these in UI YAML:
-
-- JSX
-- React hooks
-- API request code
-- database schema
-- full Tailwind class strings
-
----
-
-## Implementation Map Writing Rules
-
-`implementation-map.md` is an index and relationship map.
-
-It should include:
-
-- ID registry
-- source document references
-- short meaning
-- code impact when useful
-- traceability matrix
-
-It should not include:
-
-- full requirements
-- full business rules
-- full frontend design
-- full backend design
-- full API schemas
-- full DB schemas
-- full task instructions
-
-Recommended matrix columns:
-
-```text
-Flow | REQ | ENT/BR | FE | BE | DB | API | UI | VAL | TASK
-```
-
----
-
-## Section Length Rules
-
-Sections should be short and structured.
-
-Prefer:
-
-- tables
-- short lists
-- explicit IDs
-- code impact blocks
-- command blocks
-- references
+should be stable enough to reference from `TASK-*`.
 
 Avoid:
 
-- long paragraphs
-- repeated rationale
-- copied content from other documents
-- multiple examples unless they change implementation
-
----
-
-## Conflict Handling Language
-
-When documents conflict, write deterministic rules.
-
-Recommended:
-
-```markdown
-If `data-api-contract.md` conflicts with `frontend-design.md` about API response shape, `data-api-contract.md` wins.
-```
-
-Avoid:
-
-```markdown
-Resolve conflicts reasonably.
+```text
+long comments
+prose-heavy fields
+React code
+Tailwind class strings
+API schemas
+DB schemas
+backend logic
 ```
 
 ---
 
-## Optional and Future Scope
+## Anti-Patterns
 
-Optional items must be clearly labeled.
-
-Use:
-
-```markdown
-Future Scope:
-- SSO integration is not part of MVP.
-```
-
-or:
-
-```markdown
-Optional:
-- Add keyboard shortcuts if time allows.
-```
-
-Do not mix optional items into required implementation tasks.
-
----
-
-## Checklist
-
-Before finalizing a document, check:
+Avoid these patterns:
 
 ```text
-[ ] Does each section have a clear source-of-truth purpose?
-[ ] Does each implementation-facing section affect code, commands, tests, UI, data, API, tasks, or validation?
-[ ] Are stable IDs used where cross-references are needed?
-[ ] Are commands explicit and container-first?
-[ ] Are validation commands task-scoped?
-[ ] Are broad checks limited to milestone or release validation?
-[ ] Are full definitions kept in source documents instead of copied everywhere?
-[ ] Is implementation-map used as an index, not a definition dump?
-[ ] Is product background limited to product-spec.md?
-[ ] Is vague language removed?
+A reference catalog reads like a long essay.
+A task says "read all docs first".
+A task references a full document instead of a specific ID.
+frontend-design.md defines API response shapes.
+backend-design.md defines DB columns.
+execution-validation.md redefines business rules.
+dev-environment.md chooses task-specific validation.
+AGENTS.md contains product requirements.
+UI specs contain React code.
+Validation commands are broad and do not prove a specific claim.
 ```
 
 ---
 
-## Final Rule
+## Preferred Tables
 
-A Codex-ready sentence should reduce guessing.
+Use tables for compact structured data.
 
-If a sentence does not reduce guessing, delete it or rewrite it into a rule, reference, command, code impact, validation claim, or task.
+Good table uses:
+
+```text
+MVP boundary
+user roles
+open questions
+DB fields
+API request params
+API errors
+task dependencies
+task-to-validation mapping
+command catalogs
+review issues
+```
+
+Avoid tables when they make an entry harder to read.
+
+---
+
+## Minimal Narrative Rule
+
+Narrative is allowed only when it improves execution clarity.
+
+Keep narrative short.
+
+Long reasoning should remain in discovery discussion or working notes, not runtime documents.
+
+---
+
+## Review Checklist
+
+Before accepting a generated document, verify:
+
+```text
+[ ] IDs are heading-addressable where needed.
+[ ] Entries are compact and independently readable.
+[ ] Source-of-truth ownership is respected.
+[ ] Definitions are referenced instead of duplicated.
+[ ] Tasks reference specific sources.
+[ ] Tasks include implementation scope and out-of-scope boundaries.
+[ ] Validation commands have claim proven.
+[ ] Commands are container-first unless explicitly allowed.
+[ ] Open questions are visible.
+[ ] No document requires Codex to infer missing tasks from another document.
+```

@@ -8,25 +8,25 @@ AGENTS.md
 
 ## Purpose
 
-Generate the repository-level Codex execution protocol for a Codex-ready Web App project.
+Generate the repository-level Codex execution policy for a Codex-ready Web App project.
 
-`AGENTS.md` tells Codex how to work in the repository.
+`AGENTS.md` owns:
 
-It should define:
+```text
+Codex runtime reading policy
+execution-validation-first workflow
+task-scoped reference reading rules
+source-of-truth hierarchy
+repository boundary rules
+command rules
+validation rules
+conflict handling rules
+documentation update rules
+codex-execution-report rules
+forbidden actions
+```
 
-- reading order
-- source-of-truth hierarchy
-- implementation rules
-- command rules
-- validation rules
-- UI document usage
-- implementation-map usage
-- conflict handling
-- documentation update rules
-- execution report rules
-- final response expectations
-
-It should not redefine product requirements, frontend design, backend design, DB/API contracts, task plans, validation criteria, or UI specs.
+It exists so Codex knows how to execute from `docs/execution-validation.md` without reading the full document set by default.
 
 ---
 
@@ -34,60 +34,61 @@ It should not redefine product requirements, frontend design, backend design, DB
 
 Use the available conversation context and upstream documents already generated in the current conversation.
 
-Required upstream documents:
+Recommended upstream context:
 
 ```text
+Project Design Brief
 docs/product-spec.md
 docs/project-decisions.md
 docs/domain-model.md
 docs/architecture.md
 docs/data-api-contract.md
+docs/ui/UI_PAGE.yaml
 docs/frontend-design.md
 docs/backend-design.md
 docs/dev-environment.md
-docs/execution-validation.md
-docs/implementation-map.md
-```
-
-Use UI documents if they exist:
-
-```text
-docs/ui/UI_PAGE.yaml
 docs/ui/UI_TOKENS.yaml
 docs/ui/UI_VISUAL_SPEC.yaml
+docs/execution-validation.md
+current project discussion
+uploaded project notes
 ```
-
-Use `project-decisions.md` for:
-
-- package manager
-- repository layout
-- framework choices
-- container-first decisions
-- rejected alternatives
-
-Use `dev-environment.md` for:
-
-- canonical commands
-- Docker service names
-- forbidden host commands
-- validation command patterns
 
 Use `execution-validation.md` for:
 
+- execution spine phases
 - `TASK-*`
 - `VAL-*`
+- task-scoped reading policy
 - task dependencies
-- required task validation
+- required validation
 - milestone/release validation
 
-Use `implementation-map.md` for:
+Use `dev-environment.md` for:
 
-- ID registry
-- flow traceability
-- source document lookup
-- missing or weak links
+- `ENV-*`
+- canonical commands
+- Docker service names
+- package manager policy
+- forbidden host commands
 
-If an upstream document is unavailable, state assumptions and generate a minimal `AGENTS.md` that tells Codex what is missing.
+Use `project-decisions.md` for:
+
+- `DEC-*`
+- shared project decisions
+- rejected alternatives
+
+Use `architecture.md` for:
+
+- `ARCH-*`
+- repository boundary
+- frontend/backend boundary
+- data access boundary
+- shared package boundary
+
+Use all other reference catalogs only to define the source-of-truth hierarchy and update rules.
+
+If upstream documents are unavailable, generate a minimal `AGENTS.md` and state which runtime assumptions are being made.
 
 ---
 
@@ -103,6 +104,7 @@ standards/codex-ready-writing-rules.md
 standards/frontend-backend-boundary.md
 standards/validation-strategy.md
 standards/codex-execution-report-format.md
+standards/webapp-execution-spine.md
 standards/ui-authoring-strategy.md
 ```
 
@@ -120,67 +122,76 @@ AGENTS.md
 
 Do not generate other project documents.
 
-Do not create new project IDs.
+Do not create project IDs.
 
-You may reference existing:
+You may reference existing IDs such as:
 
 ```text
 REQ-*
+DEC-*
 ENT-*
 REL-*
 BR-*
-DEC-*
-FE-*
-BE-*
+STATE-*
+ARCH-*
 DB-*
 API-*
-VAL-*
+ERR-*
+TYPE-*
+FE-*
+BE-*
+ENV-*
 TASK-*
+VAL-*
 ```
 
 Do not redefine their detailed meanings.
 
-Do not include full source document content.
+Do not copy full source catalog entries.
+
+Do not include implementation tasks except as references to `TASK-*`.
 
 ---
 
 ## Required Document Structure
 
-Use this structure unless the project clearly needs a small adjustment:
+Use this structure:
 
 ```markdown
 # AGENTS
 
 ## Purpose
 
-## Codex Operating Principles
+## Primary Runtime Documents
 
-## Required Reading Order
+## Execution Policy
+
+## Task-Scoped Reading Policy
 
 ## Source-of-Truth Hierarchy
 
 ## Repository Boundaries
 
-## Command Rules
+## Command Policy
 
-## Validation Rules
+## Validation Policy
 
-## Task Execution Rules
+## Task Execution Procedure
 
-## Implementation Map Usage
+## UI Implementation Policy
 
-## UI Document Usage
+## Documentation Update Policy
 
-## Documentation Update Rules
+## Conflict and Blocker Handling
 
-## Conflict Handling
+## Codex Execution Report Policy
 
-## Execution Report Rules
-
-## Final Response Rules
+## Final Response Policy
 
 ## Forbidden Actions
 ```
+
+Do not add extra sections unless they directly improve Codex execution.
 
 ---
 
@@ -190,79 +201,110 @@ Use this structure unless the project clearly needs a small adjustment:
 
 State that this file defines how Codex must work in the repository.
 
-It should be short, operational, and enforceable.
+Keep it short and operational.
 
 ---
 
-## Codex Operating Principles
+## Primary Runtime Documents
 
-Include rules such as:
+Define the default Codex runtime documents.
 
-```markdown
-- Follow source documents before making implementation choices.
-- Prefer explicit project decisions over defaults.
-- Do not invent missing contracts, tasks, or IDs silently.
-- Keep changes scoped to the current task.
-- Run required task validation before marking work done.
-- Record task results in `codex-execution-report.md`.
-```
-
----
-
-## Required Reading Order
-
-Define the reading order Codex should use before implementing.
-
-Recommended order:
+Required content:
 
 ```markdown
+Codex should start with only:
+
 1. `AGENTS.md`
-2. `docs/implementation-map.md`
-3. `docs/execution-validation.md`
-4. Source documents referenced by the current task:
-   - `docs/product-spec.md`
-   - `docs/project-decisions.md`
-   - `docs/domain-model.md`
-   - `docs/architecture.md`
-   - `docs/data-api-contract.md`
-   - `docs/frontend-design.md`
-   - `docs/backend-design.md`
-   - `docs/dev-environment.md`
-   - UI documents when the task touches UI
+2. `docs/execution-validation.md`
+
+All other documents are task-scoped reference catalogs.
+Codex should read them only when the current `TASK-*` explicitly references them.
 ```
 
 Rules:
 
-- Codex should not read every file deeply for every task.
-- Codex should start from the current `TASK-*`, then follow references.
-- If implementing a flow, Codex should check the flow row in `implementation-map.md`.
+- Do not tell Codex to read the full document set before every task.
+- Do not list all reference catalogs as required upfront reading.
+- Make `execution-validation.md` the execution spine.
+
+---
+
+## Execution Policy
+
+Recommended content:
+
+```markdown
+- Execute tasks from `docs/execution-validation.md`.
+- Do not infer new tasks from other documents.
+- Do not implement future-scope work unless a current `TASK-*` requires it.
+- Do not broaden a task beyond its `Implementation Scope`.
+- Respect each task's `Out of Scope`.
+- Follow task dependencies.
+- Stop when a blocking question requires a human decision.
+```
+
+---
+
+## Task-Scoped Reading Policy
+
+Define the reading policy clearly.
+
+Required content:
+
+```markdown
+For each task:
+
+1. Read the current `TASK-*` entry in `docs/execution-validation.md`.
+2. Read only the entries listed under `Read before this task`.
+3. Do not read full reference documents by default.
+4. Read optional sources only when the task's `Do not read unless needed` condition is met.
+5. Expand reading only when:
+   - a referenced entry is ambiguous
+   - validation fails and more context is needed
+   - a source-of-truth conflict is detected
+   - the task explicitly allows additional reading
+```
+
+Also include:
+
+```markdown
+When reading a referenced source, prefer the specific heading, ID, or YAML key referenced by the task.
+```
 
 ---
 
 ## Source-of-Truth Hierarchy
 
-Define which document wins when documents conflict.
+Define which reference catalog owns which content.
 
 Recommended hierarchy:
 
 ```markdown
-1. `project-decisions.md` wins for shared project decisions.
-2. `product-spec.md` wins for product scope and `REQ-*`.
-3. `domain-model.md` wins for `ENT-*`, `REL-*`, and `BR-*`.
-4. `data-api-contract.md` wins for `DB-*`, `API-*`, request/response shapes, and error envelope.
-5. `frontend-design.md` wins for `FE-*` and frontend implementation design.
-6. `backend-design.md` wins for `BE-*` and backend implementation design.
-7. `dev-environment.md` wins for command syntax.
-8. `execution-validation.md` wins for `TASK-*`, `VAL-*`, and required validation.
-9. `implementation-map.md` indexes relationships but does not override source documents.
-10. UI YAML files win for their own UI layer.
+- `docs/product-spec.md` owns `REQ-*`.
+- `docs/project-decisions.md` owns `DEC-*`.
+- `docs/domain-model.md` owns `ENT-*`, `REL-*`, `BR-*`, and `STATE-*`.
+- `docs/architecture.md` owns `ARCH-*`.
+- `docs/data-api-contract.md` owns `DB-*`, `API-*`, `ERR-*`, and `TYPE-*`.
+- `docs/ui/UI_PAGE.yaml` owns UI pages, routes, sections, actions, and states.
+- `docs/frontend-design.md` owns `FE-*`.
+- `docs/backend-design.md` owns `BE-*`.
+- `docs/dev-environment.md` owns `ENV-*` and command patterns.
+- `docs/ui/UI_TOKENS.yaml` owns UI token names and token mapping.
+- `docs/ui/UI_VISUAL_SPEC.yaml` owns visual usage rules.
+- `docs/execution-validation.md` owns `TASK-*`, `VAL-*`, dependencies, and required validation.
 ```
+
+Rules:
+
+- Source catalogs define references.
+- `execution-validation.md` defines execution.
+- If documents conflict, follow the owner document for that ID type.
 
 ---
 
 ## Repository Boundaries
 
-State the default repository boundary.
+Use architecture and project decisions as sources.
 
 Recommended content:
 
@@ -277,132 +319,118 @@ Rules:
 - `apps/api` must not import from `apps/web`.
 - `packages/*` must not import from either app.
 - Database access belongs to `apps/api` by default.
+- Frontend communicates with backend through documented `API-*` contracts.
 ```
 
-Adjust based on project decisions.
+Adjust based on actual `ARCH-*` and `DEC-*` entries when available.
 
 ---
 
-## Command Rules
+## Command Policy
 
-Use `dev-environment.md` as the source of truth.
+Use `docs/dev-environment.md` as the source of truth.
 
 Recommended content:
 
 ```markdown
 - Use container-first commands.
+- Use command patterns from `ENV-*` entries.
 - Use only the selected package manager.
-- Do not run host install/test/build commands unless explicitly allowed.
-- Do not switch between npm, pnpm, yarn, bun, uv, poetry, pip, or other tools unless `project-decisions.md` allows it.
-- Use Docker Compose service names from `dev-environment.md`.
+- Do not run host-level install, test, build, migration, or validation commands unless an `ENV-*` entry explicitly allows it.
+- Do not switch package managers unless `DEC-*` changes.
 ```
 
-Do not copy the full command catalog from `dev-environment.md`.
+Do not copy the full command catalog.
 
 ---
 
-## Validation Rules
+## Validation Policy
 
-Use `execution-validation.md` and `dev-environment.md`.
+Use `docs/execution-validation.md` and `docs/dev-environment.md`.
 
 Recommended content:
 
 ```markdown
-- Each task must run its required validation before being marked done.
+- Each implementation task must run its required validation.
 - Required validation must be task-scoped.
 - Each validation command must have a claim proven.
 - Do not run full lint/typecheck/mypy/build for every task by default.
-- Heavy checks belong to milestone or release validation unless task-specific.
+- Heavy checks belong to milestone or release validation unless a task explicitly requires them.
 - If validation cannot run, record the blocker or failure in `codex-execution-report.md`.
 ```
 
 ---
 
-## Task Execution Rules
+## Task Execution Procedure
 
 Recommended content:
 
 ```markdown
 For each task:
 
-1. Find the task in `execution-validation.md`.
-2. Check related IDs in `implementation-map.md`.
-3. Read only the source documents needed for those IDs.
+1. Locate the next executable `TASK-*` in `docs/execution-validation.md`.
+2. Confirm dependencies are complete or explicitly deferred.
+3. Read only the task-scoped sources listed by the task.
 4. Implement the smallest coherent change that satisfies the task.
-5. Run required validation.
+5. Run the task's required validation.
 6. Update `codex-execution-report.md`.
 7. Stop if a blocker requires a human decision.
 ```
 
 Rules:
 
-- Do not implement future-scope items.
-- Do not broaden the task without updating documents.
-- Do not silently change API contracts or DB schema outside the relevant source document.
+- Do not implement unrelated tasks while working on the current task.
+- Do not fix broad unrelated issues unless they block the required validation.
+- Do not silently change contracts to make implementation easier.
 
 ---
 
-## Implementation Map Usage
+## UI Implementation Policy
 
 Recommended content:
 
 ```markdown
-Use `implementation-map.md` as an index.
+When a task touches UI:
 
-Before implementing a flow, check:
-- related `REQ-*`
-- related `ENT-*` / `BR-*`
-- related `FE-*`
-- related `BE-*`
-- related `DB-*`
-- related `API-*`
-- related UI IDs
-- related `VAL-*`
-- related `TASK-*`
-
-If the map shows `MISSING-ID`, stop and update/report the missing source document instead of inventing implementation details silently.
+- Use `docs/ui/UI_PAGE.yaml` for pages, routes, sections, actions, and states.
+- Use `docs/ui/UI_TOKENS.yaml` for token names.
+- Use `docs/ui/UI_VISUAL_SPEC.yaml` for visual rules.
+- Use `docs/frontend-design.md` for `FE-*` implementation entries.
+- Do not invent pages, sections, actions, or states absent from UI references unless the current task requires updating the relevant source.
+- Do not hardcode raw visual values when token-backed values exist.
 ```
 
 ---
 
-## UI Document Usage
+## Documentation Update Policy
 
 Recommended content:
 
 ```markdown
-When implementing UI:
-
-- Read `docs/ui/UI_PAGE.yaml` for pages, routes, sections, actions, and states.
-- Read `docs/ui/UI_TOKENS.yaml` for design tokens.
-- Read `docs/ui/UI_VISUAL_SPEC.yaml` for visual rules.
-- Use `frontend-design.md` for how UI documents are implemented in `apps/web`.
-- Do not invent pages or states that are absent from UI docs unless source docs are updated.
-- Do not hardcode raw token values when token-backed utilities exist.
-```
-
-If UI documents are absent, state how Codex should proceed.
-
----
-
-## Documentation Update Rules
-
-Recommended content:
-
-```markdown
-Update source documents only when implementation reveals a necessary contract or scope change.
+Update source catalogs only when implementation reveals a necessary source-of-truth change.
 
 Rules:
-- Do not update generated docs just to match accidental implementation.
-- If an API shape changes, update `data-api-contract.md`.
+- If product scope changes, update `product-spec.md`.
+- If a shared project decision changes, update `project-decisions.md`.
 - If a business rule changes, update `domain-model.md`.
-- If a task or validation changes, update `execution-validation.md`.
-- If ID relationships change, update `implementation-map.md`.
+- If an architecture boundary changes, update `architecture.md`.
+- If an API, DB, error, or shared type contract changes, update `data-api-contract.md`.
+- If UI structure changes, update `UI_PAGE.yaml`.
+- If frontend implementation responsibility changes, update `frontend-design.md`.
+- If backend implementation responsibility changes, update `backend-design.md`.
 - If command syntax changes, update `dev-environment.md`.
+- If tasks or validation change, update `execution-validation.md`.
+```
+
+Also include:
+
+```markdown
+Do not update source catalogs merely to match accidental implementation drift.
 ```
 
 ---
 
-## Conflict Handling
+## Conflict and Blocker Handling
 
 Recommended content:
 
@@ -410,15 +438,15 @@ Recommended content:
 If documents conflict:
 
 1. Follow the source-of-truth hierarchy.
-2. Prefer explicit IDs over prose.
+2. Prefer the owner catalog for the relevant ID type.
 3. Do not guess silently.
 4. Record the conflict in `codex-execution-report.md` if it blocks the task.
-5. Ask for a human decision when the conflict changes product scope, API contract, data model, or validation expectations.
+5. Ask for a human decision when the conflict changes product scope, API contract, data model, architecture boundary, validation expectation, or task scope.
 ```
 
 ---
 
-## Execution Report Rules
+## Codex Execution Report Policy
 
 Recommended content:
 
@@ -429,6 +457,7 @@ For each task, record:
 - Task
 - Type
 - Status
+- Sources Read
 - Required Validation
 - Result
 - Failure Reason
@@ -446,7 +475,7 @@ Do not maintain `codex-metrics.json` unless explicitly requested.
 
 ---
 
-## Final Response Rules
+## Final Response Policy
 
 Define how Codex should respond after work.
 
@@ -473,12 +502,15 @@ Include project-specific forbidden actions.
 Recommended defaults:
 
 ```markdown
+- Do not read the entire document set by default.
+- Do not infer tasks from reference catalogs.
 - Do not use host-level package install commands when container-first is required.
 - Do not switch package managers.
 - Do not import `apps/api` code into `apps/web`.
 - Do not import `apps/web` code into `apps/api`.
 - Do not put database access in frontend code.
 - Do not invent API contracts outside `data-api-contract.md`.
+- Do not invent business rules outside `domain-model.md`.
 - Do not invent tasks outside `execution-validation.md`.
 - Do not mark a task done without required validation or a recorded blocker.
 - Do not implement out-of-scope product features.
@@ -492,9 +524,10 @@ Recommended defaults:
 - Use direct rules.
 - Avoid long rationale.
 - Reference source documents instead of copying them.
-- Keep command details brief and refer to `dev-environment.md`.
-- Keep task and validation details brief and refer to `execution-validation.md`.
-- Keep ID relationships brief and refer to `implementation-map.md`.
+- Make `docs/execution-validation.md` the execution spine.
+- Make task-scoped reading explicit.
+- Keep command details brief and refer to `ENV-*`.
+- Keep task and validation details brief and refer to `TASK-*` and `VAL-*`.
 - Do not create new source IDs.
 - Do not include product narrative.
 
@@ -505,13 +538,15 @@ Recommended defaults:
 Before finalizing, verify:
 
 ```text
-[ ] Reading order is clear.
+[ ] Primary runtime documents are AGENTS.md and execution-validation.md.
+[ ] Task-scoped reading policy is explicit.
+[ ] Codex is told not to read the full document set by default.
+[ ] Codex is told not to infer tasks from reference catalogs.
 [ ] Source-of-truth hierarchy is clear.
 [ ] Repository boundaries are clear.
 [ ] Command rules are container-first.
 [ ] Validation rules are task-scoped.
-[ ] Implementation map usage is clear.
-[ ] UI document usage is clear when UI exists.
+[ ] UI document usage is clear.
 [ ] Execution report rules are included.
 [ ] Forbidden actions are explicit.
 [ ] No product/design/contract/task details are redefined here.

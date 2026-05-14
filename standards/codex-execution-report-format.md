@@ -1,429 +1,539 @@
-# Codex Execution Report Format
+# Codex Execution Report Format Standard
 
 ## Purpose
 
-Define the minimal runtime report Codex should maintain while implementing a Web App project.
+This standard defines the expected format for `codex-execution-report.md`.
 
-This report exists to answer:
+The report is a runtime execution log maintained by Codex while executing `TASK-*` entries from:
 
 ```text
-Which tasks were attempted?
-Which tasks passed?
-Which tasks failed?
-Which validation commands were run?
-What did each validation command prove?
-What blockers still require a human decision?
+docs/execution-validation.md
 ```
 
-It is not a metrics system.
+It should record:
 
-Do not maintain `codex-metrics.json` by default.
+```text
+what task was attempted
+which task-scoped sources were read
+which files changed
+which validation command was run
+what the validation result was
+what blockers or failures remain
+```
+
+It should stay concise.
 
 ---
 
-## Core Principle
+## Core Rule
+
+`codex-execution-report.md` is not a planning document.
+
+It must not define:
 
 ```text
-Record execution evidence, not process noise.
+new requirements
+new project decisions
+new domain rules
+new API contracts
+new frontend/backend design
+new tasks
+new validation criteria
 ```
 
-The report should be short, factual, and task-focused.
-
-It should not duplicate:
-
-- product requirements
-- frontend design
-- backend design
-- API contracts
-- DB schemas
-- full validation protocol
-- implementation-map relationships
-
-Those belong in source documents.
+It records execution status only.
 
 ---
 
-## Default File
+## Ownership
 
-Codex should maintain this file at the project root:
+`codex-execution-report.md` owns runtime status.
+
+`docs/execution-validation.md` owns:
 
 ```text
-codex-execution-report.md
+TASK-*
+VAL-*
+required validation
+task dependencies
+completion rules
+```
+
+`docs/dev-environment.md` owns:
+
+```text
+ENV-*
+command patterns
+service names
+forbidden host commands
+```
+
+`AGENTS.md` owns:
+
+```text
+how Codex should update the report
 ```
 
 ---
 
-## Recommended Template
+## Recommended File Structure
+
+Use this structure:
 
 ```markdown
 # Codex Execution Report
 
 ## Summary
 
-| Field | Value |
-|---|---|
-| Status | in_progress |
-| Last Updated | YYYY-MM-DD HH:MM |
-| Current Task | TASK-000 |
-| Completed Tasks | 0 |
-| Failed Tasks | 0 |
-| Blocked Tasks | 0 |
+## Current Status
 
 ## Task Results
 
-| Task | Type | Status | Required Validation | Result | Failure Reason | Notes |
-|---|---|---|---|---|---|---|
-| TASK-001 | backend | pending | not_run | not_run |  |  |
-
-## Validation Commands
-
-| Task | Command | Claim Proven | Result | Notes |
-|---|---|---|---|---|
-| TASK-001 | `docker compose exec api npm run test -- example.test.ts` | Example behavior works | passed |  |
-
 ## Blockers
 
-| Task | Blocker | Decision Needed | Blocking Document | Status |
-|---|---|---|---|---|
-| TASK-004 | Pagination default unclear | Choose default page size | `data-api-contract.md` | open |
+## Deferred or Skipped Work
 
-## Skipped or Deferred Work
+## Validation Summary
 
-| Task | Reason | Required Follow-Up |
-|---|---|---|
-| TASK-009 | Out of current scope | Revisit after MVP |
+## Notes
+```
 
-## Final Summary
+Keep sections compact.
 
-- Completed:
-- Failed:
-- Blocked:
-- Skipped:
-- Needs human decision:
+---
+
+## Summary
+
+Recommended format:
+
+```markdown
+## Summary
+
+| Field | Value |
+|---|---|
+| Project | <project name> |
+| Last Updated | <date/time if available> |
+| Current Phase | P3 Data Layer |
+| Overall Status | in_progress |
+```
+
+Allowed overall statuses:
+
+```text
+not_started
+in_progress
+blocked
+failed
+complete
+complete_with_deferred_items
 ```
 
 ---
 
-## Allowed Task Status Values
+## Current Status
 
-Use only these values unless the project defines its own list.
+Recommended format:
+
+```markdown
+## Current Status
+
+| Current Task | Status | Next Step |
+|---|---|---|
+| TASK-014 | blocked | Confirm auth requirement before implementing permission checks. |
+```
+
+Rules:
+
+- Keep this section updated.
+- Do not write long narrative.
+
+---
+
+## Task Results
+
+Each completed, failed, or blocked task should have one entry.
+
+Recommended format:
+
+```markdown
+### TASK-014: Implement Case List API
+
+Type: api
+Phase: P5 Backend Feature Workflows
+Status: complete
+
+Sources Read:
+- `docs/execution-validation.md#TASK-014`
+- `docs/data-api-contract.md#API-001`
+- `docs/backend-design.md#BE-005`
+- `docs/domain-model.md#BR-002`
+- `docs/dev-environment.md#ENV-011`
+
+Files Changed:
+- `apps/api/src/routes/cases.ts`
+- `apps/api/src/services/case-query-service.ts`
+- `apps/api/src/tests/cases-api.test.ts`
+
+Required Validation:
+| VAL | Command | Result |
+|---|---|---|
+| VAL-006 | `docker compose exec api npm run test -- cases-api.test.ts` | passed |
+
+Claim Proven:
+- API-001 returns documented paginated case data and documented structured errors.
+
+Notes:
+- None.
+```
+
+---
+
+## Task Status Values
+
+Use these task statuses:
+
+```text
+not_started
+in_progress
+complete
+blocked
+failed
+skipped
+deferred
+```
+
+Definitions:
 
 | Status | Meaning |
 |---|---|
-| `pending` | Task has not started. |
-| `in_progress` | Task is currently being implemented. |
-| `done` | Task implementation and required validation passed. |
-| `failed` | Task was attempted but required validation failed. |
-| `blocked` | Task cannot continue without a decision or missing dependency. |
-| `skipped` | Task was intentionally skipped. |
-| `deferred` | Task was postponed to later scope. |
+| `not_started` | Task has not been attempted. |
+| `in_progress` | Task is currently being worked on. |
+| `complete` | Task implementation and required validation are complete. |
+| `blocked` | Task cannot proceed without decision, dependency, command, or environment fix. |
+| `failed` | Task was attempted but required validation failed and could not be fixed in scope. |
+| `skipped` | Task was intentionally skipped with reason. |
+| `deferred` | Task was moved out of current scope with reason. |
 
 ---
 
-## Allowed Validation Result Values
+## Sources Read
 
-Use only these values unless the project defines its own list.
+Every task result should record task-scoped sources read.
 
-| Result | Meaning |
-|---|---|
-| `not_run` | Command has not been run. |
-| `passed` | Command completed successfully and proved the claim. |
-| `failed` | Command ran but failed. |
-| `blocked` | Command could not run due to missing dependency, service, env var, or decision. |
-| `skipped` | Command was intentionally skipped. |
-| `partial` | Command ran but only partially proved the claim. |
+Rules:
 
----
-
-## Task Type Values
-
-Use task type to make the report easier to scan.
-
-Recommended values:
-
-| Type | Meaning |
-|---|---|
-| `frontend` | Frontend-only implementation. |
-| `backend` | Backend-only implementation. |
-| `data` | Database, migration, schema, or repository task. |
-| `api` | API endpoint or API contract task. |
-| `ui` | UI behavior, page, component, token, or visual-spec task. |
-| `infra` | Docker, environment, command, CI, or deployment task. |
-| `test` | Test-only task. |
-| `docs` | Documentation-only task. |
-| `cross-cutting` | Task affects multiple layers. |
-
----
-
-## Required Fields
-
-Each task result row should include:
-
-```text
-Task
-Type
-Status
-Required Validation
-Result
-Failure Reason
-Notes
-```
-
-Each validation command row should include:
-
-```text
-Task
-Command
-Claim Proven
-Result
-Notes
-```
-
-Each blocker row should include:
-
-```text
-Task
-Blocker
-Decision Needed
-Blocking Document
-Status
-```
-
----
-
-## What to Record
-
-Record:
-
-- task status changes
-- required validation commands
-- validation results
-- validation failure reasons
-- blockers
-- skipped tasks
-- deferred tasks
-- final summary
-
-Do not record:
-
-- long reasoning
-- implementation diary
-- every file edit
-- every command that was not part of required or useful validation
-- repeated logs
-- stack traces unless summarized
-- full test output unless necessary
-
----
-
-## Validation Recording Rules
-
-Every validation command should include a claim proven.
+- Include the current `TASK-*`.
+- Include reference catalog entries actually read.
+- Prefer exact headings, IDs, or YAML keys.
+- Do not list entire documents unless the full document was intentionally read.
 
 Good:
 
 ```markdown
-| Task | Command | Claim Proven | Result | Notes |
-|---|---|---|---|---|
-| TASK-012 | `docker compose exec api npm run test -- risk-runs-api.test.ts` | Run trigger API rejects duplicate active runs with structured error. | passed |  |
+Sources Read:
+- `docs/execution-validation.md#TASK-014`
+- `docs/data-api-contract.md#API-001`
+- `docs/backend-design.md#BE-005`
 ```
 
-Bad:
+Avoid:
 
 ```markdown
-| Task | Command | Result |
+Sources Read:
+- all docs
+- backend docs
+- UI docs
+```
+
+---
+
+## Files Changed
+
+Record changed files.
+
+Recommended format:
+
+```markdown
+Files Changed:
+- `apps/api/src/routes/cases.ts`
+- `apps/api/src/services/case-query-service.ts`
+- `apps/api/src/tests/cases-api.test.ts`
+```
+
+Rules:
+
+- Include only files changed for the task.
+- If no files changed, write `None`.
+- If a file was intentionally not changed, explain only when relevant.
+
+---
+
+## Required Validation
+
+Every completed implementation task should record required validation.
+
+Recommended format:
+
+```markdown
+Required Validation:
+| VAL | Command | Result |
 |---|---|---|
-| TASK-012 | `npm test` | failed |
+| VAL-006 | `docker compose exec api npm run test -- cases-api.test.ts` | passed |
 ```
 
-Why bad:
+Allowed validation results:
 
-- host command may violate container-first policy
-- claim is missing
-- failure is not connected to task evidence
+```text
+passed
+failed
+not_run
+blocked
+not_applicable
+```
+
+Rules:
+
+- Use the exact command run.
+- Use container-first commands unless explicitly allowed.
+- If validation was not run, explain why under Notes or Blockers.
+- Do not mark task complete if required validation is `failed`, `blocked`, or `not_run` unless explicitly accepted.
 
 ---
 
-## Failure Reason Rules
+## Claim Proven
 
-Failure reason should be concise and actionable.
+Each completed task should include a short claim proven.
 
 Good:
 
-```text
-Expected 409 duplicate-run error, received 500.
+```markdown
+Claim Proven:
+- API-001 returns documented paginated case data and documented structured errors.
 ```
 
-```text
-Docker service `api` is not running.
-```
-
-```text
-Missing DATABASE_URL in container environment.
-```
-
-Bad:
-
-```text
-Tests failed.
-```
-
-```text
-Something is broken.
-```
-
----
-
-## Blocker Rules
-
-A blocker should identify:
-
-- the task affected
-- what blocks progress
-- what decision is needed
-- which document should be updated
-
-Example:
+Avoid:
 
 ```markdown
-| Task | Blocker | Decision Needed | Blocking Document | Status |
-|---|---|---|---|---|
-| TASK-014 | API response for stale result is undefined | Decide stale-result response shape | `data-api-contract.md` | open |
+Claim Proven:
+- Tests pass.
 ```
 
-If a blocker is resolved, update status:
-
-```text
-resolved
-```
-
-and record the decision in the relevant source document.
+The claim should match the `VAL-*` entry in `execution-validation.md`.
 
 ---
 
-## Minimal Update Timing
+## Blockers
 
-Codex should update the report:
+Use the blockers section for unresolved blockers.
 
-1. before starting a task, mark it `in_progress`
-2. after implementation, record required validation
-3. after validation, record result
-4. when blocked, record blocker
-5. at the end of a milestone or handoff, update final summary
-
-Do not update the report after every tiny edit.
-
----
-
-## Relationship to Other Documents
-
-| Source | Relationship |
-|---|---|
-| `execution-validation.md` | Defines tasks and required validation. |
-| `dev-environment.md` | Defines canonical command syntax. |
-| `implementation-map.md` | Defines related IDs and flow mapping. |
-| `AGENTS.md` | Requires Codex to maintain the report. |
-
-`codex-execution-report.md` records what happened; it does not define what should happen.
-
----
-
-## Compact Example
+Recommended format:
 
 ```markdown
-# Codex Execution Report
-
-## Summary
-
-| Field | Value |
-|---|---|
-| Status | in_progress |
-| Last Updated | 2026-05-12 15:30 |
-| Current Task | TASK-012 |
-| Completed Tasks | 3 |
-| Failed Tasks | 0 |
-| Blocked Tasks | 1 |
-
-## Task Results
-
-| Task | Type | Status | Required Validation | Result | Failure Reason | Notes |
-|---|---|---|---|---|---|---|
-| TASK-010 | data | done | `docker compose exec api npm run db:migrate` | passed |  | Added case parameter table. |
-| TASK-011 | backend | done | `docker compose exec api npm run test -- risk-run-service.test.ts` | passed |  | Duplicate active run guard works. |
-| TASK-012 | api | in_progress | not_run | not_run |  | Implementing route handler. |
-| TASK-013 | frontend | blocked | not_run | blocked | API response shape unclear | Waiting for API contract update. |
-
-## Validation Commands
-
-| Task | Command | Claim Proven | Result | Notes |
-|---|---|---|---|---|
-| TASK-010 | `docker compose exec api npm run db:migrate` | Migration applies successfully. | passed |  |
-| TASK-011 | `docker compose exec api npm run test -- risk-run-service.test.ts` | Risk run service prevents duplicate active runs. | passed |  |
-
 ## Blockers
 
 | Task | Blocker | Decision Needed | Blocking Document | Status |
 |---|---|---|---|---|
-| TASK-013 | API response shape unclear | Define stale-result response fields | `data-api-contract.md` | open |
-
-## Final Summary
-
-- Completed: TASK-010, TASK-011
-- Failed:
-- Blocked: TASK-013
-- Skipped:
-- Needs human decision: stale-result response shape
+| TASK-018 | Auth requirement is unclear. | Confirm whether MVP requires login. | product-spec.md, project-decisions.md | open |
 ```
+
+Blocker statuses:
+
+```text
+open
+resolved
+accepted_deferred
+```
+
+Rules:
+
+- Keep blockers actionable.
+- Identify the blocking source document when possible.
+- Do not hide blockers in task notes only.
+
+---
+
+## Deferred or Skipped Work
+
+Use this section when a task is deferred or skipped.
+
+Recommended format:
+
+```markdown
+## Deferred or Skipped Work
+
+| Task | Status | Reason | Approval / Note |
+|---|---|---|---|
+| TASK-030 | deferred | Visual regression tooling is not part of MVP. | Accepted as future work. |
+```
+
+Rules:
+
+- Deferred/skipped work must be explicit.
+- Do not silently drop tasks from the report.
+
+---
+
+## Validation Summary
+
+Summarize validation results.
+
+Recommended format:
+
+```markdown
+## Validation Summary
+
+| Scope | Command | Result | Notes |
+|---|---|---|---|
+| TASK-014 | `docker compose exec api npm run test -- cases-api.test.ts` | passed | None |
+| P5 Milestone | `docker compose exec api npm run test -- --run` | not_run | Pending TASK-018. |
+```
+
+Rules:
+
+- Include task validation and milestone/release validation when run.
+- Keep this section compact.
+
+---
+
+## Notes
+
+Use notes for short, non-blocking observations.
+
+Rules:
+
+- Do not turn notes into a planning document.
+- Do not define new tasks here.
+- If a note implies new work, update `execution-validation.md` instead.
+
+---
+
+## Failure Entry Format
+
+If a task fails, use this shape:
+
+```markdown
+### TASK-021: Implement Case Detail Page
+
+Type: frontend
+Phase: P7 Frontend Feature Workflows
+Status: failed
+
+Sources Read:
+- `docs/execution-validation.md#TASK-021`
+- `docs/frontend-design.md#FE-004`
+- `docs/data-api-contract.md#API-002`
+
+Files Changed:
+- `apps/web/app/cases/[caseId]/page.tsx`
+
+Required Validation:
+| VAL | Command | Result |
+|---|---|---|
+| VAL-011 | `docker compose exec web npm run test -- case-detail-page.test.tsx` | failed |
+
+Failure Reason:
+- Test fails because API-002 response field `latest_result` is undefined in the mock data.
+
+Next Step:
+- Check whether API-002 or the frontend mock should be updated.
+```
+
+Rules:
+
+- Include a clear failure reason.
+- Do not mark failed tasks as complete.
+- Keep next step short.
+
+---
+
+## Blocked Entry Format
+
+If a task is blocked, use this shape:
+
+```markdown
+### TASK-018: Implement Permission Policy
+
+Type: backend
+Phase: P4 Backend API Foundation
+Status: blocked
+
+Sources Read:
+- `docs/execution-validation.md#TASK-018`
+- `docs/product-spec.md#Open Questions`
+- `docs/project-decisions.md#Open Decision Questions`
+
+Files Changed:
+- None
+
+Required Validation:
+| VAL | Command | Result |
+|---|---|---|
+| VAL-009 | `docker compose exec api npm run test -- permission-policy.test.ts` | blocked |
+
+Blocker:
+- Authentication requirement is not confirmed.
+
+Decision Needed:
+- Confirm whether MVP requires login and user-specific permissions.
+
+Blocking Document:
+- `docs/product-spec.md`
+- `docs/project-decisions.md`
+```
+
+---
+
+## Report Update Rules
+
+Codex should update the report after each task attempt.
+
+Update when:
+
+```text
+a task starts
+a task completes
+a task fails
+a task is blocked
+validation is run
+a blocker is resolved
+work is deferred or skipped
+```
+
+Do not wait until the end of the project to update the report.
 
 ---
 
 ## Anti-Patterns
 
-Avoid turning the report into:
-
-- a changelog
-- a debug log
-- a metrics file
-- a project journal
-- a second execution plan
-- a copy of validation output
-
-Avoid adding:
-
-- token counts
-- detailed timing metrics
-- every command run
-- every file changed
-- long reasoning notes
-- full stack traces
-
-unless explicitly requested.
-
----
-
-## Health Checks
-
-The execution report is healthy when:
-
-- every active task has a status
-- every completed task has validation result
-- every validation command has a claim proven
-- every failed validation has a concise failure reason
-- every blocker has a required decision
-- report stays short
-- `codex-metrics.json` is not required
-- task definitions remain in `execution-validation.md`
-- ID relationships remain in `implementation-map.md`
-
----
-
-## Final Rule
-
-The execution report should let a human answer in under one minute:
+Avoid:
 
 ```text
-What did Codex complete?
-What did Codex prove?
-What failed?
-What needs a decision?
+using the report to define new TASK-*
+using the report to define new VAL-*
+using the report to redefine API contracts
+using the report to store long implementation diaries
+marking tasks complete without validation
+omitting sources read
+omitting files changed
+recording "tests pass" without command and claim
+hiding blockers in notes only
+```
+
+---
+
+## Quality Checklist
+
+Before accepting the report, verify:
+
+```text
+[ ] Each attempted task has a status.
+[ ] Each completed implementation task has validation result.
+[ ] Validation commands are exact.
+[ ] Claims proven are specific.
+[ ] Sources read are recorded.
+[ ] Files changed are recorded.
+[ ] Blockers are listed in the blockers section.
+[ ] Deferred/skipped work is explicit.
+[ ] The report does not define new source-of-truth content.
+[ ] The report stays concise.
 ```

@@ -8,13 +8,25 @@ docs/dev-environment.md
 
 ## Purpose
 
-Generate the development environment and command source of truth for a Codex-ready Web App project.
+Generate a compact development environment and command reference catalog for a Codex-ready Web App project.
 
-`dev-environment.md` defines how Codex and developers should run setup, install, start, migration, seed, test, build, and validation commands.
+`dev-environment.md` owns:
 
-It should make command execution predictable, container-first, and low-noise.
+```text
+ENV-* environment and command entries
+container-first command policy
+service names
+runtime and package manager assumptions
+setup/start/stop command patterns
+dependency command patterns
+database command patterns
+test command patterns
+milestone/release command patterns
+forbidden host commands
+open environment questions
+```
 
-It should not define product requirements, frontend design, backend design, database/API contracts, task order, or validation criteria.
+It exists so `execution-validation.md` can reference precise command and environment entries from `TASK-*`.
 
 ---
 
@@ -22,57 +34,65 @@ It should not define product requirements, frontend design, backend design, data
 
 Use the available conversation context and upstream documents already generated in the current conversation.
 
-Required upstream documents:
+Recommended upstream context:
 
 ```text
+Project Design Brief
 docs/product-spec.md
 docs/project-decisions.md
 docs/architecture.md
 docs/data-api-contract.md
 docs/frontend-design.md
 docs/backend-design.md
+current project discussion
+uploaded project notes
 ```
 
 Use `project-decisions.md` for:
 
+- `DEC-*`
+- container-first development
 - package manager
 - runtime choices
-- repository layout
-- container-first development decision
 - frontend framework
 - backend framework
 - database choice
-- validation strategy decision
+- validation policy
+- deployment/runtime direction
 
 Use `architecture.md` for:
 
+- `ARCH-*`
 - repository layout
 - runtime units
 - frontend/backend/data boundaries
-- service names when implied
+- service boundaries
 
 Use `data-api-contract.md` for:
 
+- `DB-*`
 - database and migration needs
 - seed data needs
-- API runtime requirements
+- API runtime needs
 
 Use `frontend-design.md` for:
 
+- `FE-*`
 - frontend app path
 - frontend package scripts
-- frontend test framework assumptions
+- frontend test assumptions
 
 Use `backend-design.md` for:
 
+- `BE-*`
 - backend app path
 - backend package scripts
-- backend test framework assumptions
-- job/worker runtime needs
+- backend test assumptions
+- worker/job runtime needs
 
-If an upstream document is unavailable, use the available context and state assumptions.
+If upstream documents are unavailable, use available context and state assumptions.
 
-If command choices are blocked by missing information, ask the minimum necessary blocking questions.
+If a command or environment decision is unclear and affects execution tasks, list it under `Open Environment Questions`.
 
 ---
 
@@ -102,300 +122,291 @@ docs/dev-environment.md
 
 Do not generate other project documents.
 
-Do not create new IDs by default.
-
-You may reference existing:
+Create only:
 
 ```text
-DEC-*
-DB-*
-API-*
-FE-*
-BE-*
+ENV-*
 ```
 
 Do not create:
 
 ```text
 REQ-*
+DEC-*
 ENT-*
 REL-*
 BR-*
+STATE-*
+ARCH-*
+DB-*
+API-*
+ERR-*
+TYPE-*
+FE-*
+BE-*
+TASK-*
+VAL-*
+```
+
+You may reference existing:
+
+```text
+DEC-*
+ARCH-*
 DB-*
 API-*
 FE-*
 BE-*
-VAL-*
-TASK-*
 ```
 
-Do not define product requirements, frontend implementation details, backend implementation details, DB/API schemas, task order, or validation criteria here.
+Every `ENV-*` must be heading-addressable.
+
+Use this heading format:
+
+```markdown
+### ENV-001: Environment Item Name
+```
+
+Do not write a long environment guide.
+
+Do not define product requirements, frontend/backend implementation, DB/API contracts, task lists, or validation criteria here.
 
 ---
 
 ## Required Document Structure
 
-Use this structure unless the project clearly needs a small adjustment:
+Use this structure:
 
 ```markdown
 # Dev Environment
 
-## Purpose
-
-## Source of Truth
-
-## Codex Usage
-
-## Non-Goals of This Document
-
-## Environment Summary
-
-## Repository Layout Assumptions
-
-## Container-First Policy
-
-## Services
-
-## Runtime Versions
-
-## Package Managers
-
-## Environment Variables
-
-## Setup Commands
-
-## Start and Stop Commands
-
-## Dependency Commands
-
-## Database Commands
-
-## Test Command Patterns
-
-## Task-Scoped Validation Command Patterns
-
-## Milestone Validation Commands
-
-## Release Validation Commands
-
-## Optional Heavy Checks
+## Environment Catalog
 
 ## Forbidden Host Commands
 
-## Troubleshooting Notes
-
-## Assumptions
-
-## Open Questions
+## Open Environment Questions
 ```
 
----
-
-## Section Rules
-
-### Purpose
-
-State that this document defines the canonical development environment and command rules.
-
-Do not describe feature implementation details.
+Do not add extra sections unless they are necessary for the project.
 
 ---
 
-### Source of Truth
+## Environment Catalog
 
-State that this document owns:
+Generate compact `ENV-*` entries.
 
-- container-first command policy
-- Docker Compose service names
-- runtime versions
-- package managers
-- setup commands
-- start/stop commands
-- dependency commands
-- migration commands
-- seed commands
-- test command patterns
-- milestone validation command patterns
-- release validation command patterns
-- optional heavy checks
-- forbidden host commands
-- environment variable inventory at command level
-
-State that this document does not own:
-
-- product requirements
-- domain rules
-- frontend design
-- backend design
-- database schema details
-- API contracts
-- task definitions
-- validation criteria
-- Codex execution protocol
-
----
-
-### Codex Usage
-
-Tell Codex to use this document to:
-
-- select canonical commands
-- avoid host-level commands when containers are required
-- determine which service to exec into
-- run setup, tests, migrations, seeds, builds, and validations consistently
-- avoid package-manager drift
-
-Tell Codex that task-specific validation selection belongs in `execution-validation.md`.
-
----
-
-### Non-Goals of This Document
-
-Explicitly state that this document does not define:
-
-- which tasks to implement
-- which validation proves each task
-- business acceptance criteria
-- API request/response shapes
-- database table fields
-- frontend component structure
-- backend service structure
-
----
-
-## Environment Summary
-
-Provide a compact overview.
+Each entry should be independently readable because `TASK-*` items in `execution-validation.md` will reference individual command/environment entries directly.
 
 Recommended format:
 
 ```markdown
-The project uses a container-first development workflow.
+### ENV-001: Container-First Command Policy
 
-Canonical commands run through Docker Compose.
+Kind: command-policy
 
-Default app layout:
-- `apps/web`
-- `apps/api`
-- `packages/*`
+Rule:
+- Install, test, build, migration, seed, and validation commands must run inside containers by default.
 
-Codex must use the service-specific commands in this document unless a later document explicitly overrides them.
+Applies To:
+- all implementation tasks
+- all validation tasks
+- Codex execution
+
+Canonical Pattern:
+```bash
+docker compose exec <service> <command>
 ```
 
-Adjust based on project decisions.
+Allowed:
+- Use `docker compose exec <service> ...` when the service is running.
+- Use `docker compose run --rm <service> ...` for setup-specific commands when the service is not running.
 
----
+Forbidden:
+- Do not run host-level package install, test, build, migration, or validation commands by default.
 
-## Repository Layout Assumptions
-
-State command-relevant layout only.
-
-Recommended format:
-
-```markdown
-| Path | Purpose |
-|---|---|
-| `apps/web` | Frontend Web app. |
-| `apps/api` | Backend API app. |
-| `packages/*` | Shared app-agnostic packages. |
+Related:
+- DEC-002
 ```
 
-Do not define full directory trees here.
+Rules:
 
----
+- Use `ENV-*` for environment and command entries that later tasks may reference.
+- Keep entries compact.
+- Include `Kind`.
+- Include exact commands or command patterns.
+- Include `Allowed` and `Forbidden` where useful.
+- Include `Related` IDs where useful.
+- Do not include task-specific validation selection.
+- Do not create `TASK-*` or `VAL-*`.
 
-## Container-First Policy
-
-Define the command policy clearly.
-
-Recommended rules:
-
-```markdown
-- All install, test, build, migration, seed, and validation commands must run inside containers by default.
-- Host-level commands are forbidden unless explicitly listed as allowed.
-- Codex must not switch package managers.
-- Codex must not install dependencies on the host when the project is container-first.
-- Codex must use `docker compose exec <service> ...` when the service is already running.
-- Codex may use `docker compose run --rm <service> ...` only when the service is not running or the command is setup-specific.
-```
-
----
-
-## Services
-
-Define Docker Compose services.
-
-Recommended format:
-
-```markdown
-| Service | Purpose | Typical Commands |
-|---|---|---|
-| `web` | Frontend Web app | npm install, npm run dev, npm run test |
-| `api` | Backend API app | npm install, npm run dev, npm run test, db commands |
-| `db` | Database | database container |
-```
-
-Use actual service names from the project if known.
-
-If service names are not known, choose reasonable names and mark them as assumptions.
-
----
-
-## Runtime Versions
-
-Define known runtime versions.
-
-Recommended format:
-
-```markdown
-| Runtime | Version | Applies To |
-|---|---|---|
-| Node.js | 20.x | `apps/web`, `apps/api` |
-| PostgreSQL | 16.x | `db` |
-```
-
-If exact versions are unknown, write:
+Recommended `Kind` values:
 
 ```text
-TBD
+command-policy
+service
+runtime
+package-manager
+environment-variable
+setup-command
+start-stop-command
+dependency-command
+database-command
+test-command
+milestone-command
+release-command
+forbidden-command
+troubleshooting
 ```
-
-Do not invent exact versions unless the project has a standard.
 
 ---
 
-## Package Managers
+## Recommended Environment Entries
 
-Define package manager choices.
+Generate entries only when they apply to the project.
+
+Common entries include:
+
+```text
+ENV-001 Container-First Command Policy
+ENV-002 Docker Compose Services
+ENV-003 Runtime Versions
+ENV-004 Package Manager Policy
+ENV-005 Environment Variables
+ENV-006 First-Time Setup Commands
+ENV-007 Start and Stop Commands
+ENV-008 Dependency Commands
+ENV-009 Database Commands
+ENV-010 Frontend Test Command Pattern
+ENV-011 Backend Test Command Pattern
+ENV-012 Milestone Validation Command Pattern
+ENV-013 Release Validation Command Pattern
+ENV-014 Optional Heavy Checks
+ENV-015 Troubleshooting Notes
+```
+
+Do not force all entries if they are not useful.
+
+---
+
+## Entry Guidance
+
+### Container-First Command Policy Entry
+
+Should define:
+
+- commands run inside containers by default
+- when to use `docker compose exec`
+- when to use `docker compose run --rm`
+- host command restrictions
+
+Should reference:
+
+```text
+DEC-* container-first decision
+ARCH-* runtime/service boundary
+```
+
+---
+
+### Docker Compose Services Entry
+
+Should define service names.
 
 Recommended format:
 
 ```markdown
-| Area | Package Manager | Canonical Prefix |
+### ENV-002: Docker Compose Services
+
+Kind: service
+
+Services:
+| Service | Purpose | Related Area |
 |---|---|---|
-| Frontend | npm | `docker compose exec web npm` |
-| Backend | npm | `docker compose exec api npm` |
+| web | Frontend Web app | apps/web |
+| api | Backend API app | apps/api |
+| db | Database service | persistence |
+```
+
+Rules:
+
+- Use actual service names when known.
+- If service names are assumptions, mark them clearly.
+- Do not define Docker Compose YAML here unless requested.
+
+---
+
+### Runtime Versions Entry
+
+Should define known runtime versions.
+
+Recommended format:
+
+```markdown
+### ENV-003: Runtime Versions
+
+Kind: runtime
+
+Runtimes:
+| Runtime | Version | Applies To |
+|---|---|---|
+| Node.js | 20.x | web, api |
+| PostgreSQL | 16.x | db |
+```
+
+Rules:
+
+- Use `TBD` if exact versions are unknown.
+- Do not invent exact versions unless the project has a standard.
+
+---
+
+### Package Manager Entry
+
+Should define exactly one package manager per app or workspace.
+
+Recommended format:
+
+```markdown
+### ENV-004: Package Manager Policy
+
+Kind: package-manager
+
+Policy:
+- Use npm for frontend and backend Node.js packages.
+
+Canonical Prefixes:
+| Area | Prefix |
+|---|---|
+| web | `docker compose exec web npm` |
+| api | `docker compose exec api npm` |
+
+Forbidden:
+- Do not switch to pnpm, yarn, or bun unless DEC-* changes.
 ```
 
 Rules:
 
 - Do not list multiple package managers as alternatives.
-- If `npm` is chosen, forbid `pnpm`, `yarn`, and `bun` unless explicitly allowed.
-- If backend uses Python, define whether the project uses `uv`, `poetry`, or plain `pip`, but choose one.
+- If backend uses Python, choose one tool such as `uv`, `poetry`, or `pip`.
 
 ---
 
-## Environment Variables
+### Environment Variables Entry
 
-List environment variables needed to run locally.
+Should list local environment variables without secret values.
 
 Recommended format:
 
 ```markdown
+### ENV-005: Environment Variables
+
+Kind: environment-variable
+
+Variables:
 | Variable | Used By | Required? | Notes |
 |---|---|---:|---|
-| `DATABASE_URL` | `api` | yes | Backend database connection string. |
-| `NEXT_PUBLIC_API_BASE_URL` | `web` | yes | Public API base URL for frontend. |
+| DATABASE_URL | api | yes | Backend database connection string. |
+| NEXT_PUBLIC_API_BASE_URL | web | yes | Public API base URL. |
 ```
 
 Rules:
@@ -403,84 +414,104 @@ Rules:
 - Do not include secret values.
 - Mark public frontend variables clearly.
 - Server-only secrets must not be exposed to frontend.
-- If `.env.example` should exist, state that requirement.
+- Mention `.env.example` if it should exist.
 
 ---
 
-## Setup Commands
+### Setup Commands Entry
 
-Define first-time setup commands.
+Should define first-time setup commands.
 
 Recommended format:
 
+```markdown
+### ENV-006: First-Time Setup Commands
+
+Kind: setup-command
+
+Commands:
 ```bash
 docker compose up -d
 docker compose exec web npm install
 docker compose exec api npm install
 ```
+```
 
 Rules:
 
-- Commands must be canonical.
-- Do not include alternative commands unless clearly marked.
-- Do not include host-level install commands by default.
+- Use canonical commands.
+- Do not include host install commands.
 
 ---
 
-## Start and Stop Commands
+### Start and Stop Commands Entry
 
-Define start and stop commands.
+Should define start, stop, and logs commands.
 
 Recommended format:
 
+```markdown
+### ENV-007: Start and Stop Commands
+
+Kind: start-stop-command
+
+Commands:
 ```bash
 docker compose up -d
 docker compose logs -f web
 docker compose logs -f api
 docker compose down
 ```
-
-If the app requires separate dev servers inside containers, include those commands.
+```
 
 ---
 
-## Dependency Commands
+### Dependency Commands Entry
 
-Define dependency installation and update commands.
+Should define package install/add commands.
 
 Recommended format:
 
+```markdown
+### ENV-008: Dependency Commands
+
+Kind: dependency-command
+
+Commands:
 ```bash
 docker compose exec web npm install
 docker compose exec api npm install
-```
-
-If adding packages:
-
-```bash
 docker compose exec web npm install <package>
 docker compose exec api npm install <package>
+```
 ```
 
 Rules:
 
 - Use the selected package manager only.
-- Do not use host commands unless explicitly allowed.
 
 ---
 
-## Database Commands
+### Database Commands Entry
 
-Define migration, seed, and reset command patterns.
+Should define migration, seed, reset, and database test command patterns when persistence exists.
 
 Recommended format:
 
+```markdown
+### ENV-009: Database Commands
+
+Kind: database-command
+
+Commands:
 ```bash
 docker compose exec api npm run db:migrate
 docker compose exec api npm run db:seed
 ```
 
-If commands are not yet known, define the expected script names and mark them as assumptions.
+Related:
+- DB-001
+```
 
 Rules:
 
@@ -490,21 +521,44 @@ Rules:
 
 ---
 
-## Test Command Patterns
+### Test Command Entries
 
-Define general test command patterns.
+Create separate entries for frontend and backend when useful.
 
-Recommended format for Node:
+Recommended format:
 
+```markdown
+### ENV-010: Frontend Test Command Pattern
+
+Kind: test-command
+
+Command Pattern:
 ```bash
 docker compose exec web npm run test -- <test-file-or-pattern>
+```
+
+Use For:
+- frontend components
+- frontend pages
+- frontend hooks
+- frontend API client behavior
+```
+
+```markdown
+### ENV-011: Backend Test Command Pattern
+
+Kind: test-command
+
+Command Pattern:
+```bash
 docker compose exec api npm run test -- <test-file-or-pattern>
 ```
 
-Recommended format for Python backend:
-
-```bash
-docker compose exec api pytest <test-file-or-pattern>
+Use For:
+- API handlers
+- backend services
+- repositories
+- business rule enforcement
 ```
 
 Rules:
@@ -515,76 +569,60 @@ Rules:
 
 ---
 
-## Task-Scoped Validation Command Patterns
+### Milestone Validation Entry
 
-Define patterns, not task-specific validation selection.
-
-Task-specific validation belongs in `execution-validation.md`.
+Should define broader but still focused commands.
 
 Recommended format:
 
 ```markdown
-| Task Type | Command Pattern | Notes |
-|---|---|---|
-| frontend component | `docker compose exec web npm run test -- <component-test>` | Use for component behavior. |
-| frontend page | `docker compose exec web npm run test -- <page-test>` | Use for page states and route behavior. |
-| backend service | `docker compose exec api npm run test -- <service-test>` | Use for business rule enforcement. |
-| backend API | `docker compose exec api npm run test -- <api-test>` | Use for request/response behavior. |
-| database migration | `docker compose exec api npm run db:migrate` | Pair with repository/API test when behavior changes. |
-```
+### ENV-012: Milestone Validation Command Pattern
 
-Rules:
+Kind: milestone-command
 
-- Do not assign these to `TASK-*` here.
-- Do not define `VAL-*` here.
-- Each actual required validation in `execution-validation.md` should include a claim proven.
-
----
-
-## Milestone Validation Commands
-
-Define broader but still focused commands.
-
-Recommended examples:
-
+Commands:
 ```bash
 docker compose exec api npm run test -- --run
 docker compose exec web npm run test -- --run
 ```
-
-or for Python backend:
-
-```bash
-docker compose exec api pytest tests/api tests/services
-docker compose exec web npm run test -- --run
 ```
 
 Rules:
 
-- Milestone validation should be broader than task validation.
-- It should still avoid unrelated heavy checks unless needed.
+- Milestone validation is broader than task validation.
+- Avoid unrelated heavy checks unless relevant.
 
 ---
 
-## Release Validation Commands
+### Release Validation Entry
 
-Define commands for final handoff or release.
+Should define final release validation commands.
 
-Recommended examples:
+Recommended format:
 
+```markdown
+### ENV-013: Release Validation Commands
+
+Kind: release-command
+
+Commands:
 ```bash
 docker compose exec api npm run test -- --run
 docker compose exec web npm run test -- --run
 docker compose exec web npm run build
 ```
+```
 
-Include typecheck/lint only if project decisions require them for release.
+Rules:
+
+- Include build/typecheck/lint only if project decisions require them for release.
+- Do not use release validation as a substitute for task validation.
 
 ---
 
-## Optional Heavy Checks
+### Optional Heavy Checks Entry
 
-List heavy checks that are not task-default.
+Should list heavy checks that are not task-default.
 
 Examples:
 
@@ -596,17 +634,31 @@ docker compose exec api npm run lint
 docker compose exec api npm run typecheck
 ```
 
-For Python backend:
-
-```bash
-docker compose exec api ruff check .
-docker compose exec api mypy .
-```
-
 Rules:
 
 - Heavy checks must not be required for every task by default.
 - Heavy checks may be used for milestone/release validation or when a task specifically needs them.
+
+---
+
+### Troubleshooting Entry
+
+Include only short practical troubleshooting notes.
+
+Recommended format:
+
+```markdown
+### ENV-015: Troubleshooting Notes
+
+Kind: troubleshooting
+
+Notes:
+| Problem | Likely Cause | Action |
+|---|---|---|
+| API cannot connect to database. | DB service not ready or DATABASE_URL missing. | Check `docker compose ps` and env vars. |
+```
+
+Do not include long debugging guides.
 
 ---
 
@@ -615,6 +667,9 @@ Rules:
 List commands Codex must not run on the host by default.
 
 Recommended format:
+
+```markdown
+## Forbidden Host Commands
 
 ```bash
 npm install
@@ -627,42 +682,18 @@ pytest
 mypy
 ruff check .
 ```
-
-Adjust based on chosen stack.
-
----
-
-## Troubleshooting Notes
-
-Include only short, practical troubleshooting notes.
-
-Recommended format:
-
-```markdown
-| Problem | Likely Cause | Action |
-|---|---|---|
-| `api` cannot connect to database | DB service not ready or `DATABASE_URL` missing | Check `docker compose ps` and env vars. |
 ```
 
-Do not include long debugging guides.
+Adjust based on the chosen stack.
+
+Rules:
+
+- Include only commands that are actually risky for the project.
+- Host commands may be allowed only if an explicit `ENV-*` entry or `DEC-*` decision permits them.
 
 ---
 
-## Assumptions
-
-List command-related assumptions.
-
-Recommended format:
-
-```markdown
-| Assumption | Impact | Confirm Later? |
-|---|---|---|
-| Docker Compose service names are `web`, `api`, and `db`. | Affects all commands. | yes |
-```
-
----
-
-## Open Questions
+## Open Environment Questions
 
 List unresolved environment questions.
 
@@ -672,22 +703,53 @@ Recommended format:
 | Question | Blocking? | Affected Area |
 |---|---:|---|
 | Should backend use npm or uv? | yes | install and test commands |
+| What is the exact database version? | no | Docker Compose, local development |
 ```
+
+Rules:
+
+- Include only questions that affect commands, runtime, services, package manager, env vars, testing, or execution tasks.
+- Mark blocking questions clearly.
+- Do not hide uncertainty inside `ENV-*` entries.
+
+---
+
+## Catalog Design Rules
+
+The generated file should behave like a task-scoped reference catalog.
+
+This means:
+
+- each `ENV-*` entry must be short enough to read independently
+- each `ENV-*` entry must have a stable Markdown heading
+- each `ENV-*` entry should include related upstream IDs when useful
+- task authors should be able to reference entries like:
+
+```text
+docs/dev-environment.md#ENV-001
+docs/dev-environment.md#ENV-010
+```
+
+Avoid broad environment narrative that Codex would need to read globally.
 
 ---
 
 ## Writing Rules
 
-- Use exact commands.
+- Write a reference catalog, not a long environment guide.
+- Use stable heading-addressable `ENV-*` IDs.
+- Keep every entry compact and independently readable.
+- Use exact commands or exact command patterns.
 - Prefer container-first commands.
-- Use one package manager per app.
-- Do not include multiple equivalent command choices.
-- Mark unknown command details as assumptions or open questions.
-- Do not define task-specific validation here.
+- Use one package manager per app/workspace.
+- Reference existing `DEC-*`, `ARCH-*`, `DB-*`, `API-*`, `FE-*`, and `BE-*` where useful.
+- Do not create non-ENV IDs.
+- Do not define task-specific validation selection here.
 - Do not define product requirements.
 - Do not define frontend/backend implementation details.
 - Do not define DB/API schemas.
-- Do not include secrets.
+- Do not include secret values.
+- Use `Open Environment Questions` for unresolved environment decisions.
 
 ---
 
@@ -696,6 +758,10 @@ Recommended format:
 Before finalizing, verify:
 
 ```text
+[ ] The file is a compact environment and command reference catalog.
+[ ] Important environment entries have ENV-* headings.
+[ ] Every ENV-* is independently readable.
+[ ] IDs are heading-addressable.
 [ ] Container-first policy is explicit.
 [ ] Docker service names are defined or clearly assumed.
 [ ] Package manager choices are explicit.
@@ -704,10 +770,10 @@ Before finalizing, verify:
 [ ] Dependency commands are exact.
 [ ] Database command patterns are defined when DB exists.
 [ ] Test command patterns are targeted.
-[ ] Milestone validation commands are defined.
-[ ] Release validation commands are defined.
+[ ] Milestone/release command patterns are defined.
 [ ] Heavy checks are not task-default.
 [ ] Forbidden host commands are listed.
-[ ] No task-specific VAL/TASK content is included.
+[ ] No TASK/VAL IDs are created.
 [ ] No product or implementation design content is included.
+[ ] No secrets are included.
 ```

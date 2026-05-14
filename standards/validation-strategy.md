@@ -1,25 +1,24 @@
-# Validation Strategy
+# Validation Strategy Standard
 
 ## Purpose
 
-Define how validation should be designed for Codex-ready Web App development.
+This standard defines how validation should be planned for a Codex-ready Web App project.
 
-This standard exists to prevent:
+Validation must support the v0.4.0 execution model:
 
-- running too many broad commands for every task
-- wasting Codex context on unrelated failures
-- using host commands when the project is container-first
-- treating lint/typecheck/mypy/build as default task validation
-- accepting vague validation such as "make sure it works"
-- missing the specific test that proves the current task is complete
+```text
+execution-validation.md is the primary execution spine
+TASK-* entries define required validation
+VAL-* entries define evidence
+ENV-* entries define command patterns
+AGENTS.md enforces task-scoped execution
+```
+
+The goal is to prove progress with focused, container-first commands instead of expensive or vague full-project checks for every task.
 
 ---
 
-## Core Principle
-
-```text
-Run the smallest containerized validation command that proves the current task works.
-```
+## Core Principles
 
 Validation should be:
 
@@ -28,512 +27,468 @@ container-first
 task-scoped
 evidence-driven
 minimal but meaningful
+repeatable
 ```
+
+Validation should not be:
+
+```text
+host-dependent
+overly broad by default
+unclear about what it proves
+used as a substitute for task planning
+only performed at release time
+```
+
+---
+
+## Ownership
+
+Validation responsibilities are split across documents.
+
+| Concern | Owner |
+|---|---|
+| Command patterns and service names | `docs/dev-environment.md` / `ENV-*` |
+| Task-specific required validation | `docs/execution-validation.md` / `TASK-*` |
+| Validation definitions and claims | `docs/execution-validation.md` / `VAL-*` |
+| Runtime validation policy | `AGENTS.md` |
+| Runtime validation results | `codex-execution-report.md` |
+
+`docs/dev-environment.md` defines how to run commands.
+
+`docs/execution-validation.md` decides which command proves each task.
+
+---
+
+## Validation Levels
+
+Use three validation levels.
+
+| Level | Purpose | Scope | Owner |
+|---|---|---|---|
+| Task validation | Prove one task is complete. | Smallest meaningful check. | `TASK-*` and `VAL-*` |
+| Milestone validation | Prove a phase or feature slice works. | Related test group or workflow group. | `execution-validation.md` |
+| Release validation | Prove handoff readiness. | Broader suite and build where required. | `execution-validation.md` |
+
+Task validation is required for implementation tasks.
+
+Milestone and release validation do not replace task validation.
+
+---
+
+## Task Validation Rules
+
+Every implementation task should have required validation.
+
+Each task validation must include:
+
+```text
+VAL-* reference
+command
+claim proven
+```
+
+Recommended task validation format:
+
+```markdown
+Required Validation:
+| VAL | Command | Claim Proven |
+|---|---|---|
+| VAL-001 | `docker compose exec api npm run test -- cases-api.test.ts` | API-001 returns paginated cases and documented errors. |
+```
+
+Rules:
+
+- Use targeted commands.
+- Use container-first commands.
+- Use command patterns from `ENV-*`.
+- Do not use vague claims such as `tests pass`.
+- Do not use release validation as the only proof for a task.
+- If no automated validation exists, use review validation and explain why.
+
+---
+
+## VAL-* Entry Rules
+
+Each `VAL-*` should define a stable validation claim.
+
+Recommended format:
+
+```markdown
+### VAL-001: Case List API Contract Validation
+
+Purpose:
+- Prove that API-001 returns documented paginated case data and documented errors.
+
+References:
+- API-001
+- DB-001
+- BE-005
+- REQ-004
+
+Command:
+```bash
+docker compose exec api npm run test -- cases-api.test.ts
+```
+
+Claim Proven:
+- API-001 returns the documented response shape and structured errors.
+
+Used By:
+- TASK-014
+```
+
+Rules:
+
+- Each `VAL-*` must prove one clear claim or a tightly related set of claims.
+- Each `VAL-*` should reference the source IDs it proves.
+- Each `VAL-*` should use an exact command.
+- Validation commands must be consistent with `docs/dev-environment.md`.
 
 ---
 
 ## Container-First Rule
 
-Project commands should run inside Docker containers by default.
+Validation commands should run inside containers by default.
 
-Preferred command style:
+Good:
 
 ```bash
-docker compose exec backend pytest tests/services/test_case_service.py
-docker compose exec frontend npm run test -- CaseList.test.tsx
+docker compose exec api npm run test -- cases-api.test.ts
+docker compose exec web npm run test -- case-list.test.tsx
+docker compose exec api npm run db:migrate
 ```
 
-Avoid host-level commands by default:
+Avoid by default:
 
 ```bash
-pytest
 npm test
 npm run build
-mypy .
+pytest
+mypy
 ruff check .
 ```
 
-Host commands are allowed only when `dev-environment.md` explicitly marks them as allowed.
+Host commands are allowed only when an `ENV-*` entry explicitly allows them.
 
 ---
 
-## Command Ownership
+## Targeted Test Preference
 
-Command syntax belongs in:
+Prefer targeted validation for tasks.
+
+Good task validation examples:
 
 ```text
-dev-environment.md
+API handler task -> targeted API test
+service task -> targeted service test
+repository task -> repository test
+migration task -> migration command plus repository/API test
+frontend page task -> page/component test
+API client task -> API client mock test
+UI state task -> state rendering test
 ```
 
-Validation selection belongs in:
-
-```text
-execution-validation.md
-```
-
-Codex enforcement belongs in:
-
-```text
-AGENTS.md
-```
-
-Runtime evidence belongs in:
-
-```text
-codex-execution-report.md
-```
-
-This means:
-
-| File | Responsibility |
-|---|---|
-| `dev-environment.md` | Defines canonical command prefixes and allowed/forbidden commands. |
-| `execution-validation.md` | Selects required validation for each task. |
-| `AGENTS.md` | Requires Codex to run the selected validation. |
-| `codex-execution-report.md` | Records command, claim proven, and result. |
-
----
-
-## Validation Layers
-
-Use three validation layers.
-
-## 1. Task-Scoped Validation
-
-Task-scoped validation is required for every implementation task.
-
-It should prove the current task works with the smallest relevant command.
-
-Examples:
-
-```bash
-docker compose exec backend pytest tests/services/test_case_service.py
-docker compose exec backend pytest tests/api/test_cases.py
-docker compose exec frontend npm run test -- CaseList.test.tsx
-docker compose exec frontend npm run test -- CaseForm.test.tsx
-```
-
-Use task-scoped validation for:
-
-- service behavior
-- API route behavior
-- frontend component behavior
-- form behavior
-- business rule enforcement
-- specific bug fixes
-- data transformation logic
-- permission behavior
-
-Task-scoped validation should not run unrelated full-project checks by default.
-
----
-
-## 2. Milestone Validation
-
-Milestone validation runs after a group of related tasks is completed.
-
-It should cover the main path of the milestone without becoming full CI.
-
-Examples:
-
-```bash
-docker compose exec backend pytest tests/api tests/services
-docker compose exec frontend npm run test -- --run
-```
-
-Use milestone validation when:
-
-- several related backend tasks are complete
-- several related frontend tasks are complete
-- an end-to-end feature slice is complete
-- a milestone changes multiple layers
-
-Milestone validation may include broader test suites, but it should still be related to the completed milestone.
-
----
-
-## 3. Release Validation
-
-Release validation runs before handoff, release, or major merge.
-
-It may be broader than task or milestone validation.
-
-Examples:
-
-```bash
-docker compose exec backend pytest
-docker compose exec frontend npm run test -- --run
-docker compose exec frontend npm run build
-```
-
-Use release validation when:
-
-- the implementation is complete
-- a user requests final verification
-- before creating a release
-- before merging a large feature branch
-
-Release validation may include build, typecheck, lint, or E2E if the project requires them.
-
----
-
-## Heavy Checks
-
-The following are heavy checks and must not be required for every task by default:
+Avoid requiring these for every task by default:
 
 ```text
 full lint
 full typecheck
-mypy
-ruff
 full build
-full E2E
 full test suite
+full E2E
+mypy over entire repo
 ```
 
-Heavy checks are appropriate when:
-
-- a task specifically changes types or shared schemas
-- a task changes build configuration
-- a task changes lint or formatting configuration
-- a milestone requires broader confidence
-- release validation is requested
-- a prior failure suggests the heavy check is relevant
+These may belong to milestone or release validation.
 
 ---
 
-## Required Validation Format
+## Engineering Foundation Validation
 
-Each required validation command should include a claim proven.
-
-Use this format in `execution-validation.md`:
-
-```markdown
-| Command | Claim Proven |
-|---|---|
-| `docker compose exec backend pytest tests/services/test_case_service.py` | Case service enforces case creation rules. |
-| `docker compose exec frontend npm run test -- CaseList.test.tsx` | Case list renders loading, empty, error, and ready states. |
-```
-
-Do not write:
-
-```markdown
-Run tests.
-```
-
-Do not write:
-
-```markdown
-Make sure everything works.
-```
-
----
-
-## Task Validation Pattern
-
-Each `TASK-*` should include:
-
-```markdown
-## TASK-012: Implement Run Trigger API
-
-Expected code impact:
-- `apps/api/routes/risk-runs.ts`
-- `apps/api/services/risk-run-service.ts`
-- `apps/api/tests/api/risk-runs.test.ts`
-
-Required validation:
-| Command | Claim Proven |
-|---|---|
-| `docker compose exec api npm run test -- risk-runs.test.ts` | Run trigger API prevents duplicate active runs and returns structured errors. |
-
-Optional validation:
-| Command | When to Run |
-|---|---|
-| `docker compose exec api npm run test -- --run` | Run after completing all run-related backend tasks. |
-```
-
----
-
-## Frontend Validation Guidance
-
-Prefer targeted frontend tests for:
-
-- page rendering
-- component behavior
-- form validation
-- loading state
-- empty state
-- error state
-- permission rendering
-- route-backed state
-- user interactions
+Foundation tasks also need evidence.
 
 Examples:
 
-```bash
-docker compose exec web npm run test -- CaseList.test.tsx
-docker compose exec web npm run test -- CaseForm.test.tsx
-docker compose exec web npm run test -- Sidebar.test.tsx
-```
+| Task Type | Validation Example | Claim Proven |
+|---|---|---|
+| repository skeleton | file/directory review or script check | Expected layout exists. |
+| Docker Compose setup | `docker compose config` | Compose file is valid. |
+| service startup | `docker compose up -d` plus health/log check | Services can start. |
+| package scripts | targeted script invocation | Scripts exist and are executable. |
+| env example | review validation | Required variables are documented. |
 
-Use build or full typecheck only when:
-
-- shared types changed
-- route structure changed substantially
-- framework config changed
-- release validation is requested
+Use review validation when automated validation would be artificial.
 
 ---
 
-## Backend Validation Guidance
+## Data Layer Validation
 
-Prefer targeted backend tests for:
+For data tasks, prefer:
 
-- service rules
-- repository behavior
-- API endpoints
-- permissions
-- transactions
-- concurrency guards
-- structured errors
-- integration adapters
-
-Examples:
-
-```bash
-docker compose exec api pytest tests/services/test_risk_run_service.py
-docker compose exec api pytest tests/api/test_risk_runs.py
+```text
+migration command
+seed command
+repository tests
+constraint tests
+query tests
 ```
-
-For Node-based APIs:
-
-```bash
-docker compose exec api npm run test -- risk-run-service.test.ts
-docker compose exec api npm run test -- risk-runs-api.test.ts
-```
-
-Use full backend test suite only for milestone or release validation unless a task specifically requires it.
-
----
-
-## Database Validation Guidance
-
-When a task changes database schema or migrations, validation should prove:
-
-- migration applies
-- ORM/schema is updated
-- affected API or service behavior works
 
 Examples:
 
 ```bash
 docker compose exec api npm run db:migrate
-docker compose exec api npm run test -- cases-repository.test.ts
+docker compose exec api npm run db:seed
+docker compose exec api npm run test -- case-repository.test.ts
 ```
 
-or:
+Claims should mention the data object or constraint proven.
 
-```bash
-docker compose exec backend alembic upgrade head
-docker compose exec backend pytest tests/repositories/test_cases_repository.py
+Good claim:
+
+```text
+DB-001 migration creates the cases table and repository can create/read cases.
 ```
-
-Do not rely only on migration success if the task also changes behavior.
 
 ---
 
-## API Validation Guidance
+## Backend Validation
 
-When a task changes an API endpoint, validation should prove:
+For backend tasks, prefer:
 
-- request validation
-- response shape
-- auth or permission behavior
-- error envelope
-- relevant business rule behavior
+```text
+service tests
+API handler tests
+request validation tests
+error mapping tests
+transaction tests
+permission tests
+integration adapter tests with mocks
+```
 
 Examples:
 
 ```bash
+docker compose exec api npm run test -- case-service.test.ts
 docker compose exec api npm run test -- cases-api.test.ts
-docker compose exec backend pytest tests/api/test_cases.py
+docker compose exec api npm run test -- run-transaction.test.ts
 ```
 
-If frontend depends on the API, add a frontend test only when the frontend behavior is part of the same task.
+Claims should reference `API-*`, `BE-*`, `BR-*`, `ERR-*`, or `DB-*` where useful.
 
 ---
 
-## UI Validation Guidance
+## Frontend Validation
 
-When a task changes UI behavior, validation should prove:
+For frontend tasks, prefer:
 
-- the relevant page or component renders
-- key states are handled
-- user actions work
-- UI follows route/local state expectations
-- permission-based rendering works when relevant
+```text
+component tests
+page tests
+route state tests
+form behavior tests
+API client mock tests
+state rendering tests
+accessibility checks when available
+```
 
 Examples:
 
 ```bash
-docker compose exec web npm run test -- CaseList.test.tsx
-docker compose exec web npm run test -- CaseRunButton.test.tsx
+docker compose exec web npm run test -- case-list-page.test.tsx
+docker compose exec web npm run test -- api-client.test.ts
+docker compose exec web npm run test -- error-state.test.tsx
 ```
 
-For purely visual changes, a component or snapshot-style test may be useful only if the project already uses it.
-
-Do not add visual validation tools unless the project already supports them or the user requests them.
+Claims should reference `FE-*`, UI page/action/state IDs, `API-*`, or `ERR-*` where useful.
 
 ---
 
-## Avoiding Validation Noise
+## UI Validation
 
-Validation noise happens when Codex runs broad commands that fail for unrelated reasons.
+For UI state and visual integration tasks, prefer:
 
-To reduce validation noise:
+```text
+state rendering tests
+component variant tests
+responsive behavior tests when available
+accessibility checks when available
+manual review validation for visual-only rules when automated tests are not practical
+```
 
-- prefer targeted tests first
-- avoid full lint/typecheck by default
-- do not run unrelated frontend checks for backend-only tasks
-- do not run unrelated backend checks for frontend-only tasks
-- record unrelated failures separately instead of treating the task as failed
-- escalate to broader checks only when task-scoped validation passes or when needed
+Do not require screenshot or visual regression tooling unless the project explicitly has it.
+
+Good claim:
+
+```text
+The case list page renders loading, empty, error, permission, and ready states from UI_PAGE.yaml.
+```
 
 ---
 
-## Failure Handling
+## Cross-Cutting Validation
 
-When validation fails, Codex should record:
+For hardening tasks, choose validation based on the risk.
 
-- task ID
-- command
-- claim proven
-- result
-- failure reason
-- whether failure appears task-related
-- next action
+Examples:
 
-Use `codex-execution-report.md`.
+| Risk | Validation |
+|---|---|
+| duplicate submission | service/API test for idempotency or conflict behavior |
+| permission drift | backend permission tests and frontend permission state tests |
+| stale state | frontend state transition test |
+| sensitive data exposure | API response test |
+| contract drift | API/client contract test |
+| structured error drift | error mapping test |
 
-Recommended format:
+---
+
+## Milestone Validation
+
+Milestone validation should be broader than task validation but still focused.
+
+Recommended milestone examples:
 
 ```markdown
-| Task | Command | Claim Proven | Result | Failure Reason |
-|---|---|---|---|---|
-| TASK-012 | `docker compose exec api npm run test -- risk-runs-api.test.ts` | Duplicate runs are rejected | failed | Expected 409, received 500 |
+| Phase / Milestone | Command | Claim Proven |
+|---|---|---|
+| P3 Data Layer | `docker compose exec api npm run test -- repositories` | Data layer tests pass for implemented repositories. |
+| P5 Backend Workflows | `docker compose exec api npm run test -- --run` | Backend API/service tests pass for backend milestone. |
+| P7 Frontend Workflows | `docker compose exec web npm run test -- --run` | Frontend page/component tests pass for implemented workflows. |
 ```
+
+Rules:
+
+- Use milestone validation after a coherent phase or feature slice.
+- Do not run unrelated heavy checks unless needed.
 
 ---
 
-## Optional Validation
+## Release Validation
 
-Optional validation should be clearly marked.
+Release validation proves handoff readiness.
 
-Use optional validation for:
-
-- broader confidence
-- suspected integration effects
-- post-milestone checks
-- release checks
-- debugging after failure
-
-Do not make optional validation look required.
-
----
-
-## Forbidden Patterns
-
-Avoid:
-
-```markdown
-Required validation:
-- Run all tests.
-- Run lint.
-- Run typecheck.
-- Run build.
-```
-
-unless the task genuinely requires all of them.
-
-Avoid:
-
-```markdown
-Validation:
-- Make sure the feature works.
-```
-
-because it gives Codex no command or proof target.
-
-Avoid:
+Recommended release examples:
 
 ```bash
-npm test
-pytest
+docker compose exec api npm run test -- --run
+docker compose exec web npm run test -- --run
+docker compose exec web npm run build
 ```
 
-when the project is container-first and the canonical command requires Docker.
+Include lint/typecheck/build only when project decisions require them for release.
+
+Release validation should not be the first time a task is tested.
 
 ---
 
-## Good Validation Examples
+## Optional Heavy Checks
 
-### Backend Service Task
+Heavy checks may include:
 
-```markdown
-Required validation:
-| Command | Claim Proven |
-|---|---|
-| `docker compose exec api npm run test -- risk-run-service.test.ts` | Risk run service prevents duplicate active runs. |
+```bash
+docker compose exec web npm run lint
+docker compose exec web npm run typecheck
+docker compose exec web npm run build
+docker compose exec api npm run lint
+docker compose exec api npm run typecheck
+docker compose exec api mypy .
+docker compose exec api ruff check .
 ```
 
-### API Task
+Rules:
 
-```markdown
-Required validation:
-| Command | Claim Proven |
-|---|---|
-| `docker compose exec api npm run test -- risk-runs-api.test.ts` | API returns structured success and error responses for run trigger. |
+- Do not make heavy checks task-default.
+- Use heavy checks for milestone/release validation or tasks that directly affect type/build/lint behavior.
+- If a heavy check is required, explain what claim it proves.
+
+---
+
+## Review Validation
+
+Some tasks may not have meaningful automated validation.
+
+Examples:
+
+```text
+documentation-only task
+initial catalog update
+AGENTS.md policy update
+cross-document review fix
+environment variable example update
 ```
 
-### Frontend Component Task
+Use review validation format:
 
 ```markdown
-Required validation:
-| Command | Claim Proven |
-|---|---|
-| `docker compose exec web npm run test -- CaseRunButton.test.tsx` | Run button disables duplicate submissions while request is pending. |
+Required Validation:
+| VAL | Command | Claim Proven |
+|---|---|---|
+| VAL-012 | Manual review of `AGENTS.md` policy section | AGENTS.md states task-scoped reading and execution-validation-first policy. |
 ```
 
-### Schema Task
+Rules:
 
-```markdown
-Required validation:
-| Command | Claim Proven |
-|---|---|
-| `docker compose exec api npm run db:migrate` | Database migration applies successfully. |
-| `docker compose exec api npm run test -- case-parameters-repository.test.ts` | Repository reads and writes the new schema correctly. |
+- Review validation must still prove a specific claim.
+- Review validation should not be used to avoid writing tests for implementation tasks.
+
+---
+
+## Failure and Blocker Handling
+
+If validation fails:
+
+```text
+record the failing command
+record the failure reason
+fix if within task scope
+do not broaden scope without updating task or asking for decision
+rerun targeted validation
+```
+
+If validation cannot run:
+
+```text
+record the blocker
+record the missing command/service/dependency
+record the decision needed
+do not mark task done unless explicitly accepted
+```
+
+`codex-execution-report.md` must capture validation result and blockers.
+
+---
+
+## Bad Validation Patterns
+
+Avoid:
+
+```text
+run all checks for every task
+run host commands in a container-first project
+use "tests pass" as the claim proven
+skip validation because the change seems simple
+use release validation as task validation
+validate frontend behavior only through backend tests
+validate backend business rules only through frontend UI tests
+mark task done without recording validation
 ```
 
 ---
 
-## Validation Health Checks
+## Quality Checklist
 
-A validation plan is healthy when:
+Before accepting `execution-validation.md`, verify:
 
-- every `TASK-*` has required validation
-- every required command has a claim proven
-- commands are container-first
-- task validation is targeted
-- broad checks are limited to milestone or release validation
-- frontend-only tasks do not require backend-wide checks by default
-- backend-only tasks do not require frontend-wide checks by default
-- schema tasks validate both migration and behavior
-- failures can be recorded in `codex-execution-report.md`
-
----
-
-## Final Rule
-
-Validation is not about running the most commands.
-
-Validation is about producing the smallest reliable evidence that the current task is correct.
+```text
+[ ] Every must-priority implementation task has required validation.
+[ ] Every validation command is container-first unless explicitly allowed.
+[ ] Every validation command has a claim proven.
+[ ] Task validation is targeted.
+[ ] Milestone validation is broader but focused.
+[ ] Release validation proves handoff readiness.
+[ ] Heavy checks are not required for every task by default.
+[ ] Review validation is used only when automation is not meaningful.
+[ ] Validation commands are supported by ENV-* entries.
+[ ] codex-execution-report.md rules include validation result and blockers.
+```

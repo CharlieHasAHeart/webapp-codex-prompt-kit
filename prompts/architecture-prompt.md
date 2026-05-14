@@ -8,11 +8,21 @@ docs/architecture.md
 
 ## Purpose
 
-Generate the system architecture source of truth for a Codex-ready Web App project.
+Generate a compact architecture reference catalog for a Codex-ready Web App project.
 
-`architecture.md` defines the system-level structure and boundaries that later frontend, backend, data/API, environment, validation, and Codex execution documents must follow.
+`architecture.md` owns:
 
-It should describe **how the application is organized at the system level**, not detailed frontend components, backend service methods, database fields, or API payloads.
+```text
+ARCH-* architecture boundary entries
+repository layout rules
+runtime unit rules
+dependency direction rules
+shared package rules
+configuration boundary rules
+open architecture questions
+```
+
+It exists so `execution-validation.md` can reference precise architecture rules from `TASK-*`.
 
 ---
 
@@ -20,44 +30,42 @@ It should describe **how the application is organized at the system level**, not
 
 Use the available conversation context and upstream documents already generated in the current conversation.
 
-Required upstream documents:
+Recommended upstream context:
 
 ```text
+Project Design Brief
 docs/product-spec.md
 docs/project-decisions.md
 docs/domain-model.md
+current project discussion
+uploaded project notes
 ```
 
 Use `product-spec.md` for:
 
-- MVP scope
-- product workflows
+- MVP boundary
 - user roles
 - `REQ-*`
-- out-of-scope items
 
 Use `project-decisions.md` for:
 
 - `DEC-*`
-- repository layout decisions
-- framework decisions
-- package manager decisions
-- container-first development decisions
-- UI stack decisions
-- deployment or runtime decisions
+- repository layout
+- frontend/backend split
+- container-first development
+- package manager
+- framework choices
+- deployment/runtime choices
 
 Use `domain-model.md` for:
 
-- `ENT-*`
-- `REL-*`
-- `BR-*`
-- state machines
-- invariants
-- domain ownership and permission meaning
+- domain objects and business rules that affect boundaries
+- ownership and permission meaning
+- state concepts that affect runtime workflows
 
-If an upstream document is unavailable, use the available context and state assumptions.
+If upstream documents are unavailable, use the available context and state assumptions.
 
-If an architecture choice is blocked by missing information, ask the minimum necessary blocking questions.
+If an architecture decision is unclear and affects execution tasks, list it under `Open Architecture Questions`.
 
 ---
 
@@ -87,434 +95,330 @@ docs/architecture.md
 
 Do not generate other project documents.
 
-You may reference existing:
+Create only:
 
 ```text
-REQ-*
-ENT-*
-REL-*
-BR-*
-DEC-*
+ARCH-*
 ```
 
 Do not create:
 
 ```text
-FE-*
-BE-*
+REQ-*
+DEC-*
+ENT-*
+REL-*
+BR-*
+STATE-*
 DB-*
 API-*
-VAL-*
+FE-*
+BE-*
 TASK-*
+VAL-*
 ```
 
-Do not define detailed frontend design, backend service implementation, database schema, API request/response contracts, task order, or validation commands here.
+You may reference existing:
+
+```text
+REQ-*
+DEC-*
+ENT-*
+REL-*
+BR-*
+STATE-*
+```
+
+Every `ARCH-*` must be heading-addressable.
+
+Use this heading format:
+
+```markdown
+### ARCH-001: Architecture Rule Name
+```
+
+Do not write a long architecture narrative.
+
+Do not include database schema, API contracts, frontend component details, backend service details, command catalogs, task lists, or validation commands.
 
 ---
 
 ## Required Document Structure
 
-Use this structure unless the project clearly needs a small adjustment:
+Use this structure:
 
 ```markdown
 # Architecture
 
-## Purpose
+## Architecture Catalog
 
-## Source of Truth
-
-## Codex Usage
-
-## Non-Goals of This Document
-
-## Architecture Summary
-
-## Repository Layout
-
-## System Components
-
-## Frontend / Backend / Data Boundaries
-
-## Dependency Direction
-
-## Request Lifecycle
-
-## Authentication and Authorization Boundary
-
-## Error Handling Boundary
-
-## Configuration and Environment Boundary
-
-## Shared Packages
-
-## Runtime and Deployment View
-
-## Architectural Constraints
-
-## Assumptions
-
-## Open Questions
+## Open Architecture Questions
 ```
 
----
-
-## Section Rules
-
-### Purpose
-
-State that this document defines the system-level architecture, boundaries, dependency direction, and runtime organization.
-
-Do not include detailed implementation internals.
+Do not add extra sections unless they are necessary for the project.
 
 ---
 
-### Source of Truth
+## Architecture Catalog
 
-State that this document owns:
+Generate compact `ARCH-*` entries.
 
-- system-level architecture
-- repository layout at the top level
-- frontend/backend/data boundaries
-- dependency direction
-- request lifecycle at a high level
-- auth boundary
-- error boundary
-- configuration boundary
-- runtime/deployment view
-- shared package boundary
-
-State that this document does not own:
-
-- frontend routes and components
-- frontend state management details
-- backend service and repository details
-- database tables and fields
-- API request/response schemas
-- command syntax
-- task order
-- validation commands
-- UI YAML contents
-
----
-
-### Codex Usage
-
-Tell Codex to use this document to understand:
-
-- where frontend code belongs
-- where backend code belongs
-- where shared code belongs
-- which imports are allowed or forbidden
-- where business rules should be enforced
-- where API translation should happen
-- how requests flow through the system
-- which later documents refine the architecture
-
-Tell Codex not to infer low-level implementation details from this document.
-
----
-
-### Non-Goals of This Document
-
-Explicitly state that this document does not define:
-
-- complete frontend file tree
-- complete backend file tree
-- database schema
-- API contracts
-- UI page structure
-- validation test list
-- Docker command syntax
-- implementation tasks
-
----
-
-## Architecture Summary
-
-Provide a compact overview.
+Each entry should be independently readable because `TASK-*` items in `execution-validation.md` will reference individual architecture rules directly.
 
 Recommended format:
 
 ```markdown
-The application uses a monorepo structure with:
+### ARCH-001: Repository Layout
 
-- `apps/web` for the frontend Web app
-- `apps/api` for the backend API app
-- `packages/*` for shared app-agnostic code
+Kind: repository-boundary
 
-The frontend communicates with the backend through documented API contracts.
-The backend owns authoritative business rule enforcement and database access.
-Shared packages contain app-agnostic types, schemas, constants, and utilities.
-```
+Rule:
+- Use a monorepo with:
+  - `apps/web`
+  - `apps/api`
+  - `packages/*`
 
-Adjust based on actual project decisions.
+Applies To:
+- frontend tasks
+- backend tasks
+- shared package tasks
+- dev environment tasks
 
----
+Allowed:
+- `apps/web` may import app-agnostic code from `packages/*`.
+- `apps/api` may import app-agnostic code from `packages/*`.
 
-## Repository Layout
-
-Define the top-level layout.
-
-Default layout unless the user chose otherwise:
-
-```text
-apps/
-├── web/
-└── api/
-packages/
-```
-
-Recommended format:
-
-```markdown
-| Path | Owner | Responsibility |
-|---|---|---|
-| `apps/web` | Frontend | Web app, routes, pages, UI implementation. |
-| `apps/api` | Backend | API handlers, services, repositories, jobs, integrations. |
-| `packages/*` | Shared | App-agnostic types, schemas, constants, utilities, config. |
-```
-
-Rules:
-
-- Do not define every file in each app.
-- Detailed `apps/web` structure belongs in `frontend-design.md`.
-- Detailed `apps/api` structure belongs in `backend-design.md`.
-- Shared package details should be refined in `data-api-contract.md`, `frontend-design.md`, and `backend-design.md` where relevant.
-
----
-
-## System Components
-
-List major system components.
-
-Recommended format:
-
-```markdown
-| Component | Location | Responsibility | Related IDs |
-|---|---|---|---|
-| Web App | `apps/web` | User interface and frontend interaction handling. | REQ-001, DEC-001 |
-| API App | `apps/api` | API endpoints, business orchestration, database access. | BR-001, DEC-001 |
-| Database | external service / container | Durable application persistence. | DEC-004 |
-```
-
-Do not define low-level modules here.
-
----
-
-## Frontend / Backend / Data Boundaries
-
-Define the boundary rules.
-
-Recommended defaults:
-
-```markdown
+Forbidden:
 - `apps/web` must not import from `apps/api`.
 - `apps/api` must not import from `apps/web`.
 - `packages/*` must not import from either app.
-- Frontend communicates with backend through API contracts.
-- Database access belongs to backend code.
-- Frontend guards may improve UX, but backend permissions are authoritative.
-```
 
-Adjust only when project decisions require a different boundary.
-
----
-
-## Dependency Direction
-
-Define allowed dependency direction.
-
-Recommended diagram:
-
-```text
-apps/web  ─┐
-           ├──> packages/*
-apps/api  ─┘
-```
-
-Forbidden:
-
-```text
-apps/web -> apps/api internals
-apps/api -> apps/web internals
-packages/* -> apps/web
-packages/* -> apps/api
-```
-
-If the project uses shared API contract types, describe where they live.
-
----
-
-## Request Lifecycle
-
-Describe the high-level request flow.
-
-Recommended format:
-
-```markdown
-1. User interacts with UI in `apps/web`.
-2. Frontend API client sends request to `apps/api`.
-3. API route validates request shape.
-4. Backend service enforces business rules from `domain-model.md`.
-5. Repository/data layer reads or writes persistence.
-6. API returns documented response or structured error.
-7. Frontend renders loading, success, empty, or error state.
+Related:
+- DEC-001
 ```
 
 Rules:
 
-- Keep this high-level.
-- Do not define exact endpoint payloads.
-- Do not define service method names.
+- Use `ARCH-*` for architecture rules that later tasks must follow.
+- Keep entries compact.
+- Include `Kind`.
+- Include `Rule`.
+- Include `Allowed` and `Forbidden` when they prevent Codex drift.
+- Include `Applies To` when useful.
+- Include `Related` IDs where useful.
+- Do not define detailed file trees unless needed for task execution.
 
----
+Recommended `Kind` values:
 
-## Authentication and Authorization Boundary
-
-Define where auth decisions belong.
-
-Recommended defaults:
-
-```markdown
-- Backend enforces authoritative authentication and authorization.
-- Frontend may hide unavailable actions for UX.
-- Frontend-only permission checks must not be trusted.
-- Shared role or permission constants may live in `packages/*` if needed.
-```
-
-If authentication is out of scope for MVP, state that clearly and explain the assumed development mode.
-
-Do not define middleware implementation details here.
-
----
-
-## Error Handling Boundary
-
-Define where errors are created and consumed.
-
-Recommended defaults:
-
-```markdown
-- `apps/api` creates structured API errors.
-- `data-api-contract.md` defines the error envelope.
-- `apps/web` renders error states using frontend and UI specs.
-- Frontend must not parse arbitrary backend strings as business logic.
-```
-
-Do not define complete error codes here.
-
----
-
-## Configuration and Environment Boundary
-
-Define high-level config ownership.
-
-Recommended defaults:
-
-```markdown
-- `dev-environment.md` owns exact commands and environment variable lists.
-- `apps/api` owns server-only secrets.
-- `apps/web` may only use explicitly public frontend environment variables.
-- `packages/*` must not contain environment-specific secrets.
-```
-
-Do not define command syntax here.
-
----
-
-## Shared Packages
-
-Define intended shared package policy.
-
-Recommended format:
-
-```markdown
-| Package Area | Allowed Contents | Forbidden Contents |
-|---|---|---|
-| `packages/api-contract` | Request/response types, shared schemas, error envelope types. | Backend services, database clients, frontend components. |
-| `packages/config` | Shared lint/type/test config when needed. | Runtime secrets. |
-| `packages/shared` | App-agnostic constants and utilities. | App-specific runtime behavior. |
-```
-
-Only include packages that are actually useful for the project.
-
----
-
-## Runtime and Deployment View
-
-Define high-level runtime shape.
-
-Recommended format:
-
-```markdown
-| Runtime Unit | Description | Notes |
-|---|---|---|
-| Web | Frontend app runtime. | Served by chosen frontend framework. |
-| API | Backend API runtime. | Owns API and business orchestration. |
-| Database | Persistent storage. | Accessed only by backend. |
-```
-
-Do not write deployment scripts or Docker commands here.
-
----
-
-## Architectural Constraints
-
-List constraints Codex must follow.
-
-Examples:
-
-```markdown
-- Business rules from `domain-model.md` must be enforced in backend services, not only in UI.
-- API route handlers must not become the primary home for business rules.
-- Repositories must not depend on frontend code.
-- Shared packages must remain app-agnostic.
-- Database access must not be implemented in `apps/web`.
-```
-
-Use strong language.
-
----
-
-## Assumptions
-
-List assumptions made while generating architecture.
-
-Recommended format:
-
-```markdown
-| Assumption | Impact | Confirm Later? |
-|---|---|---|
-| The project uses a monorepo. | Enables `apps/web`, `apps/api`, `packages/*`. | yes |
+```text
+repository-boundary
+runtime-boundary
+dependency-direction
+frontend-backend-boundary
+shared-package-boundary
+data-access-boundary
+auth-boundary
+error-boundary
+configuration-boundary
+deployment-boundary
 ```
 
 ---
 
-## Open Questions
+## Recommended Architecture Entries
+
+Generate entries only when they apply to the project.
+
+Common entries include:
+
+```text
+ARCH-001 Repository Layout
+ARCH-002 Frontend Backend Boundary
+ARCH-003 Shared Package Boundary
+ARCH-004 Data Access Boundary
+ARCH-005 Request Lifecycle
+ARCH-006 Authentication Boundary
+ARCH-007 Error Handling Boundary
+ARCH-008 Configuration Boundary
+ARCH-009 Runtime Units
+ARCH-010 Deployment Boundary
+```
+
+Do not force all entries if they are not useful.
+
+---
+
+## Entry Guidance
+
+### Repository Layout Entry
+
+Should define:
+
+- top-level app/package layout
+- which code belongs in each area
+- forbidden cross-app imports
+
+Do not define every file.
+
+### Frontend Backend Boundary Entry
+
+Should define:
+
+- frontend communicates with backend through API contracts
+- frontend must not import backend internals
+- backend must not import frontend code
+- backend owns authoritative business rule enforcement
+
+### Shared Package Boundary Entry
+
+Should define:
+
+- what may live in `packages/*`
+- what must not live in `packages/*`
+- shared packages must stay app-agnostic
+
+Good shared contents:
+
+```text
+API contract types
+shared schemas
+shared constants
+test utilities if app-agnostic
+shared config
+```
+
+Forbidden shared contents:
+
+```text
+frontend components
+backend services
+database clients
+server-only secrets
+browser-only code
+```
+
+### Data Access Boundary Entry
+
+Should define:
+
+- database access belongs to backend by default
+- frontend must not access database directly
+- repositories/data clients belong to backend or dedicated data packages only when explicitly allowed
+
+### Request Lifecycle Entry
+
+Should define high-level flow only.
+
+Recommended rule:
+
+```text
+UI -> frontend API client -> backend API handler -> service -> repository/data layer -> service -> API response -> UI state
+```
+
+Do not define endpoint payloads here.
+
+### Authentication Boundary Entry
+
+Should define:
+
+- backend is authoritative for auth/permissions
+- frontend permission rendering is UX only
+- route guards do not replace backend checks
+
+If auth is out of scope, state the MVP assumption.
+
+### Error Handling Boundary Entry
+
+Should define:
+
+- backend creates structured errors
+- API error envelope belongs to `data-api-contract.md`
+- frontend renders documented error states
+- frontend must not parse arbitrary backend strings as business logic
+
+### Configuration Boundary Entry
+
+Should define:
+
+- server-only secrets belong to backend runtime
+- public frontend env vars must be explicitly public
+- exact env vars belong in `dev-environment.md`
+- shared packages must not contain secrets
+
+### Runtime Units Entry
+
+Should define runtime units such as:
+
+```text
+web
+api
+db
+worker
+queue
+```
+
+Only include units that apply to the project.
+
+Do not define Docker commands here.
+
+---
+
+## Open Architecture Questions
 
 List unresolved architecture questions.
 
 Recommended format:
 
 ```markdown
-| Question | Blocking? | Affected Documents |
+| Question | Blocking? | Affected Area |
 |---|---:|---|
-| Is authentication required in MVP? | yes | backend-design, data-api-contract, execution-validation |
+| Does the MVP require a worker runtime? | no | async jobs, deployment, dev environment |
+| Is authentication required for local MVP? | yes | auth boundary, API, frontend |
 ```
+
+Rules:
+
+- Include only questions that affect architecture, boundaries, runtime units, or execution tasks.
+- Mark blocking questions clearly.
+- Do not hide uncertainty inside `ARCH-*` entries.
+
+---
+
+## Catalog Design Rules
+
+The generated file should behave like a task-scoped reference catalog.
+
+This means:
+
+- each `ARCH-*` entry must be short enough to read independently
+- each `ARCH-*` entry must have a stable Markdown heading
+- each `ARCH-*` entry should include related upstream IDs when useful
+- task authors should be able to reference entries like:
+
+```text
+docs/architecture.md#ARCH-001
+docs/architecture.md#ARCH-004
+```
+
+Avoid broad narrative sections that Codex would need to read globally.
 
 ---
 
 ## Writing Rules
 
-- Keep this system-level.
-- Reference `REQ-*`, `ENT-*`, `BR-*`, and `DEC-*` where useful.
-- Do not create `FE-*`, `BE-*`, `DB-*`, `API-*`, `VAL-*`, or `TASK-*`.
-- Do not define frontend internal implementation.
-- Do not define backend service/repository details.
-- Do not define DB tables or API payloads.
-- Do not include command lines.
-- Use clear allowed/forbidden boundary rules.
-- Prefer tables for components, paths, runtime units, and open questions.
+- Write a reference catalog, not a narrative architecture document.
+- Use stable heading-addressable `ARCH-*` IDs.
+- Keep every entry compact and independently readable.
+- Use direct architecture rules.
+- Include forbidden behavior when it prevents Codex drift.
+- Reference existing `REQ-*`, `DEC-*`, `ENT-*`, `BR-*`, and `STATE-*` where useful.
+- Do not create non-ARCH IDs.
+- Do not include DB schema.
+- Do not include API contracts.
+- Do not include frontend/backend implementation details.
+- Do not include implementation tasks.
+- Do not include validation commands.
+- Use `Open Architecture Questions` for unresolved architecture decisions.
 
 ---
 
@@ -523,15 +427,17 @@ Recommended format:
 Before finalizing, verify:
 
 ```text
-[ ] Repository-level boundaries are clear.
-[ ] `apps/web`, `apps/api`, and `packages/*` are handled if applicable.
-[ ] Frontend/backend import rules are explicit.
-[ ] Database access boundary is explicit.
-[ ] Auth and error boundaries are described at system level.
-[ ] Shared package policy is clear.
-[ ] Request lifecycle is high-level and implementation useful.
-[ ] No detailed frontend design is included.
-[ ] No detailed backend design is included.
-[ ] No DB/API schemas are included.
-[ ] No commands, tasks, or validations are included.
+[ ] The file is a compact architecture reference catalog.
+[ ] Architecture rules have ARCH-* headings.
+[ ] Every ARCH-* is independently readable.
+[ ] IDs are heading-addressable.
+[ ] Repository boundaries are explicit.
+[ ] Frontend/backend boundaries are explicit.
+[ ] Shared package rules are explicit when packages exist.
+[ ] Data access boundary is explicit when persistence exists.
+[ ] Runtime units are clear when needed.
+[ ] No DB/API/FE/BE/TASK/VAL IDs are created.
+[ ] No implementation commands are included.
+[ ] No long architecture narrative is included.
+[ ] Open architecture questions are marked blocking or non-blocking.
 ```

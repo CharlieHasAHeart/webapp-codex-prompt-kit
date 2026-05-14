@@ -8,20 +8,19 @@ docs/domain-model.md
 
 ## Purpose
 
-Generate the domain source of truth for a Codex-ready Web App project.
+Generate a compact domain reference catalog for a Codex-ready Web App project.
 
-`domain-model.md` translates product requirements into business concepts that code must preserve:
+`domain-model.md` owns:
 
-- domain vocabulary
-- entities
-- relationships
-- business rules
-- state machines
-- lifecycles
-- invariants
-- domain-level ownership and permission meaning
+```text
+ENT-* domain entities
+REL-* domain relationships
+BR-* business rules
+STATE-* state concepts when needed
+open domain questions
+```
 
-It should describe the business world, not the storage layer, API layer, frontend layer, or backend module structure.
+It exists so `execution-validation.md` can reference precise domain concepts and rules from `TASK-*`.
 
 ---
 
@@ -29,27 +28,31 @@ It should describe the business world, not the storage layer, API layer, fronten
 
 Use the available conversation context and upstream documents already generated in the current conversation.
 
-Required upstream documents:
+Recommended upstream context:
 
 ```text
+Project Design Brief
 docs/product-spec.md
 docs/project-decisions.md
+current project discussion
+uploaded project notes
 ```
 
 Use `product-spec.md` for:
 
-- product scope
-- `REQ-*`
+- MVP boundary
 - user roles
-- user workflows
-- success criteria
-- out-of-scope items
+- `REQ-*`
+- open product questions
 
-Use `project-decisions.md` only for decisions that affect domain interpretation.
+Use `project-decisions.md` for:
 
-If an upstream document is unavailable, use the available context and state assumptions.
+- `DEC-*`
+- decisions that affect domain ownership, auth, tenancy, persistence, or workflow behavior
 
-If domain meaning is unclear and blocks modeling, ask the minimum necessary blocking questions.
+If upstream documents are unavailable, use the available context and state assumptions.
+
+If a domain concept is unclear and affects later implementation tasks, list it under `Open Domain Questions`.
 
 ---
 
@@ -77,12 +80,26 @@ docs/domain-model.md
 
 Do not generate other project documents.
 
-Only create these IDs in this file:
+Create only:
 
 ```text
 ENT-*
 REL-*
 BR-*
+STATE-*
+```
+
+Do not create:
+
+```text
+REQ-*
+DEC-*
+DB-*
+API-*
+FE-*
+BE-*
+TASK-*
+VAL-*
 ```
 
 You may reference existing:
@@ -92,205 +109,128 @@ REQ-*
 DEC-*
 ```
 
-Do not create:
+Every catalog ID must be heading-addressable.
 
-```text
-FE-*
-BE-*
-DB-*
-API-*
-VAL-*
-TASK-*
+Use these heading formats:
+
+```markdown
+### ENT-001: Entity Name
+### REL-001: Relationship Name
+### BR-001: Business Rule Name
+### STATE-001: State Concept Name
 ```
 
-Do not define database tables, API endpoints, frontend components, backend service files, tasks, or validation commands here.
+Do not write a long domain narrative.
+
+Do not include implementation design.
+
+Do not include database schema, API contracts, command lines, or validation commands.
 
 ---
 
 ## Required Document Structure
 
-Use this structure unless the project clearly needs a small adjustment:
+Use this structure:
 
 ```markdown
 # Domain Model
 
-## Purpose
+## Entity Catalog
 
-## Source of Truth
+## Relationship Catalog
 
-## Codex Usage
+## Business Rule Catalog
 
-## Non-Goals of This Document
+## State Catalog
 
-## Domain Glossary
-
-## Core Entities
-
-## Relationships
-
-## Business Rules
-
-## State Machines
-
-## Lifecycles
-
-## Domain Permissions and Ownership
-
-## Invariants
-
-## Forbidden Interpretations
-
-## Assumptions
-
-## Open Questions
+## Open Domain Questions
 ```
+
+If the project has no meaningful state concepts, keep `State Catalog` and write `None required for MVP`.
+
+Do not add extra sections unless they are necessary for the project.
 
 ---
 
 ## Section Rules
 
-### Purpose
+### Entity Catalog
 
-State that this document defines the domain concepts and rules that implementation must preserve.
-
-Do not describe storage, API, frontend, or backend implementation details.
-
-### Source of Truth
-
-State that this document owns:
-
-- domain terms
-- `ENT-*`
-- `REL-*`
-- `BR-*`
-- state machines
-- lifecycle rules
-- domain invariants
-- domain-level ownership and permission meaning
-- forbidden domain interpretations
-
-State that this document does not own:
-
-- database table definitions
-- database field details
-- API request/response schemas
-- frontend routes
-- frontend state management
-- backend service file structure
-- task order
-- validation commands
-
-### Codex Usage
-
-Tell Codex to use this document to understand:
-
-- which domain objects exist
-- which relationships matter
-- which business rules must be enforced
-- which state transitions are allowed
-- which invariants later backend, DB, API, and validation documents must preserve
-
-Tell Codex not to infer database schema or API response shape from this document.
-
-### Non-Goals of This Document
-
-Explicitly state that this document does not define:
-
-- database tables or columns
-- API endpoints or payloads
-- frontend routes or components
-- backend services or repositories
-- validation commands
-- implementation tasks
-
----
-
-## Domain Glossary
-
-Define important business terms.
-
-Recommended format:
-
-```markdown
-| Term | Meaning | Related IDs |
-|---|---|---|
-| Case | A project or assessment record being evaluated. | ENT-001 |
-```
-
-Rules:
-
-- Keep definitions concise.
-- Avoid implementation details.
-- Use terms consistently across later documents.
-
----
-
-## Core Entities
-
-Use stable `ENT-*` IDs.
+Generate compact `ENT-*` entries.
 
 Recommended format:
 
 ```markdown
 ### ENT-001: Case
 
-Definition:
-- A case represents ...
+Meaning:
+- A case is the main assessment record created and managed by a user.
 
-Domain attributes:
+Key Domain Attributes:
 - name
 - status
 - owner
 - created time
+- latest result reference
 
-Owned by:
-- workspace / user / project
+Ownership:
+- Belongs to one workspace or user, depending on the project decision.
 
-Related requirements:
+Related:
 - REQ-001
 - REQ-004
+- DEC-001
 ```
 
 Rules:
 
-- Domain attributes are conceptual, not database fields.
-- Do not define column types.
-- Do not define API payloads.
-- Avoid treating UI views as domain entities unless they represent real business concepts.
+- Keep attributes conceptual, not database fields.
+- Do not include column types.
+- Do not define API response fields.
+- Do not define frontend components.
+- Do not define backend services.
+- Include ownership only when it affects access, persistence, or workflow behavior.
+- Each `ENT-*` should be independently readable.
 
 ---
 
-## Relationships
+### Relationship Catalog
 
-Use stable `REL-*` IDs.
+Generate compact `REL-*` entries only for relationships that affect implementation.
 
 Recommended format:
 
 ```markdown
-### REL-001: Case Has Parameter Values
+### REL-001: Case Owns Results
 
-From: ENT-001 Case
-To: ENT-002 Parameter Value
-Cardinality: one-to-many
+From:
+- ENT-001 Case
+
+To:
+- ENT-003 Result
+
+Cardinality:
+- one-to-many
 
 Meaning:
-- A case owns the parameter values used for assessment.
+- A case may have multiple generated results over time.
 
-Related rules:
-- BR-002
+Related Rules:
+- BR-003
 ```
 
 Rules:
 
-- Define business relationship meaning.
-- Avoid storage implementation details.
-- Do not specify foreign key names here.
+- Use relationships when they affect DB, API, backend logic, UI behavior, or validation.
+- Do not define foreign key names here.
+- Do not duplicate database schema.
+- If a relationship is obvious and has no implementation impact, omit it.
 
 ---
 
-## Business Rules
+### Business Rule Catalog
 
-Use stable `BR-*` IDs.
+Generate compact `BR-*` entries.
 
 Recommended format:
 
@@ -298,50 +238,56 @@ Recommended format:
 ### BR-001: No Concurrent Active Run
 
 Rule:
-- A case must not have more than one active risk run.
+- A case must not have more than one active run at the same time.
 
-Enforced by:
-- backend service
-- transaction boundary
-- database constraint where applicable
+Enforcement Expectation:
+- Backend service must enforce this rule.
+- Data layer may support it with a constraint when practical.
+
+Failure Behavior:
+- Return a conflict-style error through the documented API error envelope.
 
 Related:
+- REQ-008
 - ENT-001
-- ENT-004
-- REQ-028
+- STATE-002
 ```
 
 Rules:
 
-- Every business rule must be enforceable.
+- Every `BR-*` must be enforceable.
 - Use direct language: `must`, `must not`, `required`, `forbidden`.
-- Avoid vague rules such as "should be handled carefully".
-- It is acceptable to mention likely enforcement layers, but do not define their implementation.
+- Include expected failure behavior when useful.
+- Do not define exact API error codes unless they already exist.
+- Do not define database constraints in detail.
+- Do not define validation commands.
+- Each `BR-*` should be independently readable.
 
 ---
 
-## State Machines
+### State Catalog
 
-Define stateful domain concepts only when state affects implementation.
+Generate `STATE-*` entries only when state affects implementation.
 
 Recommended format:
 
 ```markdown
-### State Machine: Case Status
+### STATE-001: Case Status
 
-Entity: ENT-001 Case
+Applies To:
+- ENT-001 Case
 
 States:
 | State | Meaning |
 |---|---|
 | draft | Case exists but required inputs are incomplete. |
-| ready | Required inputs are complete. |
+| ready | Case is ready for the next workflow step. |
 | archived | Case is no longer active. |
 
 Allowed Transitions:
-| From | To | Trigger | Rule |
+| From | To | Trigger | Related Rule |
 |---|---|---|---|
-| draft | ready | required inputs completed | BR-003 |
+| draft | ready | Required inputs completed. | BR-002 |
 
 Forbidden Transitions:
 | From | To | Reason |
@@ -349,116 +295,17 @@ Forbidden Transitions:
 | archived | ready | Archived cases cannot be reactivated in MVP. |
 ```
 
-Do not add state machines when simple attributes are enough.
-
----
-
-## Lifecycles
-
-Define lifecycle sequences for important domain objects or workflows.
-
-Use this section for flows such as:
-
-- case creation
-- run creation
-- result generation
-- invitation lifecycle
-- approval lifecycle
-- export lifecycle
-
-Recommended format:
-
-```markdown
-### Lifecycle: Risk Run
-
-1. User triggers run.
-2. System validates case readiness.
-3. System creates parameter snapshot.
-4. System creates active run.
-5. System computes result.
-6. System marks run as completed or failed.
-7. Latest successful result becomes visible.
-```
-
 Rules:
 
-- Describe domain lifecycle, not implementation task order.
-- Do not include code file names.
-- Do not include validation commands.
+- Use `STATE-*` only for meaningful lifecycle or workflow state.
+- Do not create state entries for simple display labels.
+- Keep state definitions compact.
+- Do not define database enum implementation here.
+- Do not define frontend state management here.
 
 ---
 
-## Domain Permissions and Ownership
-
-Define ownership and permission meaning at the domain level.
-
-Recommended format:
-
-```markdown
-| Concept | Ownership Meaning | Permission Meaning |
-|---|---|---|
-| Case | A case belongs to one workspace. | Users must belong to the workspace to access the case. |
-| Result | A result belongs to one case. | Result visibility follows case visibility. |
-```
-
-Rules:
-
-- Do not define frontend guards here.
-- Do not define backend middleware here.
-- Do not define exact API auth rules here.
-
----
-
-## Invariants
-
-List rules that must always remain true.
-
-Recommended format:
-
-```markdown
-| Invariant | Related IDs |
-|---|---|
-| A result must belong to exactly one case. | ENT-001, ENT-005 |
-| A completed run must have an immutable parameter snapshot. | ENT-004, BR-006 |
-```
-
-Invariants should later map to backend tests, DB constraints, API behavior, or validation criteria.
-
----
-
-## Forbidden Interpretations
-
-Explicitly state what Codex must not assume.
-
-Examples:
-
-```markdown
-- A risk run is not the same as a risk result.
-- A parameter definition is not the same as a case parameter value.
-- The latest result means the latest successful result, not the latest attempted run.
-```
-
-This section is important when terms are easy to confuse.
-
----
-
-## Assumptions
-
-List assumptions made while generating the domain model.
-
-Include only assumptions that affect domain meaning.
-
-Recommended format:
-
-```markdown
-| Assumption | Domain Impact | Confirm Later? |
-|---|---|---|
-| Cases belong to one workspace. | Affects ownership and permissions. | yes |
-```
-
----
-
-## Open Questions
+### Open Domain Questions
 
 List unresolved domain questions.
 
@@ -467,23 +314,54 @@ Recommended format:
 ```markdown
 | Question | Blocking? | Affected Area |
 |---|---:|---|
-| Can archived cases be restored? | no | Case lifecycle |
+| Can archived cases be restored? | no | case lifecycle |
+| Can two users edit the same case at the same time? | yes | concurrency, backend, UI |
 ```
+
+Rules:
+
+- Include only questions that affect entities, relationships, rules, states, ownership, or implementation tasks.
+- Mark blocking questions clearly.
+- Do not hide uncertainty inside entity or rule text.
+
+---
+
+## Catalog Design Rules
+
+The generated file should behave like a task-scoped reference catalog.
+
+This means:
+
+- each ID entry must be short enough to read independently
+- each ID entry must have a stable Markdown heading
+- each ID entry should include related upstream IDs when useful
+- task authors should be able to reference entries like:
+
+```text
+docs/domain-model.md#ENT-001
+docs/domain-model.md#BR-001
+docs/domain-model.md#STATE-001
+```
+
+Avoid broad narrative sections that Codex would need to read globally.
 
 ---
 
 ## Writing Rules
 
-- Use stable `ENT-*`, `REL-*`, and `BR-*` IDs.
-- Reference `REQ-*` and `DEC-*` where useful.
-- Keep domain attributes conceptual.
+- Write a reference catalog, not a narrative domain document.
+- Use stable heading-addressable IDs.
+- Keep every entry compact and independently readable.
+- Keep attributes conceptual.
 - Make business rules enforceable.
-- Use forbidden interpretations to prevent term confusion.
-- Do not define database columns.
-- Do not define API payloads.
-- Do not define frontend components.
-- Do not define backend services.
-- Do not define tasks or validation commands.
+- Reference existing `REQ-*` and `DEC-*` where useful.
+- Do not create non-domain IDs.
+- Do not include DB column types.
+- Do not include API contracts.
+- Do not include frontend/backend implementation details.
+- Do not include implementation tasks.
+- Do not include validation commands.
+- Use `Open Domain Questions` for unresolved domain decisions.
 
 ---
 
@@ -492,16 +370,15 @@ Recommended format:
 Before finalizing, verify:
 
 ```text
-[ ] Core business entities have ENT-* IDs.
-[ ] Important relationships have REL-* IDs.
-[ ] Business rules have BR-* IDs.
-[ ] Rules are enforceable.
-[ ] State machines are defined only where state matters.
-[ ] Invariants are explicit.
-[ ] Domain permissions and ownership are clear.
-[ ] No DB table or field definitions are included.
-[ ] No API request/response schemas are included.
-[ ] No FE/BE/DB/API/TASK/VAL IDs are defined here.
-[ ] Requirements are referenced but not copied in full.
-[ ] Ambiguous terms have forbidden interpretations.
+[ ] The file is a compact domain reference catalog.
+[ ] Core entities have ENT-* headings.
+[ ] Important relationships have REL-* headings.
+[ ] Enforceable business rules have BR-* headings.
+[ ] Meaningful state concepts have STATE-* headings when needed.
+[ ] Every ID entry is independently readable.
+[ ] IDs are heading-addressable.
+[ ] Domain attributes are conceptual, not DB fields.
+[ ] No DB/API/FE/BE/TASK/VAL IDs are created.
+[ ] No implementation commands are included.
+[ ] Open domain questions are marked blocking or non-blocking.
 ```

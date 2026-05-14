@@ -8,21 +8,36 @@ docs/product-spec.md
 
 ## Purpose
 
-Generate the first formal project document for a Codex-ready Web App.
+Generate a compact product requirement reference catalog for a Codex-ready Web App project.
 
-`product-spec.md` is the product source of truth. It defines what product should be built, what is in scope, what is out of scope, and which requirements later documents must reference.
+`product-spec.md` owns:
 
-This document may also capture early candidate project decisions discussed with the user, but it must not formalize them as `DEC-*`.
+```text
+MVP boundary
+user roles
+REQ-* requirement entries
+open product questions
+```
+
+It exists so `execution-validation.md` can reference precise product requirements from `TASK-*`.
 
 ---
 
 ## Source Context
 
-Use the available project brief, conversation context, uploaded notes, and product decisions already discussed with the user.
+Use the available conversation context and the output from `discovery-workshop-prompt.md` when available.
+
+Recommended upstream context:
+
+```text
+Project Design Brief
+current project discussion
+uploaded project notes
+```
 
 If no usable product context exists, ask for a concise project brief before generating.
 
-If information is missing but the user wants to proceed, state explicit assumptions and continue.
+If information is incomplete but the user wants to proceed, state explicit assumptions inside the generated file only when those assumptions affect requirements.
 
 ---
 
@@ -51,9 +66,11 @@ docs/product-spec.md
 
 Do not generate other project documents.
 
-Do not include prompt instructions, commentary, or implementation notes outside the target document.
+Create only:
 
-Only create `REQ-*` IDs in this file.
+```text
+REQ-*
+```
 
 Do not create:
 
@@ -62,369 +79,211 @@ DEC-*
 ENT-*
 REL-*
 BR-*
-FE-*
-BE-*
 DB-*
 API-*
-VAL-*
+FE-*
+BE-*
 TASK-*
+VAL-*
 ```
 
-Candidate project decisions may be listed, but they must not use `DEC-*` IDs.
+Every `REQ-*` must be heading-addressable.
+
+Use this heading format:
+
+```markdown
+### REQ-001: Requirement Name
+```
+
+Do not write a long PRD narrative.
+
+Do not include implementation design.
+
+Do not include command lines.
 
 ---
 
 ## Required Document Structure
 
-Use this structure unless the project clearly needs a small adjustment:
+Use this structure:
 
 ```markdown
 # Product Spec
 
-## Purpose
-
-## Source of Truth
-
-## Codex Usage
-
-## Non-Goals of This Document
-
-## Product Summary
-
-## Target Users
-
-## User Problems
-
-## MVP Scope
-
-## Out of Scope
+## MVP Boundary
 
 ## User Roles
 
-## Requirements
-
-## User Stories
-
-## Success Criteria
-
-## Candidate Project Decisions
-
-## Assumptions
+## Requirement Catalog
 
 ## Open Questions
 ```
+
+Do not add extra sections unless they are necessary for the project.
 
 ---
 
 ## Section Rules
 
-### Purpose
+### MVP Boundary
 
-State that this document defines product intent, product scope, and product requirements.
-
-Do not describe detailed implementation design.
-
-### Source of Truth
-
-State that this document owns:
-
-- product background
-- target users
-- user problems
-- MVP scope
-- non-goals
-- user roles
-- `REQ-*`
-- user stories
-- product-level success criteria
-- candidate project decisions discovered during early discussion
-
-State that this document does not own:
-
-- formal `DEC-*` decisions
-- domain entity definitions
-- frontend design
-- backend design
-- database schema
-- API contract
-- command definitions
-- task order
-- validation commands
-- UI visual rules
-
-### Codex Usage
-
-Tell Codex to use this document to understand:
-
-- what must be built
-- what must not be built
-- which product workflows matter
-- which requirements must be referenced by later documents
-- which early candidate decisions should be confirmed in `project-decisions.md`
-
-Tell Codex not to infer detailed implementation architecture from product background.
-
-### Non-Goals of This Document
-
-Explicitly state that this document does not define:
-
-- database tables
-- API endpoints
-- frontend routes
-- backend services
-- command syntax
-- implementation tasks
-- acceptance test commands
-- UI token values
-- UI visual rules
-
-### Product Summary
-
-Provide a compact product explanation.
-
-The summary should answer:
-
-```text
-What is the product?
-Who is it for?
-What core problem does the MVP solve?
-```
-
-Avoid marketing-style language.
-
-### Target Users
-
-List concrete user types.
-
-Prefer a table:
-
-```markdown
-| User Type | Main Goal | Key Workflow |
-|---|---|---|
-| Analyst | Create and evaluate cases. | Create case, edit inputs, run assessment, review result. |
-```
-
-Avoid vague user types unless their responsibilities are defined.
-
-### User Problems
-
-List concrete problems the MVP solves.
-
-Bad:
-
-```text
-Users need a better experience.
-```
-
-Good:
-
-```text
-Users currently compare assessment cases manually across spreadsheets, which makes updates and result review error-prone.
-```
-
-### MVP Scope
-
-Define what is included in the first build.
-
-Prefer a table:
-
-```markdown
-| MVP Area | Included Capability | Related REQ |
-|---|---|---|
-| Case management | Create, list, view, and edit cases. | REQ-001, REQ-002 |
-```
-
-Each MVP item should be traceable to one or more `REQ-*`.
-
-### Out of Scope
-
-Define what Codex must not implement.
-
-Use strong language:
-
-```text
-Must not implement
-Not part of MVP
-Future scope
-```
+Define what is included, excluded, future, or unknown.
 
 Recommended format:
 
 ```markdown
-| Out-of-Scope Item | Reason | Future? |
+| Area | Status | Notes |
 |---|---|---|
-| Enterprise SSO | Not required for MVP. | yes |
+| Case management | included | Core MVP workflow. |
+| Export | future | Not required for MVP. |
+| Enterprise SSO | excluded | Not part of current scope. |
 ```
+
+Use these status values:
+
+```text
+included
+excluded
+future
+unknown
+```
+
+Rules:
+
+- Keep this section short.
+- Use it to prevent overbuilding.
+- Do not define implementation details.
+- If a boundary affects a requirement, reference it in the relevant `REQ-*` entry.
+
+---
 
 ### User Roles
 
-Define roles at the product level.
+Define product-level roles only.
 
 Recommended format:
 
 ```markdown
-| Role | Description | MVP Permissions |
+| Role | Goal | MVP Permissions |
 |---|---|---|
-| Admin | Manages workspace settings and users. | Full access. |
-| Analyst | Creates and edits assessment cases. | Case read/write. |
-| Viewer | Reviews results. | Read-only. |
-```
-
-Do not define low-level permission enforcement here.
-
-### Requirements
-
-Requirements must use stable `REQ-*` IDs.
-
-Recommended format:
-
-```markdown
-### REQ-001: Requirement Name
-
-Type: functional / non-functional / constraint
-Priority: must / should / future
-MVP: yes / no
-
-Description:
-- ...
-
-Acceptance intent:
-- ...
-
-Notes:
-- ...
+| Analyst | Create and evaluate cases. | Create, read, update own cases. |
+| Viewer | Review results. | Read-only access. |
 ```
 
 Rules:
 
-- Each requirement should be specific enough to map to implementation.
-- Avoid bundling unrelated behaviors into one requirement.
-- Label future-scope requirements clearly.
-- Do not describe database columns or API endpoints.
-- Do not describe frontend component structure.
-- Do not describe backend service structure.
+- Keep roles product-level.
+- Do not define backend middleware, frontend guards, or database permission logic.
+- If auth/permission details are unknown, state them in `Open Questions`.
 
-### User Stories
+---
 
-Use user stories only when they clarify workflows.
+### Requirement Catalog
+
+Generate compact `REQ-*` entries.
+
+Each entry should be independently readable because `TASK-*` items in `execution-validation.md` will reference individual requirements directly.
 
 Recommended format:
 
 ```markdown
-| Story | Role | Need | Outcome | Related REQ |
-|---|---|---|---|---|
-| US-001 | Analyst | create a case | track assessment inputs and results | REQ-001 |
+### REQ-001: Create Case
+
+Type: functional
+Priority: must
+MVP: yes
+
+Actor:
+- Analyst
+
+Requirement:
+- The user can create a new case with the minimum required information.
+
+Acceptance Intent:
+- A created case persists and can be opened from the case list.
+
+Out of Scope:
+- Bulk import.
+- Advanced templates.
+
+Related Workflow:
+- Case creation
 ```
 
-Do not use user stories as a replacement for requirements.
+Rules:
 
-### Success Criteria
+- Use stable `REQ-*` IDs.
+- Keep each entry compact.
+- Split unrelated behaviors into separate requirements.
+- Use direct product language.
+- Mark future requirements clearly.
+- Include `Out of Scope` inside a requirement when needed to prevent overbuilding.
+- Do not define database fields.
+- Do not define API endpoints.
+- Do not define frontend components.
+- Do not define backend services.
+- Do not define validation commands.
+- Do not define task IDs.
 
-Define observable product-level success criteria.
-
-Examples:
+Recommended requirement types:
 
 ```text
-User can create, edit, run, and review a case without using external spreadsheets.
-A refreshed page preserves case inputs and latest successful result.
-Core MVP workflows are covered by validation criteria in later documents.
+functional
+non-functional
+constraint
+security
+usability
+data
+workflow
 ```
 
-Do not include exact test commands here.
+Recommended priorities:
 
-### Candidate Project Decisions
-
-Capture technical, execution, and UI decisions that emerged during early project discussion.
-
-These are candidates, not formal `DEC-*` decisions.
-
-Recommended format:
-
-```markdown
-| Area | Candidate Decision | Confidence | Should Confirm In | Notes |
-|---|---|---|---|---|
-| Repository | Use `apps/web`, `apps/api`, `packages/*` monorepo layout. | high | project-decisions.md / architecture.md | Default for this prompt kit. |
-| Development | Container-first development. | high | project-decisions.md / dev-environment.md | Commands should run through Docker. |
-| UI | Use shadcn/ui + Tailwind. | high | project-decisions.md / frontend-design.md | UI specs handled separately. |
-| Database | Use PostgreSQL. | medium | project-decisions.md / data-api-contract.md | Confirm based on persistence needs. |
+```text
+must
+should
+could
+future
 ```
 
-Rules:
-
-- Do not assign `DEC-*` IDs here.
-- Include only decisions likely to affect multiple later documents.
-- If a decision is uncertain, mark confidence as `low` or `medium`.
-- If no technical decisions are known yet, write `None yet`.
-
-Good candidate decisions include:
-
-- repository layout
-- container-first development
-- package manager preference
-- frontend framework
-- backend framework
-- database
-- ORM
-- UI stack
-- API style
-- auth direction
-- deployment target
-- validation strategy
-- whether UI YAML docs are needed
-- whether standalone `implementation-map.md` is needed
-
-Bad candidate decisions include:
-
-- one API field
-- one database column
-- one component prop
-- one test filename
-- one service method name
-
-### Assumptions
-
-List assumptions that affect product scope, requirements, or candidate decisions.
-
-Recommended format:
-
-```markdown
-| Assumption | Impact | Confirm Later? |
-|---|---|---|
-| The MVP is single-tenant. | Simplifies auth and data model. | yes |
-```
+---
 
 ### Open Questions
 
 List unresolved product questions.
-
-Each question should state whether it is blocking.
 
 Recommended format:
 
 ```markdown
 | Question | Blocking? | Affected Area |
 |---|---:|---|
-| Should viewers be able to export results? | no | future scope |
-| Is authentication required in MVP? | yes | roles, API, data model |
+| Is authentication required in MVP? | yes | roles, API, backend, frontend |
 ```
+
+Rules:
+
+- Include only questions that affect requirements, scope, roles, or execution planning.
+- Mark blocking questions clearly.
+- Do not hide uncertainty inside requirement text.
 
 ---
 
 ## Writing Rules
 
-- Use clear product language.
-- Use stable `REQ-*` IDs.
-- Keep product background concise.
-- Prefer tables for roles, scope, stories, candidate decisions, assumptions, and open questions.
-- Mark future scope explicitly.
-- Do not include detailed implementation design.
-- Do not include command lines.
+- Write a reference catalog, not a narrative PRD.
+- Keep the file compact.
+- Use stable `REQ-*` headings.
+- Make every `REQ-*` independently readable.
+- Keep `MVP Boundary` short.
+- Keep `User Roles` short.
+- Use `Open Questions` for unresolved product decisions.
+- Do not create non-REQ IDs.
+- Do not include implementation commands.
 - Do not include validation commands.
-- Do not include database fields.
-- Do not include API endpoint definitions.
-- Do not include frontend or backend module design.
-- Do not create formal `DEC-*` IDs here.
-- Do not create task IDs.
+- Do not include DB schema.
+- Do not include API contracts.
+- Do not include frontend/backend implementation details.
+- Separate MVP from future scope.
 
 ---
 
@@ -433,15 +292,14 @@ Recommended format:
 Before finalizing, verify:
 
 ```text
-[ ] The document has a clear MVP scope.
-[ ] The document has explicit non-goals.
-[ ] Requirements use stable REQ-* IDs.
-[ ] Each REQ is specific enough to map to implementation.
-[ ] Future scope is clearly labeled.
-[ ] Product background is not excessive.
-[ ] Candidate project decisions are captured without DEC-* IDs.
-[ ] Candidate decisions only include cross-document decisions.
-[ ] No DB/API/FE/BE/TASK/VAL/ENT/BR/DEC IDs are defined here.
-[ ] No implementation commands are included.
+[ ] The file is a compact product requirement reference catalog.
+[ ] MVP boundary is explicit.
+[ ] User roles are defined at product level.
+[ ] Every requirement has a REQ-* heading.
+[ ] Every REQ-* is compact and independently readable.
+[ ] Future scope is clearly marked.
 [ ] Open questions are marked blocking or non-blocking.
+[ ] No DB/API/FE/BE/TASK/VAL/ENT/BR/DEC IDs are created.
+[ ] No implementation commands are included.
+[ ] No long PRD narrative is included.
 ```
