@@ -1,579 +1,494 @@
 # UI Page Prompt
 
-## Target File
-
-```text
-docs/ui/UI_PAGE.yaml
-```
-
 ## Purpose
 
-Generate the semantic UI page reference file for a Codex-ready Web App project.
+Use this prompt to generate `UI_PAGE.yaml` for a Web App project.
 
-`UI_PAGE.yaml` owns:
+`UI_PAGE.yaml` defines the flow-facing semantic UI surface: what the user can see, where the user can act, how important states are represented semantically, where feedback appears, where recovery is offered, where artifacts appear, and where completion signals become visible.
+
+It is not a visual design file, not a token file, not a React implementation file, and not a styling-stack specification.
+
+## Target Output
+
+Generate exactly one file:
 
 ```text
-app shell
+docs/reference/ui/UI_PAGE.yaml
+```
+
+## Document Role
+
+`docs/reference/ui/UI_PAGE.yaml` is a final UI reference catalog.
+
+It owns:
+
+```text
+semantic app shell
+navigation hierarchy
 routes
-navigation
 pages
 sections
 actions
-page states
 route-backed state
 local UI state
-semantic UI structure
+global UI states
+semantic component roles
+flow surface mapping
+action effect mapping
+feedback state mapping
+recovery path mapping
+artifact surface mapping
+completion signal mapping
+traceability to REQ-*, API-*, ERR-*, TYPE-*, and FE-* where useful
 ```
 
-It exists so `frontend-design.md` and `execution-validation.md` can reference precise UI page structure from `FE-*` and `TASK-*`.
-
-This is a lightweight calling prompt. Detailed YAML rules live in the UI authoring standard.
-
----
-
-## Source Context
-
-Use the available conversation context and upstream documents already generated in the current conversation.
-
-Recommended upstream context:
+It must not own:
 
 ```text
-Project Design Brief
-docs/product-spec.md
-docs/project-decisions.md
-docs/domain-model.md
-docs/architecture.md
-docs/data-api-contract.md
-current project discussion
-uploaded project notes
+visual token values
+raw colors
+spacing values
+CSS variables
+Tailwind classes
+React or JSX code
+API request/response shapes
+backend logic
+database schema
+business rules owned by non-UI reference documents
+technology-specific styling instructions
+Open Questions
 ```
 
-Use `product-spec.md` for:
+## Standards to Apply
 
-- MVP boundary
-- user roles
-- `REQ-*`
+Read only the standards listed below.
 
-Use `project-decisions.md` for:
+| Standard | Required? | Use For |
+|---|---:|---|
+| `standards/ui-reference-system.md` | yes | Defines flow-facing UI reference principles, UI field dictionary, and Codex consumption rules. |
+| `standards/ui-authoring-specs/UI_PAGE.yaml-Authoring-Specification.md` | yes | Defines the required structure, fields, constraints, and checks for `UI_PAGE.yaml`. |
+| `standards/flow-concepts-and-composition.md` | yes | Ensures UI_PAGE supports Core User Flows, Side Effect Flows, Feedback Flows, Recovery Flows, artifacts, and completion signals. |
+| `standards/document-responsibilities.md` | yes | Prevents UI_PAGE from redefining non-UI reference content. |
+| `standards/open-questions-policy.md` | yes | Prevents unresolved questions from entering final UI references. |
+| `standards/codex-ready-writing-rules.md` | yes | Keeps generated YAML stable, explicit, and Codex-usable. |
+| `standards/document-length-budgets.md` | optional | Use to keep the generated YAML compact when the UI is large. |
 
-- `DEC-*`
-- UI stack decisions
-- navigation or app shell decisions
-- repository/layout decisions
+Do not read or apply any technology-specific UI implementation standard in this revision.
 
-Use `domain-model.md` for:
+Do not assume Tailwind, shadcn/ui, CSS variables, MUI, Chakra, CSS Modules, Styled Components, or any concrete styling stack.
 
-- `ENT-*`
-- `BR-*`
-- `STATE-*`
-- domain terminology and lifecycle states
+## Standard Application Rules
 
-Use `architecture.md` for:
+Standards constrain how this prompt generates `UI_PAGE.yaml`. Standards do not create additional output targets.
 
-- `ARCH-*`
-- frontend/backend boundary
-- request lifecycle
-- auth boundary
-- error boundary
+Rules:
+1. Read only the standards listed in this prompt.
+2. Do not load all standards by default.
+3. The current prompt defines the target output and required output structure.
+4. Standards define reusable terminology, ownership boundaries, quality rules, and authoring constraints.
+5. Do not copy large sections from standards into the generated YAML.
+6. Do not generate documents requested by a standard unless this prompt explicitly targets them.
+7. If required UI structure or flow behavior remains unresolved, output a blocked-generation report instead of inventing UI decisions.
 
-Use `data-api-contract.md` for:
+## Priority Rule
 
-- `API-*`
-- `ERR-*`
-- data shown on pages
-- actions that call backend APIs
-- error and permission behavior
+When generating `UI_PAGE.yaml`, use this priority order:
 
-If upstream documents are unavailable, use the available context and state assumptions.
+1. User-confirmed answers and corrections.
+2. This prompt's target output and required output structure.
+3. Required UI standards listed in this prompt.
+4. Final non-UI reference catalogs.
+5. Review-stage flow and decision documents.
+6. Prior project discussion.
 
-If UI scope is unclear and affects page structure, list the uncertainty in the YAML if the authoring spec supports it, or ask the minimum necessary blocking questions.
+If a conflict involves unresolved blockers, Open Questions leakage, unsafe scope invention, missing required decisions, reference ownership redefinition, or missing flow-facing UI behavior, output a blocked-generation report instead of generating normal YAML.
 
----
+## Required Inputs
 
-## Standard to Use
-
-Strictly follow:
+Use these upstream documents when available:
 
 ```text
-standards/ui-authoring-specs/UI_PAGE.authoring-spec.md
+docs/review/project-decisions.md
+docs/review/question-resolution.md
+
+docs/reference/product-spec.md
+docs/reference/domain-model.md
+docs/reference/architecture.md
+docs/reference/data-api-contract.md
+docs/reference/frontend-design.md
 ```
 
-Also respect:
+Optional inputs when available:
 
 ```text
-standards/ui-authoring-strategy.md
-standards/codex-ready-writing-rules.md
+docs/reference/backend-design.md
+docs/reference/dev-environment.md
 ```
 
-Do not restate these standards in the generated YAML.
+Do not require all reference files to understand every UI field. Use only the relevant source material needed to define user-visible UI surfaces.
 
----
+## Generation Goal
 
-## Output Rules
-
-Generate only:
+Generate `UI_PAGE.yaml` that answers:
 
 ```text
-docs/ui/UI_PAGE.yaml
+Where does the user see each important flow?
+Where does the user act?
+Which actions trigger effects?
+Where does the user receive feedback?
+Where can the user recover?
+Where do uploaded or generated artifacts appear?
+Where does completion become visible?
+Which route-backed state is addressable?
+Which state is local UI-only?
 ```
 
-Use YAML only.
+## Required Top-Level YAML Shape
 
-Do not include Markdown explanation.
+Generate YAML using this structure:
 
-Do not generate other project documents.
+```yaml
+meta:
+  name: UI_PAGE
+  project: string
+  version: 1
+  purpose: string
 
-Do not create:
+codex_consumption:
+  file_role: flow_facing_semantic_ui_surface
+  source_of_truth: []
+  traceability_only: []
+  codex_should: []
+  codex_must_not: []
+  read_with: []
+
+product:
+  id: string
+  name: string
+  description: string
+
+app_shell:
+  layout: {}
+  regions: []
+
+navigation:
+  primary: []
+  secondary: []
+
+routes: []
+
+pages: []
+
+flow_surface_mapping: []
+
+action_effect_mapping: []
+
+feedback_state_mapping: []
+
+recovery_path_mapping: []
+
+artifact_surface_mapping: []
+
+completion_signal_mapping: []
+
+components: {}
+
+global_states: {}
+
+global_actions: {}
+```
+
+## Required YAML Sections
+
+The generated file must include:
+
+```yaml
+meta:
+codex_consumption:
+product:
+routes:
+pages:
+```
+
+Include these sections when relevant:
+
+```yaml
+app_shell:
+navigation:
+flow_surface_mapping:
+action_effect_mapping:
+feedback_state_mapping:
+recovery_path_mapping:
+artifact_surface_mapping:
+completion_signal_mapping:
+components:
+global_states:
+global_actions:
+```
+
+If a recommended section is not relevant, it may be omitted or left empty with a clear reason only if the YAML format remains clean and useful.
+
+## `codex_consumption` Requirements
+
+The generated YAML must include:
+
+```yaml
+codex_consumption:
+  file_role: flow_facing_semantic_ui_surface
+  source_of_truth:
+    - app shell
+    - navigation hierarchy
+    - routes
+    - pages
+    - sections
+    - actions
+    - UI states
+    - local UI state
+    - flow surface mapping
+    - feedback surface mapping
+    - recovery path mapping
+    - artifact surface mapping
+    - completion signal mapping
+  traceability_only:
+    - related_requirements
+    - calls_api
+    - related_frontend_responsibilities
+  codex_should:
+    - implement pages, sections, actions, and states according to their semantic purpose
+    - read referenced API contracts before implementing actions that call APIs
+    - preserve the distinction between route-backed state and local UI state
+    - make completion signals visible to the user
+    - make recovery paths actionable when defined
+    - use UI_VISUAL_SPEC.yaml for presentation rules
+    - use UI_TOKENS.yaml for technology-agnostic token intent
+  codex_must_not:
+    - infer API request or response shapes from calls_api
+    - treat sections as HTML tags or component implementation instructions
+    - treat states as visual styling rules
+    - hide critical states behind color-only feedback
+    - invent routes, pages, or actions outside the current task scope
+    - assume Tailwind, shadcn/ui, CSS variables, MUI, Chakra, or any styling stack
+  read_with:
+    - docs/reference/ui/UI_VISUAL_SPEC.yaml
+    - docs/reference/ui/UI_TOKENS.yaml
+    - docs/reference/frontend-design.md
+    - docs/reference/data-api-contract.md when actions call APIs
+```
+
+## Flow-Facing UI Rules
+
+For each important Core User Flow or product-facing flow area:
+
+1. Define the visible UI surface.
+2. Define the primary page or pages.
+3. Define the sections needed for the user to act and observe progress.
+4. Define the actions the user can take.
+5. Define states that affect user-visible feedback.
+6. Define recovery paths if failure or blocked behavior exists.
+7. Define artifact surfaces if uploaded or generated artifacts exist.
+8. Define completion signals.
+
+Do not create final executable `FLOW-*`, `TASK-*`, or `VAL-*`.
+
+Use stable flow references such as:
 
 ```text
-FE-*
-BE-*
-DB-*
-API-*
-ERR-*
-TYPE-*
-TASK-*
-VAL-*
+generate_proposal
+upload_source_file
+review_generation_status
+download_generated_artifact
 ```
 
-Existing IDs may be referenced, including:
+when final execution IDs do not yet exist.
+
+## Route and State Rules
+
+Use `routes[].query` only for addressable or shareable state such as:
+
+```text
+search
+filters
+pagination
+sort
+addressable tabs
+selected resource id when URL-shareable
+```
+
+Use `local_state` for temporary UI-only state such as:
+
+```text
+dialog open state
+drawer open state
+copy success state
+form dirty state
+drag active state
+temporary loading flags
+temporary preview expansion
+```
+
+Do not place temporary UI-only state in route query.
+
+## Action Rules
+
+Actions describe user-triggered operations or navigation.
+
+Action types may include:
+
+```text
+navigation
+action
+download
+upload
+toggle
+copy
+retry
+cancel
+```
+
+For each important action, include:
+
+```text
+id
+label
+type
+visible_when or disabled_when when relevant
+calls_api when relevant
+feedback when relevant
+```
+
+`calls_api` is traceability only. It must not define API request or response fields.
+
+## Feedback and Recovery Rules
+
+Important action effects must have visible feedback.
+
+Required for relevant states:
+
+```text
+submitting
+queued
+running
+succeeded
+failed
+blocked
+validation_failed
+artifact_available
+download_ready
+```
+
+Failure and blocked states must be visible to the user.
+
+If recovery exists, define a recovery path and user-visible action.
+
+If recovery does not exist, ensure the terminal or blocked state has a visible explanation.
+
+## Artifact and Completion Rules
+
+If the product generates or uploads artifacts, define:
+
+```text
+artifact_surface_mapping
+visible states
+available actions
+completion signal relationship
+```
+
+Completion must be visible to the user.
+
+Backend success alone is not a UI completion signal.
+
+## Traceability Rules
+
+`UI_PAGE.yaml` may reference:
 
 ```text
 REQ-*
-DEC-*
-ENT-*
-BR-*
-STATE-*
-ARCH-*
 API-*
 ERR-*
+TYPE-*
+FE-*
 ```
 
-Existing `API-*` and `ERR-*` IDs may be referenced, but must not be defined here.
+These references are traceability only.
+
+Do not redefine:
+
+```text
+requirements
+API request/response shapes
+error contracts
+shared types
+frontend implementation responsibilities
+backend behavior
+```
+
+## Technology-Agnostic Rules
 
 Do not include:
 
 ```text
-JSX
-React hooks
 Tailwind classes
-CSS values
-visual token values
-API implementation
-backend logic
-database schema
-validation commands
+CSS variable names
+shadcn/ui component names as required implementation
+MUI or Chakra component names as required implementation
+React component file paths
+JSX
+HTML tags as structure
 ```
 
----
+UI_PAGE defines semantic UI surfaces, not implementation structure.
 
-## Required YAML Scope
+## Blocked Generation Rules
 
-The YAML should describe semantic UI structure, not implementation code.
+Output a blocked-generation report instead of normal YAML if:
 
-It should include, when relevant:
+- required page structure is unclear
+- primary user flows cannot be mapped to visible UI surfaces
+- important actions are missing or contradictory
+- action effects are unknown
+- feedback states are required but unresolved
+- recovery behavior is required but unresolved
+- artifact surfaces are required but unresolved
+- completion signals are unclear
+- unresolved Open Questions would enter the final UI reference
+- generation would require inventing API, product, domain, frontend, backend, or styling-stack decisions
 
-```yaml
-app:
-  name:
-  description:
+Blocked-generation report structure:
 
-shell:
-  layout:
-  navigation:
-  global_actions:
+```markdown
+# UI_PAGE Generation Blocked
 
-routes:
-  - id:
-    path:
-    page:
+## Blocking Issues
 
-pages:
-  - id:
-    route:
-    title:
-    purpose:
-    primary_user_tasks:
-    related_requirements:
-    related_entities:
-    related_apis:
-    sections:
-    actions:
-    states:
-    route_state:
-    local_state:
+| Issue | Decision Needed | Affected UI Area | Affected Source Docs |
+|---|---|---|---|
+
+## Partial Safe Structure
+
+## Required User Decisions
 ```
 
-Follow the exact shape and naming conventions from:
-
-```text
-standards/ui-authoring-specs/UI_PAGE.authoring-spec.md
-```
-
-when that standard is more specific than this prompt.
-
----
-
-## App Shell Guidance
-
-Define the app shell only at the semantic level.
-
-Include relevant items such as:
-
-```text
-sidebar navigation
-top navigation
-page header area
-breadcrumbs
-global search
-global create action
-user/account area
-settings access
-```
-
-Example semantic content:
-
-```yaml
-shell:
-  layout: sidebar
-  sidebar:
-    collapsible: true
-    navigation_groups:
-      - id: main
-        items:
-          - id: cases
-            label: Cases
-            route: /cases
-            icon: folder
-```
-
-Rules:
-
-- Icons may be semantic names or lucide-compatible names.
-- Do not include icon import code.
-- Do not include Tailwind classes.
-- Do not include pixel values.
-- Do not include color values.
-
----
-
-## Route Guidance
-
-Routes should align with product workflows and API contracts.
-
-Recommended route item:
-
-```yaml
-routes:
-  - id: cases_list_route
-    path: /cases
-    page: cases_list
-    related_requirements:
-      - REQ-004
-```
-
-Rules:
-
-- Use stable route IDs.
-- Use clear path names.
-- Do not define framework file paths.
-- Do not define route component implementation.
-- Prefer route paths that support later frontend implementation without ambiguity.
-
----
-
-## Page Guidance
-
-Each page should include:
-
-```text
-stable page ID
-route reference
-title
-purpose
-primary user tasks
-related requirements
-related APIs
-sections
-actions
-states
-route-backed state
-local UI state
-```
-
-Recommended page item:
-
-```yaml
-pages:
-  - id: cases_list
-    route: /cases
-    title: Cases
-    purpose: View and filter cases.
-    primary_user_tasks:
-      - browse_cases
-      - filter_cases
-      - open_case_detail
-    related_requirements:
-      - REQ-004
-    related_apis:
-      - API-001
-```
-
-Rules:
-
-- Page IDs should be stable and easy to reference from `frontend-design.md` and `execution-validation.md`.
-- Page purpose should be short.
-- Do not describe visual styling.
-- Do not include React component names unless the authoring spec allows semantic component hints.
-
----
-
-## Section Guidance
-
-Sections should describe semantic page regions.
-
-Recommended section item:
-
-```yaml
-sections:
-  - id: cases_filter_bar
-    type: filter_bar
-    purpose: Filter the case list by status and owner.
-    data_dependencies:
-      - API-001
-    states:
-      - ready
-      - disabled
-```
-
-Rules:
-
-- Use semantic section types.
-- Sections should map cleanly to frontend feature components later.
-- Do not include Tailwind classes.
-- Do not include shadcn component names unless the authoring spec explicitly allows component hints.
-
----
-
-## Action Guidance
-
-Actions should describe user intents, not implementation functions.
-
-Recommended action item:
-
-```yaml
-actions:
-  - id: create_case
-    label: Create Case
-    type: primary
-    triggers:
-      - open_dialog
-    related_requirements:
-      - REQ-001
-    related_apis:
-      - API-002
-```
-
-Rules:
-
-- Actions should map to product workflows.
-- Actions may reference related APIs.
-- Do not include event handler function names.
-- Do not include implementation code.
-
----
-
-## State Guidance
-
-Define page and component states that frontend implementation must handle.
-
-Common states:
-
-```text
-loading
-empty
-ready
-error
-permission_denied
-not_found
-disabled
-submitting
-success
-conflict
-stale
-```
-
-Recommended state item:
-
-```yaml
-states:
-  - id: empty
-    meaning: No records exist or no records match the current filters.
-    expected_user_guidance: Offer a clear next action or a way to clear filters.
-```
-
-Rules:
-
-- States should be semantic and user-facing.
-- Error states should align with `ERR-*` contracts when available.
-- Permission states should align with API permission requirements.
-- Include loading, empty, error, and ready states for data-driven pages.
-
----
-
-## Route State Guidance
-
-Use route state for shareable, bookmarkable UI state.
-
-Examples:
-
-```yaml
-route_state:
-  - id: status_filter
-    param: status
-    type: string
-    related_section: cases_filter_bar
-  - id: page
-    param: page
-    type: number
-```
-
-Good route state candidates:
-
-```text
-filters
-pagination
-sorting
-selected tab
-search query
-```
-
-Avoid route state for:
-
-```text
-dialog open state
-hover state
-temporary form input
-transient loading state
-```
-
----
-
-## Local State Guidance
-
-Use local state for temporary UI-only state.
-
-Examples:
-
-```yaml
-local_state:
-  - id: create_case_dialog_open
-    type: boolean
-    purpose: Controls whether the create case dialog is open.
-```
-
-Good local state candidates:
-
-```text
-dialog open/closed
-popover open/closed
-temporary form draft
-expanded/collapsed local section
-hover state
-```
-
----
-
-## Modern Web App Structure Guidance
-
-When relevant to the product, include semantic support for:
-
-```text
-collapsible sidebar
-sidebar navigation groups
-sidebar item icon names
-page header
-breadcrumbs
-primary page action
-secondary actions
-filter toolbar
-data table
-row actions
-bulk actions
-detail panels
-forms
-dialogs
-settings pages
-loading states
-empty states
-error states
-permission states
-responsive navigation
-```
-
-Keep these semantic.
-
-Do not define visual styling.
-
----
-
-## Catalog Design Rules
-
-The generated file should behave like a task-scoped UI reference.
-
-This means:
-
-- page IDs must be stable and easy to reference
-- section IDs must be stable and easy to reference
-- action IDs must be stable and easy to reference
-- state IDs must be stable and easy to reference
-- later tasks should be able to reference UI entries like:
-
-```text
-docs/ui/UI_PAGE.yaml#cases_list
-docs/ui/UI_PAGE.yaml#cases_filter_bar
-docs/ui/UI_PAGE.yaml#create_case
-```
-
-Avoid broad UI narrative that Codex would need to read globally.
-
----
-
-## Writing Rules
-
-- Use YAML only.
-- Keep the YAML semantic.
-- Use stable IDs.
-- Reference existing `REQ-*`, `ENT-*`, `BR-*`, `STATE-*`, `ARCH-*`, `API-*`, and `ERR-*` IDs where useful.
-- Do not create implementation IDs such as `FE-*`, `BE-*`, `VAL-*`, or `TASK-*`.
-- Do not include JSX.
-- Do not include React hooks.
-- Do not include Tailwind classes.
-- Do not include CSS values.
-- Do not include database schema.
-- Do not include backend logic.
-- Do not include API request/response schema definitions.
-- Do not duplicate product requirements in full.
-
----
-
-## Quality Checklist
+## Final Checks
 
 Before finalizing, verify:
 
-```text
-[ ] YAML is valid.
-[ ] UI structure is semantic, not implementation code.
-[ ] Routes align with product workflows.
-[ ] Pages have stable IDs.
-[ ] Pages have clear purposes.
-[ ] Page sections are explicit.
-[ ] Page actions are explicit.
-[ ] Loading, empty, error, and permission states are covered where relevant.
-[ ] Route-backed state and local state are separated.
-[ ] Related REQ/API/ERR references are included where useful.
-[ ] No Tailwind classes are included.
-[ ] No JSX or React code is included.
-[ ] No DB schema or backend logic is included.
-[ ] No FE/BE/VAL/TASK IDs are created here.
-```
+- `meta.name` equals `UI_PAGE`.
+- `codex_consumption` exists.
+- Routes are unique.
+- Pages are unique.
+- Every `route.page` references an existing page.
+- Every `page.route_ref` references an existing route.
+- Sections have semantic IDs.
+- Actions have stable IDs.
+- Route-backed state is in `routes[].query`.
+- Local-only state is in `local_state`.
+- Primary flows have visible surfaces.
+- Important actions have feedback mappings.
+- Critical states have visible feedback mappings.
+- Recovery paths are mapped when recovery exists.
+- Artifacts have visible surfaces when in scope.
+- Completion signals are visible.
+- No Tailwind classes appear.
+- No React or JSX appears.
+- No styling technology is assumed.
+- No Open Questions appear.

@@ -1,492 +1,407 @@
-# Data API Contract Prompt
-
-## Target File
-
-```text
-docs/data-api-contract.md
-```
+# Data/API Contract Prompt
 
 ## Purpose
 
-Generate a compact data and API contract reference catalog for a Codex-ready Web App project.
+Use this prompt to generate the data and API contract catalog for the current implementation.
 
-`data-api-contract.md` owns:
+The data/API contract document defines stable `DB-*`, `API-*`, `ERR-*`, and `TYPE-*` entries. It is the source of truth for data structures, API routes, request payloads, response payloads, error contracts, and shared contract types.
 
-```text
-DB-* database/data object entries
-API-* API contract entries
-ERR-* API error contract entries
-TYPE-* shared contract type entries when needed
-open data/API questions
-```
+It is a non-UI reference catalog. It must be ownership-decoupled and entry-self-contained.
 
-It exists so `execution-validation.md` can reference precise data and API contracts from `TASK-*`.
+## Target Output
 
----
-
-## Source Context
-
-Use the available conversation context and upstream documents already generated in the current conversation.
-
-Recommended upstream context:
+Generate exactly one document:
 
 ```text
-Project Design Brief
-docs/product-spec.md
-docs/project-decisions.md
-docs/domain-model.md
-docs/architecture.md
-current project discussion
-uploaded project notes
+docs/reference/data-api-contract.md
 ```
 
-Use `product-spec.md` for:
+## Standards to Apply
 
-- MVP boundary
-- user roles
-- `REQ-*`
+Read only the standards listed below.
 
-Use `project-decisions.md` for:
+| Standard | Required? | Use For |
+|---|---:|---|
+| `standards/document-responsibilities.md` | yes | Enforces non-UI reference ownership, entry self-containment, and traceability without dependency. |
+| `standards/flow-concepts-and-composition.md` | yes | Helps identify data/API contracts needed by Core User Flows, Side Effect Flows, artifacts, state transitions, and foundation readiness. |
+| `standards/frontend-backend-boundary.md` | yes | Ensures frontend and backend consume/implement this contract without redefining it. |
+| `standards/open-questions-policy.md` | yes | Prevents unresolved questions from entering final reference docs. |
+| `standards/codex-ready-writing-rules.md` | yes | Ensures stable IDs, resolved wording, and Codex-safe contract entries. |
+| `standards/document-length-budgets.md` | optional | Use to keep contract entries compact and addressable. |
 
-- `DEC-*`
-- database choice
-- API style
-- auth direction
-- shared package direction
-- validation direction
+## Standard Application Rules
 
-Use `domain-model.md` for:
+Standards constrain how this prompt generates its target document. Standards do not create additional output targets.
 
-- `ENT-*`
-- `REL-*`
-- `BR-*`
-- `STATE-*`
-- ownership and lifecycle meaning
+Rules:
+1. Read only the standards listed in this prompt.
+2. Do not load all standards by default.
+3. The current prompt defines the target output and required output structure.
+4. Standards define reusable terminology, ownership boundaries, quality rules, and review constraints.
+5. Do not copy large sections from standards into the generated document.
+6. Do not generate documents requested by a standard unless this prompt explicitly targets them.
+7. If required context remains unresolved under the standards, output a blocked-generation report instead of inventing missing decisions.
 
-Use `architecture.md` for:
+## Priority Rule
 
-- `ARCH-*`
-- frontend/backend boundary
-- data access boundary
-- request lifecycle
-- configuration boundary
-- shared package boundary
+When generating the target document, use this priority order:
 
-If upstream documents are unavailable, use the available context and state assumptions.
+1. User-confirmed answers and corrections.
+2. This prompt's target output and required output structure.
+3. Required standards listed in this prompt.
+4. Upstream generated project documents.
+5. Prior project discussion.
 
-If a data or API contract decision is unclear and affects execution tasks, list it under `Open Data/API Questions`.
+If a conflict involves unresolved blockers, Open Questions leakage, unsafe scope invention, missing required decisions, or reference ownership dependency, output a blocked-generation report instead of generating a normal final document.
 
----
+## Required Inputs
 
-## Relevant Standards
-
-Apply only the standards relevant to this document:
+Use these upstream documents when available:
 
 ```text
-standards/document-responsibilities.md
-standards/document-length-budgets.md
-standards/codex-ready-writing-rules.md
-standards/frontend-backend-boundary.md
+docs/review/project-decisions.md
+docs/review/question-resolution.md
+docs/reference/product-spec.md
+docs/reference/domain-model.md
+docs/reference/architecture.md
 ```
 
-Do not restate these standards in the generated document.
+Do not require every reference document to understand this output. The generated contract entries must be self-contained in their own data/API responsibility layer.
 
----
+## Data/API Contract Ownership
 
-## Output Rules
-
-Generate only:
-
-```text
-docs/data-api-contract.md
-```
-
-Do not generate other project documents.
-
-Create only:
+`docs/reference/data-api-contract.md` owns:
 
 ```text
 DB-*
 API-*
 ERR-*
 TYPE-*
+data objects and persistence structures
+API routes
+request payloads
+response payloads
+error contracts
+shared contract types
+status enums
+artifact metadata contracts
+contract-level validation rules
 ```
 
-Do not create:
+It must not own:
 
 ```text
-REQ-*
-DEC-*
-ENT-*
-REL-*
-BR-*
-STATE-*
-ARCH-*
-FE-*
-BE-*
+product requirements
+domain meaning beyond contract naming
+architecture boundaries
+frontend API client implementation
+frontend state behavior
+backend service implementation
+backend repository implementation
+ORM implementation
+environment commands
+execution task sequencing
+validation commands
+final executable FLOW-*
 TASK-*
 VAL-*
+Open Questions
 ```
 
-You may reference existing:
+## Reference Decoupling Rules
 
-```text
-REQ-*
-DEC-*
-ENT-*
-REL-*
-BR-*
-STATE-*
-ARCH-*
-```
+Because this is a non-UI reference catalog:
 
-Every catalog ID must be heading-addressable.
+1. Every `DB-*`, `API-*`, `ERR-*`, and `TYPE-*` entry must be entry-self-contained.
+2. Related IDs may be included only for traceability.
+3. Do not write "see product-spec.md for details" as a substitute for contract content.
+4. Do not copy product, domain, architecture, frontend, backend, or environment source definitions.
+5. Do not redefine another document's owned content.
+6. Contract entries may mention related flow areas, but must not perform full flow composition.
 
-Use these heading formats:
+Allowed:
 
 ```markdown
-### DB-001: Data Object Name
-### API-001: API Contract Name
-### ERR-001: Error Contract Name
-### TYPE-001: Shared Type Name
+Related Requirements:
+- REQ-001
+Related Domain Items:
+- ENT-001
 ```
 
-Do not write a long data/API narrative.
-
-Do not include frontend implementation, backend service implementation, task lists, command catalogs, or validation commands.
-
----
-
-## Required Document Structure
-
-Use this structure:
+Forbidden:
 
 ```markdown
-# Data API Contract
-
-## Data Object Catalog
-
-## API Contract Catalog
-
-## Error Contract Catalog
-
-## Shared Type Catalog
-
-## Open Data/API Questions
+API-001 implements REQ-001. See REQ-001 for details.
 ```
 
-If the project does not need shared types, keep `Shared Type Catalog` and write `None required for MVP`.
+## Flow-Aware Contract Rules
 
-Do not add extra sections unless they are necessary for the project.
+The data/API contract must support flow-first execution without becoming an execution plan.
 
----
+Required:
+- Identify contracts needed by current Core User Flows and Side Effect Flows.
+- Include data/API support for product-visible feedback, recovery, state transitions, artifacts, and completion signals.
+- Represent generated artifacts and intermediate artifacts when they are part of current scope.
+- Define terminal and non-terminal statuses when they affect API behavior or frontend/backend coordination.
+- Define stable error contracts for recoverable, failed, blocked, validation, and not-found behavior when applicable.
+- Keep final executable `FLOW-*`, `TASK-*`, and `VAL-*` out of this document.
 
-## Section Rules
+Forbidden:
+- Generating a final flow catalog.
+- Generating frontend client responsibilities.
+- Generating backend implementation responsibilities.
+- Generating task order.
+- Generating validation commands.
 
-### Data Object Catalog
-
-Generate compact `DB-*` entries for persisted objects, important database views, or durable data structures.
-
-Recommended format:
+## Required Output Structure
 
 ```markdown
-### DB-001: cases
+# Data/API Contract
 
-Kind: table
+## 1. Contract Scope
+
+State what this document owns and what it does not own.
+
+## 2. Contract Summary
+
+Summarize the data/API model in current-scope terms.
+
+## 3. Shared Type Catalog
+
+### TYPE-001: <Type Name>
+
+Kind:
+- enum / object / scalar / union / identifier / status
 
 Purpose:
-- Stores case records.
+- ...
 
-Related:
-- ENT-001
-- REQ-001
-- ARCH-004
+Fields / Values:
+| Field or Value | Type | Required? | Meaning |
+|---|---|---:|---|
+
+Rules:
+- ...
+
+Related IDs:
+- ...
+
+Flow Support:
+- ...
+
+## 4. Data Object Catalog
+
+### DB-001: <Data Object Name>
+
+Purpose:
+- ...
 
 Fields:
-| Field | Type | Required | Notes |
+| Field | Type | Required? | Meaning |
 |---|---|---:|---|
-| id | uuid | yes | Primary identifier. |
-| name | text | yes | User-visible case name. |
-| status | case_status | yes | Current lifecycle status. |
-| created_at | timestamp | yes | Creation time. |
-| updated_at | timestamp | yes | Last update time. |
 
 Constraints:
-- Case name must be unique within the owning workspace when applicable.
+- ...
 
-Indexes:
-- `idx_cases_updated_at`
-```
+Lifecycle:
+- ...
 
-Rules:
+Related IDs:
+- ...
 
-- Use project-appropriate field types.
-- Include fields only when they affect migration, persistence, API, or validation.
-- Include constraints and indexes when they affect implementation.
-- Reference domain IDs where useful.
-- Do not define repository methods.
-- Do not define backend service logic.
-- Do not define frontend display behavior.
+Flow Support:
+- ...
 
-Recommended `Kind` values:
+## 5. API Contract Catalog
 
-```text
-table
-view
-materialized-view
-join-table
-snapshot
-log
-queue
-external-record
-```
+### API-001: <API Name>
 
----
+Method:
+- ...
 
-### API Contract Catalog
-
-Generate compact `API-*` entries for endpoints or RPC-style operations.
-
-Recommended format:
-
-```markdown
-### API-001: List Cases
-
-Method: GET
-Path: `/api/cases`
+Path:
+- ...
 
 Purpose:
-- Return a paginated list of cases visible to the current user.
-
-Related:
-- REQ-004
-- ENT-001
-- DB-001
-- ARCH-005
-
-Auth:
-- Required when authentication is enabled.
-- User must have case read access.
+- ...
 
 Request:
-| Name | In | Type | Required | Notes |
-|---|---|---|---:|---|
-| page | query | number | no | Defaults to 1. |
-| page_size | query | number | no | Defaults to 20. |
-| status | query | case_status | no | Optional status filter. |
+| Field | Type | Required? | Meaning |
+|---|---|---:|---|
 
 Response:
-```json
-{
-  "items": [
-    {
-      "id": "uuid",
-      "name": "string",
-      "status": "draft",
-      "updated_at": "ISO-8601"
-    }
-  ],
-  "pagination": {
-    "page": 1,
-    "page_size": 20,
-    "total": 100
-  }
-}
-```
+| Field | Type | Required? | Meaning |
+|---|---|---:|---|
+
+Status Codes:
+| Code | Meaning | Error Contract |
+|---:|---|---|
 
 Errors:
-- ERR-001
-- ERR-002
-- ERR-004
-```
+- ERR-...
 
-Rules:
+State / Artifact Effects:
+- ...
 
-- Each `API-*` must define method and path unless the project uses a non-HTTP API style.
-- Request shape must be explicit.
-- Response shape must be explicit.
-- Auth/permission expectations must be explicit when relevant.
-- Errors must reference `ERR-*` entries when possible.
-- Keep examples compact.
-- Do not include frontend API client implementation.
-- Do not include backend handler implementation.
-- Do not include validation commands.
+Related IDs:
+- ...
 
----
+Flow Support:
+- ...
 
-### Error Contract Catalog
+Out of Scope:
+- ...
 
-Generate compact `ERR-*` entries for stable API error shapes or error codes.
+## 6. Error Contract Catalog
 
-Recommended format:
-
-```markdown
-### ERR-001: Validation Error
-
-HTTP Status:
-- 400
-
-Code:
-- `VALIDATION_ERROR`
-
-Shape:
-```json
-{
-  "error": {
-    "code": "VALIDATION_ERROR",
-    "message": "string",
-    "details": {}
-  }
-}
-```
-
-Use When:
-- Request input fails shape or field validation.
-
-Frontend Behavior:
-- Show field-level or form-level validation feedback when possible.
-```
-
-Rules:
-
-- Error codes should be stable.
-- Include HTTP status when using HTTP.
-- Include frontend behavior only at a high level.
-- Do not define React implementation.
-- Do not expose internal stack traces or secrets.
-- Include common errors only when relevant.
-
-Common useful errors:
-
-```text
-VALIDATION_ERROR
-UNAUTHORIZED
-FORBIDDEN
-NOT_FOUND
-CONFLICT
-RATE_LIMITED
-INTERNAL_ERROR
-```
-
----
-
-### Shared Type Catalog
-
-Generate compact `TYPE-*` entries when shared request/response/error/pagination types are useful.
-
-Recommended format:
-
-```markdown
-### TYPE-001: Pagination Response
+### ERR-001: <Error Name>
 
 Purpose:
-- Shared pagination metadata used by list APIs.
+- ...
+
+When Returned:
+- ...
 
 Shape:
-```json
-{
-  "page": 1,
-  "page_size": 20,
-  "total": 100
-}
+| Field | Type | Required? | Meaning |
+|---|---|---:|---|
+
+Recovery Guidance:
+- ...
+
+Related IDs:
+- ...
+
+## 7. Contract-Level Rules
+
+List cross-contract rules that are owned by data/API contracts.
+
+## 8. Out-of-Scope Contracts
+
+List data/API contracts intentionally excluded from the current implementation.
+
+## 9. Downstream Seeds
+
+List concise seeds for frontend, backend, flow composition, execution, and validation documents.
+
+## 10. Final Readiness
+
+Status: ready / blocked
+
+If blocked, list missing decisions and affected downstream documents.
 ```
 
-Used By:
-- API-001
-- API-004
+## Entry Requirements
 
-Package:
-- `packages/api-contract` if shared contracts are used.
-```
-
-Rules:
-
-- Use shared types only when they reduce drift.
-- Shared types must stay app-agnostic.
-- Do not put backend services, database clients, frontend components, or secrets in shared type entries.
-- If no shared package is needed, write `None required for MVP`.
-
----
-
-### Open Data/API Questions
-
-List unresolved data or API questions.
-
-Recommended format:
-
-```markdown
-| Question | Blocking? | Affected Area |
-|---|---:|---|
-| Should list endpoints use cursor pagination instead of page pagination? | no | list APIs |
-| Is authentication required in MVP? | yes | API auth behavior |
-```
-
-Rules:
-
-- Include only questions that affect data objects, API contracts, errors, shared types, or execution tasks.
-- Mark blocking questions clearly.
-- Do not hide uncertainty inside `DB-*` or `API-*` entries.
-
----
-
-## Catalog Design Rules
-
-The generated file should behave like a task-scoped reference catalog.
-
-This means:
-
-- each ID entry must be short enough to read independently
-- each ID entry must have a stable Markdown heading
-- each ID entry should include related upstream IDs when useful
-- task authors should be able to reference entries like:
+Each `TYPE-*` entry must include:
 
 ```text
-docs/data-api-contract.md#DB-001
-docs/data-api-contract.md#API-001
-docs/data-api-contract.md#ERR-001
-docs/data-api-contract.md#TYPE-001
+ID
+name
+kind
+purpose
+fields or values
+rules
 ```
 
-Avoid broad narrative sections that Codex would need to read globally.
+Each `DB-*` entry must include:
 
----
+```text
+ID
+name
+purpose
+fields
+constraints
+lifecycle when applicable
+```
 
-## Writing Rules
+Each `API-*` entry must include:
 
-- Write a reference catalog, not a narrative contract document.
-- Use stable heading-addressable IDs.
-- Keep every entry compact and independently readable.
-- Define DB fields clearly enough for implementation.
-- Define API request and response shapes explicitly.
-- Define stable error contracts.
-- Reference existing `REQ-*`, `DEC-*`, `ENT-*`, `BR-*`, `STATE-*`, and `ARCH-*` where useful.
-- Do not create non-data/API IDs.
-- Do not include frontend API client implementation.
-- Do not include backend handler or service implementation.
-- Do not include implementation tasks.
-- Do not include validation commands.
-- Use `Open Data/API Questions` for unresolved contract decisions.
+```text
+ID
+name
+method
+path
+purpose
+request
+response
+status codes
+errors
+state or artifact effects when applicable
+out-of-scope where useful
+```
 
----
+Each `ERR-*` entry must include:
 
-## Quality Checklist
+```text
+ID
+name
+purpose
+when returned
+shape
+recovery guidance when applicable
+```
+
+## Writing Constraints
+
+Use direct, resolved contract language.
+
+Prefer:
+
+```text
+The create-run API returns a stable `run_id`, the initial run status, and any validation errors in the documented error envelope.
+```
+
+Avoid:
+
+```text
+The API might return whatever the backend creates.
+```
+
+Avoid dependency-only wording:
+
+```text
+See product-spec.md for request behavior.
+```
+
+Instead, state the contract behavior here and leave product intent, frontend implementation, and backend implementation to their owner documents.
+
+## Blocked Generation Rules
+
+Output a blocked-generation report instead of a normal data/API contract if:
+
+- required API behavior is unresolved
+- required data persistence or storage boundary is unresolved
+- required artifact contract behavior is unresolved
+- status lifecycle affects contracts but is unresolved
+- error shape is required but undecided
+- frontend/backend contract boundary is unclear
+- unresolved Open Questions would enter the final contract doc
+
+Blocked-generation report structure:
+
+```markdown
+# Data/API Contract Generation Blocked
+
+## Blocking Issues
+
+| Issue | Decision Needed | Affected Docs | Flow Impact |
+|---|---|---|---|
+
+## Partial Safe Content
+
+## Required User Decisions
+```
+
+## Final Checks
 
 Before finalizing, verify:
 
-```text
-[ ] The file is a compact data/API reference catalog.
-[ ] Core persisted objects have DB-* headings.
-[ ] Core API contracts have API-* headings.
-[ ] Common error contracts have ERR-* headings when needed.
-[ ] Shared types have TYPE-* headings when useful.
-[ ] Every ID entry is independently readable.
-[ ] IDs are heading-addressable.
-[ ] API request shapes are explicit.
-[ ] API response shapes are explicit.
-[ ] Auth/permission expectations are explicit where relevant.
-[ ] DB/API entries reference related upstream IDs where useful.
-[ ] No FE/BE/TASK/VAL IDs are created.
-[ ] No frontend or backend implementation is included.
-[ ] No implementation commands are included.
-[ ] Open data/API questions are marked blocking or non-blocking.
-```
+- No unresolved Open Questions remain.
+- No frontend API client implementation is defined.
+- No backend service or repository implementation is defined.
+- No ORM implementation detail is defined.
+- No `TASK-*`, `VAL-*`, or final executable `FLOW-*` entries are created.
+- Every `DB-*`, `API-*`, `ERR-*`, and `TYPE-*` entry is self-contained.
+- Related IDs are traceability hints only.
+- Data/API contracts support flow-first execution without becoming a flow composition document.

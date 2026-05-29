@@ -1,544 +1,707 @@
 # Document Responsibilities Standard
 
-## Purpose
+## 1. Purpose
 
-This standard defines the responsibility of each document in the Codex-ready Web App document system.
+This standard defines responsibility boundaries for generated documents in the WebApp Codex Prompt Kit.
 
-The system uses:
+It ensures that review documents, reference catalogs, UI reference files, and execution documents each serve their own role without duplicate ownership, hidden dependencies, or unsafe Codex execution assumptions.
 
-```text
-reference catalogs
-execution spine
-runtime policy
-review report
-```
+## 2. Scope
 
-Each document must own a narrow source-of-truth area and avoid redefining other documents.
-
----
-
-## Core Responsibility Rule
-
-Every document must answer one question:
+This standard applies to:
 
 ```text
-What does this file own that no other file should define?
+docs/review/*.md
+docs/reference/*.md
+docs/reference/ui/*.yaml
+docs/execution/*.md
 ```
 
-If content belongs to another document, reference that document's ID or stable key instead of copying the full definition.
+It also defines how generated project documents relate to prompt-kit standards and UI authoring specifications.
 
----
+## 3. Core Principle
 
-## Runtime Model
-
-Codex runtime behavior is centered on:
+Generated documents are split into three roles:
 
 ```text
-AGENTS.md
-docs/execution-validation.md
+review     -> connect, explain, resolve, compose, and prepare
+reference  -> define stable source catalogs and UI reference intent
+execution  -> instruct Codex what to do, what to read, and how to validate it
 ```
 
-All other documents are reference catalogs.
+Review documents may connect.
 
-Codex reads reference catalogs only when a `TASK-*` explicitly references a specific entry.
+Reference documents must define.
 
-Therefore, every reference catalog entry should be:
+Execution documents must direct.
 
-```text
-compact
-heading-addressable
-independently readable
-safe to cite from a task
-```
+UI reference documents define the user-visible shape of the application, but they do not define a concrete frontend styling stack.
 
----
+## 4. Document Role Separation
 
-## Document Responsibility Table
-
-| File | Owns | Must Not Own |
-|---|---|---|
-| `AGENTS.md` | Codex runtime policy and task-scoped reading rules. | Product requirements, API contracts, implementation tasks, validation definitions. |
-| `docs/product-spec.md` | `REQ-*`, MVP boundary, user roles, open product questions. | Project decisions, domain rules, DB/API contracts, FE/BE implementation, tasks, validation commands. |
-| `docs/project-decisions.md` | `DEC-*`, rejected alternatives, open decision questions. | Product requirements, detailed architecture, DB/API contracts, FE/BE implementation, tasks. |
-| `docs/domain-model.md` | `ENT-*`, `REL-*`, `BR-*`, `STATE-*`, open domain questions. | DB schema, API contracts, frontend/backend implementation, tasks, validation commands. |
-| `docs/architecture.md` | `ARCH-*`, repository/runtime/boundary rules, open architecture questions. | DB schema, API contracts, FE/BE implementation details, command catalogs, tasks. |
-| `docs/data-api-contract.md` | `DB-*`, `API-*`, `ERR-*`, `TYPE-*`, open data/API questions. | Frontend implementation, backend service implementation, tasks, validation commands. |
-| `docs/ui/UI_PAGE.yaml` | Semantic app shell, routes, pages, sections, actions, UI states, route/local state. | Visual tokens, visual styling rules, React code, API implementation, backend logic. |
-| `docs/frontend-design.md` | `FE-*`, frontend implementation responsibilities, code impact, frontend rules. | API contracts, DB schema, backend implementation, tasks, validation commands. |
-| `docs/backend-design.md` | `BE-*`, backend implementation responsibilities, code impact, backend rules. | API contracts, DB schema definitions, frontend implementation, tasks, validation commands. |
-| `docs/dev-environment.md` | `ENV-*`, service names, command policies, command patterns, forbidden host commands. | Task-specific validation selection, product requirements, implementation design. |
-| `docs/ui/UI_TOKENS.yaml` | UI token names, semantic tokens, token mappings. | Page structure, visual layout rules, React code, API/DB/backend logic. |
-| `docs/ui/UI_VISUAL_SPEC.yaml` | Visual usage rules, layout/component/state/responsive/accessibility visual rules. | Token values, page structure, React code, API/DB/backend logic, tasks. |
-| `docs/execution-validation.md` | `TASK-*`, `VAL-*`, execution spine phases, dependencies, task-scoped references, validation mappings. | Source definitions for product, domain, API, DB, FE, BE, UI, or ENV entries. |
-| `codex-execution-report.md` | Runtime execution status recorded by Codex. | Source-of-truth definitions, new tasks, new validation criteria. |
-| `cross-document-review-report.md` | Review findings and recommended fixes. | Source-of-truth definitions unless user explicitly asks to revise documents. |
-
----
-
-## Reference Catalog Responsibilities
-
-Reference catalogs should define stable entries.
-
-Each entry should include enough information for Codex to execute a task after reading only that entry and the current task.
-
-A reference catalog entry should usually include:
-
-```text
-ID or stable key
-short purpose or meaning
-rules or constraints
-related IDs
-open questions when relevant
-```
-
-A reference catalog entry should not include:
-
-```text
-long rationale
-implementation diary
-unrelated background
-definitions owned by another catalog
-task execution instructions
-validation commands
-```
-
----
-
-## `product-spec.md`
-
-Owns:
-
-```text
-MVP boundary
-user roles
-REQ-* requirement entries
-open product questions
-```
-
-Recommended entry shape:
-
-```markdown
-### REQ-001: Requirement Name
-
-Type:
-Priority:
-MVP:
-
-Actor:
-- ...
+### DR-001: Document Role Separation Rule
 
 Requirement:
-- ...
+- Each generated document must belong to one role: review, reference, or execution.
 
-Acceptance Intent:
-- ...
-
-Out of Scope:
-- ...
-
-Related Workflow:
-- ...
-```
-
-Rules:
-
-- Product requirements should be compact and product-facing.
-- Requirement entries should not define API routes, DB fields, frontend components, backend services, tasks, or validation commands.
-- Future scope must be marked clearly.
-
----
-
-## `project-decisions.md`
-
-Owns:
-
-```text
-DEC-* shared project decisions
-rejected alternatives
-open decision questions
-```
-
-Recommended entry shape:
-
-```markdown
-### DEC-001: Decision Name
-
-Status:
-Area:
-
-Decision:
-- ...
-
-Applies To:
-- ...
+Required:
+- Review docs may summarize, connect, map, and analyze.
+- Reference docs define stable source-of-truth entries or stable UI reference intent.
+- Execution docs define Codex runtime behavior, tasks, validation, and worklog policy.
 
 Forbidden:
-- ...
+- Turning a reference catalog into a review narrative.
+- Turning a review document into a final source-of-truth catalog.
+- Turning an execution document into a product, API, domain, frontend, backend, UI, or environment source catalog.
+- Turning UI reference files into React code, CSS class catalogs, or styling-stack implementation standards.
 
-Rationale:
-- ...
-```
+Applies To:
+- All generated documents.
 
-Rules:
-
-- Use `DEC-*` only for choices that affect multiple downstream catalogs or execution tasks.
-- Small implementation details should not become decisions.
-- Unconfirmed decisions should be `provisional`, `deferred`, or listed as open questions.
-
----
-
-## `domain-model.md`
-
-Owns:
-
-```text
-ENT-* entities
-REL-* relationships
-BR-* business rules
-STATE-* state concepts
-open domain questions
-```
-
-Rules:
-
-- `ENT-*` entries should describe domain meaning, not database columns.
-- `BR-*` entries must be enforceable.
-- `STATE-*` entries should be used only for meaningful lifecycle/workflow state.
-- Domain rules should not be enforced only in frontend design.
+Check:
+- A reviewer can identify whether the file is review, reference, or execution without ambiguity.
 
 ---
 
-## `architecture.md`
+## 5. Review Document Responsibilities
 
-Owns:
+### DR-002: Review Documents May Connect Rule
 
-```text
-ARCH-* architecture and boundary rules
-repository layout rules
-runtime unit rules
-dependency direction rules
-shared package rules
-data access boundary rules
-configuration boundary rules
-open architecture questions
-```
+Requirement:
+- Review documents may intentionally connect multiple future documents.
 
-Rules:
+Allowed:
+- Summarizing project context.
+- Mapping Open Questions to affected documents.
+- Mapping resolutions to target documents.
+- Recording cross-document decisions.
+- Performing flow composition analysis.
+- Reporting cross-document consistency issues.
+- Checking whether UI surfaces, actions, feedback, recovery paths, artifacts, and completion signals support the intended flows.
 
-- Architecture entries should define boundaries and allowed/forbidden dependencies.
-- Architecture should not define detailed DB schema, API payloads, frontend components, backend services, or command catalogs.
-- Repository and import boundaries should be clear enough for Codex to avoid cross-app drift.
+Forbidden:
+- Treating review documents as Codex default runtime context.
+- Defining final source-of-truth entries owned by reference documents.
+- Defining final `FLOW-*`, `TASK-*`, or `VAL-*` entries unless the review document explicitly reports existing entries.
+- Leaving unresolved review questions inside final reference or execution documents.
 
----
+Applies To:
+- `docs/review/project-design-brief.md`
+- `docs/review/open-questions-review.md`
+- `docs/review/question-resolution.md`
+- `docs/review/project-decisions.md`
+- `docs/review/flow-composition-review.md`
+- `docs/review/cross-document-review-report.md`
 
-## `data-api-contract.md`
-
-Owns:
-
-```text
-DB-* data object entries
-API-* API contract entries
-ERR-* error contract entries
-TYPE-* shared type entries
-open data/API questions
-```
-
-Rules:
-
-- `DB-*` entries may define fields, constraints, and indexes needed for implementation.
-- `API-*` entries must define request and response shapes.
-- `ERR-*` entries must define stable error behavior.
-- This file should not define frontend API client code or backend handler/service implementation.
+Check:
+- Review documents can reference and map many files, but final source-of-truth content is still converted into the correct owner document.
 
 ---
 
-## `UI_PAGE.yaml`
+## 6. Non-UI Reference Document Responsibilities
 
-Owns:
+### DR-003: Non-UI Reference Decoupling Rule
 
-```text
-semantic app shell
-routes
-navigation
-pages
-sections
-actions
-states
-route-backed state
-local UI state
-```
+Requirement:
+- Non-UI reference catalogs must be ownership-decoupled.
 
-Rules:
+Applies To:
+- `docs/reference/product-spec.md`
+- `docs/reference/domain-model.md`
+- `docs/reference/architecture.md`
+- `docs/reference/data-api-contract.md`
+- `docs/reference/frontend-design.md`
+- `docs/reference/backend-design.md`
+- `docs/reference/dev-environment.md`
 
-- UI page structure must stay semantic.
-- Do not include Tailwind classes, CSS values, React code, API implementation, or backend logic.
-- Page, section, action, and state IDs should be stable enough for `TASK-*` references.
+Required:
+- Each non-UI reference catalog must define its own responsibility layer.
+- A reference entry must be understandable within its own document's ownership boundary.
+- Cross-document IDs may appear only as traceability hints.
+- Related IDs must not replace the current entry's owned content.
 
----
+Forbidden:
+- Making one reference catalog depend on another reference catalog for meaning.
+- Writing entries whose main content is "see another file."
+- Copying another reference catalog's source-of-truth definitions.
+- Redefining another reference catalog's owned content.
+- Scattering final flow composition across reference catalogs.
 
-## `frontend-design.md`
-
-Owns:
-
-```text
-FE-* frontend implementation entries
-frontend code impact
-frontend page/route implementation rules
-frontend API client rules
-frontend state/form/error behavior rules
-UI document consumption rules
-open frontend questions
-```
-
-Rules:
-
-- `FE-*` entries should reference `UI_PAGE.yaml`, `API-*`, `ERR-*`, `TYPE-*`, and `ARCH-*` where relevant.
-- Frontend design must consume API contracts from `data-api-contract.md`; it must not define them.
-- Frontend design must not define DB schema or backend service behavior.
+Check:
+- A non-UI reference entry can be understood without opening another non-UI reference document.
 
 ---
 
-## `backend-design.md`
+### DR-004: Non-UI Reference Ownership Rule
 
-Owns:
+Requirement:
+- Each non-UI reference catalog owns only its designated ID family or responsibility area.
 
-```text
-BE-* backend implementation entries
-backend code impact
-API handler responsibilities
-service responsibilities
-repository/data access responsibilities
-transaction responsibilities
-auth/permission responsibilities
-structured error handling responsibilities
-background job/integration responsibilities
-open backend questions
-```
+Ownership:
+- `product-spec.md` owns `REQ-*`.
+- `domain-model.md` owns `ENT-*`, `REL-*`, `BR-*`, `STATE-*`.
+- `architecture.md` owns `ARCH-*`.
+- `data-api-contract.md` owns `DB-*`, `API-*`, `ERR-*`, `TYPE-*`.
+- `frontend-design.md` owns `FE-*`.
+- `backend-design.md` owns `BE-*`.
+- `dev-environment.md` owns `ENV-*`.
 
-Rules:
+Forbidden:
+- Creating `TASK-*` or `VAL-*` in reference catalogs.
+- Creating final executable `FLOW-*` in reference catalogs.
+- Leaving unresolved Open Questions in reference catalogs.
+- Performing full flow assembly in reference catalogs.
 
-- `BE-*` entries should reference `API-*`, `DB-*`, `ERR-*`, `ENT-*`, `BR-*`, `STATE-*`, and `ARCH-*` where relevant.
-- Backend design must implement API contracts from `data-api-contract.md`; it must not redefine them.
-- Backend design must not define frontend implementation or validation commands.
-
----
-
-## `dev-environment.md`
-
-Owns:
-
-```text
-ENV-* environment and command entries
-container-first command policy
-Docker service names
-runtime versions
-package manager policy
-setup/start/stop/dependency/database/test command patterns
-milestone/release command patterns
-forbidden host commands
-open environment questions
-```
-
-Rules:
-
-- This file defines command patterns, not task-specific validation selection.
-- `execution-validation.md` chooses which command is required for each task.
-- Commands should be container-first unless a decision explicitly says otherwise.
-- Do not include secrets.
+Check:
+- The document's headings and IDs match its owned family.
 
 ---
 
-## `UI_TOKENS.yaml`
+### DR-005: Non-UI Entry Self-Containment Rule
 
-Owns:
+Requirement:
+- Every non-UI reference entry must be self-contained at the entry level.
 
-```text
-semantic color tokens
-typography tokens
-spacing tokens
-radius tokens
-shadow tokens
-border tokens
-motion tokens
-breakpoint tokens
-CSS variable mapping
-Tailwind/shadcn token compatibility
-```
+Required:
+- A `REQ-*` entry states product-facing behavior and acceptance intent.
+- An `ENT-*` entry states domain meaning.
+- A `BR-*` entry states the rule and when it applies.
+- A `STATE-*` entry states state meaning and transition constraints.
+- An `ARCH-*` entry states the architecture boundary or rule.
+- An `API-*` entry states route, request, response, and error behavior.
+- A `TYPE-*` entry states the shared contract meaning.
+- A `FE-*` entry states frontend responsibility.
+- A `BE-*` entry states backend responsibility.
+- An `ENV-*` entry states environment or command policy.
 
-Rules:
+Forbidden:
+- Replacing owned explanation with a related ID.
+- Using another reference file as required reading for understanding the current entry.
+- Writing incomplete entries that only point elsewhere.
 
-- Tokens should be semantic and reusable.
-- Do not define page structure or visual layout rules.
-- Do not include React code or full Tailwind class strings.
-
----
-
-## `UI_VISUAL_SPEC.yaml`
-
-Owns:
-
-```text
-visual layout rules
-component visual rules
-state visual rules
-responsive behavior rules
-accessibility visual rules
-shadcn/ui usage boundaries
-Tailwind usage boundaries
-token usage rules
-```
-
-Rules:
-
-- Visual rules should reference token names from `UI_TOKENS.yaml`.
-- Do not duplicate token values.
-- Do not include React code, JSX, API schemas, DB schemas, backend logic, tasks, or validation commands.
+Check:
+- Each entry can be read alone by ChatGPT or Codex when referenced from a task.
 
 ---
 
-## `execution-validation.md`
+### DR-006: Traceability Without Dependency Rule
 
-Owns:
+Requirement:
+- Cross-document references in non-UI reference catalogs must support traceability, not dependency.
+
+Allowed:
 
 ```text
-execution reading policy
-P0-P10 execution spine
-phase applicability
-TASK-*
-VAL-*
-task dependencies
-task-scoped source references
-implementation scope
-expected code impact
-out-of-scope boundaries
-required validation
-task-to-validation mapping
-milestone validation
-release validation
-Codex execution report rules
-open execution questions
+Related Requirements:
+- REQ-001
 ```
 
-Rules:
+Forbidden:
 
-- This is the primary Codex execution spine.
-- It must include engineering foundation tasks and product workflow tasks.
-- It must not require Codex to infer missing tasks from other documents.
-- Each implementation task must include task-scoped source references.
-- Each implementation task must include required validation or a clear reason why validation is not applicable.
-- It must not redefine source catalog entries.
+```text
+This implements REQ-001. See REQ-001 for details.
+```
+
+Required:
+- State the current entry's owned meaning first.
+- Add related IDs only after the current entry is understandable.
+- Use related IDs for review, consistency checking, flow composition, and task-scoped source mapping.
+
+Check:
+- Removing related IDs should not destroy the entry's owned meaning.
 
 ---
 
-## `AGENTS.md`
+## 7. UI Reference Document Responsibilities
 
-Owns:
+### DR-007: UI Reference System Rule
+
+Requirement:
+- UI reference files define the user-visible shape of the Web App.
+
+UI reference files:
 
 ```text
-Codex runtime policy
-primary runtime documents
-task-scoped reading policy
-source-of-truth hierarchy
-repository boundaries
-command policy
-validation policy
-task execution procedure
-documentation update policy
-conflict handling
-execution report policy
-forbidden actions
+docs/reference/ui/UI_PAGE.yaml
+docs/reference/ui/UI_TOKENS.yaml
+docs/reference/ui/UI_VISUAL_SPEC.yaml
 ```
 
-Rules:
+Core principle:
 
-- Must state that Codex starts from `AGENTS.md` and `docs/execution-validation.md`.
-- Must state that other documents are task-scoped reference catalogs.
-- Must forbid Codex from reading the full document set by default.
-- Must forbid Codex from inferring new tasks from reference catalogs.
+```text
+UI is the flow-facing shape of the Web App.
+```
+
+UI references must describe:
+- what the user can see
+- what the user can do
+- how actions trigger effects
+- how system status becomes visible
+- how failure and blocked states are shown
+- how recovery is offered
+- where artifacts appear
+- where completion becomes visible
+
+UI references must not be reduced to:
+- page names only
+- component lists only
+- visual tokens only
+- style preferences only
+
+Check:
+- The UI reference set makes user flows operable, observable, recoverable, and complete.
 
 ---
 
-## `codex-execution-report.md`
+### DR-008: UI File Ownership Rule
 
-Owns runtime execution status only.
+Requirement:
+- Each UI reference file owns a distinct UI responsibility layer.
 
-Recommended fields:
+Ownership:
 
 ```text
-Task
-Type
-Status
-Sources Read
-Required Validation
-Result
-Failure Reason
-Notes
+UI_PAGE.yaml
+= flow-facing semantic UI surface
+
+UI_TOKENS.yaml
+= technology-agnostic design token reference
+
+UI_VISUAL_SPEC.yaml
+= visual and interaction presentation rules
 ```
 
-Rules:
+`UI_PAGE.yaml` owns:
+- app shell
+- navigation hierarchy
+- routes
+- pages
+- sections
+- actions
+- route-backed state
+- local UI state
+- global UI states
+- semantic component roles
+- flow surface mapping
+- action effect mapping
+- feedback state mapping
+- recovery path mapping
+- artifact surface mapping
+- completion signal mapping
+- traceability to `REQ-*`, `API-*`, `ERR-*`, `TYPE-*`, and `FE-*` where useful
 
-- It is updated by Codex during execution.
-- It does not define source-of-truth content.
-- It does not create new tasks or validation criteria.
+`UI_TOKENS.yaml` owns:
+- theme intent
+- semantic color roles
+- typography tokens
+- spacing tokens
+- radius tokens
+- border tokens
+- shadow tokens
+- layout dimension tokens
+- breakpoint tokens
+- motion tokens
+- z-index tokens
+- status token roles
+- accessibility token roles
+
+`UI_VISUAL_SPEC.yaml` owns:
+- visual direction
+- token usage intent
+- layout presentation rules
+- surface hierarchy
+- navigation presentation rules
+- component visual roles
+- interaction state presentation
+- feedback state presentation
+- recovery presentation
+- artifact presentation
+- completion signal presentation
+- responsive behavior
+- accessibility presentation rules
+- density intent
+- status-to-visual-role mapping
+
+Check:
+- A reader can determine whether a UI concern belongs in `UI_PAGE.yaml`, `UI_TOKENS.yaml`, or `UI_VISUAL_SPEC.yaml`.
 
 ---
 
-## Cross-Document Review Report
+### DR-009: UI Technology-Agnostic Rule
 
-Owns review findings only.
+Requirement:
+- UI reference files must not assume a concrete frontend styling stack.
 
-It should check:
+Forbidden unless explicitly introduced later by a dedicated implementation standard:
+- Tailwind-specific rules
+- shadcn/ui-specific rules
+- CSS variable mappings
+- MUI theme mappings
+- Chakra theme mappings
+- CSS Modules mappings
+- Styled Components implementation rules
+- Vanilla Extract implementation rules
+- framework-specific component requirements
+- full `className` strings
+- React or JSX code
 
-```text
-reference catalog quality
-execution spine completeness
-task-scoped reading quality
-source-of-truth conflicts
-undefined IDs
-frontend/backend boundary issues
-validation quality
-AGENTS runtime policy
-document bloat
-```
+Required:
+- UI references describe semantic UI, token intent, and visual/interaction presentation intent.
+- Codex maps that intent to the actual project stack and code conventions during implementation.
 
-Rules:
-
-- It should not silently rewrite documents.
-- It should provide actionable fixes.
-- It should distinguish blocking issues from improvements.
-
----
-
-## Prohibited Ownership Drift
-
-Avoid these common mistakes:
-
-```text
-frontend-design.md defines API response shapes
-backend-design.md defines DB fields
-architecture.md defines Docker commands
-dev-environment.md chooses task-specific validation
-execution-validation.md redefines business rules
-UI_PAGE.yaml contains Tailwind classes
-UI_TOKENS.yaml contains page structure
-UI_VISUAL_SPEC.yaml contains token raw values that belong in UI_TOKENS.yaml
-AGENTS.md contains product requirements
-codex-execution-report.md becomes a planning document
-```
+Check:
+- The UI reference files remain usable whether the project uses Tailwind, CSS Modules, MUI, Chakra, plain CSS, or another styling system.
 
 ---
 
-## Quality Checklist
+### DR-010: UI Codex Consumption Rule
 
-Before accepting a document, verify:
+Requirement:
+- Every generated UI YAML file must include a compact runtime dictionary section:
+
+```yaml
+codex_consumption:
+  file_role: ...
+  source_of_truth:
+    - ...
+  traceability_only:
+    - ...
+  codex_should:
+    - ...
+  codex_must_not:
+    - ...
+  read_with:
+    - ...
+```
+
+Required:
+- `UI_PAGE.yaml` must explain how Codex consumes semantic UI surfaces.
+- `UI_TOKENS.yaml` must explain how Codex consumes technology-agnostic token intent.
+- `UI_VISUAL_SPEC.yaml` must explain how Codex consumes visual and interaction presentation rules.
+
+Forbidden:
+- Requiring Codex to infer UI field meaning from field names alone.
+- Using `codex_consumption` to define project-specific implementation tasks.
+- Using `codex_consumption` to define a concrete styling stack.
+
+Check:
+- Codex can understand the role and limits of each UI YAML file without reading prompt-kit standards.
+
+---
+
+### DR-011: UI Traceability Without Redefinition Rule
+
+Requirement:
+- UI reference files may reference non-UI source IDs only for traceability.
+
+Allowed:
+- `UI_PAGE.yaml` may reference `REQ-*`, `API-*`, `ERR-*`, `TYPE-*`, and `FE-*`.
+- `UI_VISUAL_SPEC.yaml` may reference UI_PAGE sections, actions, states, and UI_TOKENS token roles.
+- `UI_TOKENS.yaml` should usually avoid non-UI source IDs unless a traceability note is truly useful.
+
+Forbidden:
+- Defining API request/response fields in `UI_PAGE.yaml`.
+- Defining frontend implementation responsibilities in `UI_PAGE.yaml`.
+- Defining token raw values inside `UI_VISUAL_SPEC.yaml`.
+- Defining routes or page sections in `UI_VISUAL_SPEC.yaml`.
+- Defining workflow logic, page structure, or component implementation in `UI_TOKENS.yaml`.
+
+Check:
+- UI files can point to source content, but do not redefine that content.
+
+---
+
+### DR-012: UI Flow Support Rule
+
+Requirement:
+- UI reference files must support flow-first execution.
+
+Required:
+- Primary user flows have visible UI surfaces.
+- Important actions have user affordances.
+- Important action effects have visible feedback.
+- Critical states have visible presentation.
+- Recovery paths are visible or intentionally out of scope.
+- Artifacts have visible surfaces when in scope.
+- Completion signals are visible to the user.
+
+Forbidden:
+- Treating backend success alone as UI completion.
+- Hiding failed or blocked states in invisible state only.
+- Relying on color alone for critical states.
+- Omitting artifact surfaces when artifact interaction is in scope.
+- Omitting UI recovery paths when recovery behavior is in scope.
+
+Check:
+- `flow-composition-review.md` can use UI references to determine whether each flow is operable, observable, recoverable, and complete.
+
+---
+
+## 8. Execution Document Responsibilities
+
+### DR-013: Execution Document Responsibility Rule
+
+Requirement:
+- Execution documents define Codex runtime policy, executable tasks, validation, and runtime worklog behavior.
+
+Required:
+- `execution-validation.md` owns final `FLOW-*` where used, `TASK-*`, `VAL-*`, flow-first task sequencing, required validation, release validation, and task-scoped source references.
+- `AGENTS.md` owns Codex runtime behavior, task reading policy, validation policy, blocker policy, UI consumption policy, and runtime worklog policy.
+- `codex-execution-report.md` is a runtime worklog created and maintained by Codex according to `AGENTS.md`.
+
+Forbidden:
+- Redefining product requirements, API contracts, domain rules, frontend design, backend design, UI reference content, or environment source content inside execution docs.
+- Treating the runtime worklog as a planning document or source-of-truth catalog.
+- Adding unresolved Open Questions to execution documents.
+- Asking Codex to infer tasks from reference catalogs or UI YAML files.
+
+Check:
+- Codex can execute from `AGENTS.md` and `execution-validation.md` without inventing missing product, UI, architecture, API, FE, BE, or ENV decisions.
+
+---
+
+### DR-014: Runtime Worklog Responsibility Rule
+
+Requirement:
+- `docs/execution/codex-execution-report.md` is a Codex runtime worklog, not a generated source catalog.
+
+Required:
+- `AGENTS.md` must instruct Codex to create the worklog when missing.
+- The worklog records task status, sources read, files changed, validation commands, validation results, blockers, and notes.
+- The worklog is updated after task attempts.
+
+Forbidden:
+- Generating `codex-execution-report.md` as a normal ChatGPT prompt output.
+- Defining new requirements, UI references, decisions, APIs, tasks, or validation criteria inside the worklog.
+- Treating the worklog as a reference document.
+
+Check:
+- Cross-document review checks whether `AGENTS.md` defines worklog behavior, not whether the worklog pre-exists.
+
+---
+
+## 9. Flow Responsibility Placement
+
+### DR-015: Flow Responsibility Placement Rule
+
+Requirement:
+- Flow concepts must be represented at the correct document layer.
+
+Required:
+- Product-facing flow meaning belongs in `product-spec.md`.
+- Domain states and rules that flows depend on belong in `domain-model.md`.
+- API/data behavior required by flows belongs in `data-api-contract.md`.
+- Frontend responsibilities required by flows belong in `frontend-design.md`.
+- Backend responsibilities required by flows belong in `backend-design.md`.
+- Environment or command requirements required by flows belong in `dev-environment.md`.
+- UI surfaces, actions, states, feedback, recovery paths, artifacts, and completion signals belong in the UI reference files.
+- Flow composition belongs in `docs/review/flow-composition-review.md`.
+- Final executable flow assembly belongs in `docs/execution/execution-validation.md`.
+
+Forbidden:
+- Creating a separate non-UI reference flow model.
+- Turning non-UI reference catalogs into a full flow assembly document.
+- Generating final `FLOW-*`, `TASK-*`, or `VAL-*` inside reference catalogs or UI YAML files.
+- Treating UI files as execution plans.
+
+Check:
+- Flow assembly happens after reference catalogs and UI references are generated, not inside them.
+
+---
+
+## 10. Open Questions Placement
+
+### DR-016: Open Questions Placement Rule
+
+Requirement:
+- Open Questions are review-stage artifacts only.
+
+Allowed:
+- `docs/review/open-questions-review.md`
+- `docs/review/question-resolution.md`
+
+Forbidden:
+- Unresolved Open Questions in `docs/reference/*.md`
+- Unresolved Open Questions in `docs/reference/ui/*.yaml`
+- Unresolved Open Questions in `docs/execution/*.md`
+- `OQ-*` references in final reference or execution documents unless describing policy itself.
+
+Check:
+- Final reference, UI, and execution docs contain resolved content, not questions.
+
+---
+
+## 11. Duplicate Ownership
+
+### DR-017: Duplicate Ownership Rule
+
+Requirement:
+- A generated document must not redefine content owned by another generated document.
+
+Examples:
+- `frontend-design.md` must not define API response shapes.
+- `backend-design.md` must not define database schema as source of truth.
+- `architecture.md` must not define API payload fields.
+- `product-spec.md` must not define backend service implementation.
+- `domain-model.md` must not define ORM columns.
+- `execution-validation.md` must not redefine UI reference content.
+- `AGENTS.md` must not define product, domain, API, frontend, backend, UI, environment, task, or validation source-of-truth entries.
+- `UI_PAGE.yaml` must not define API request/response shapes.
+- `UI_TOKENS.yaml` must not define CSS variable or Tailwind mappings in this revision.
+- `UI_VISUAL_SPEC.yaml` must not define routes, sections, class names, JSX, or token raw values.
+
+Check:
+- Each source-of-truth fact has one owner.
+
+---
+
+## 12. Document Responsibility Matrix
+
+| Generated File | Owns | Must Not Own |
+|---|---|---|
+| `docs/review/project-design-brief.md` | Discovery summary, project context, early flow source material, constraints, risks. | Final requirements, API contracts, tasks, validation commands. |
+| `docs/review/open-questions-review.md` | Temporary `OQ-*`, blocking classification, affected docs, flow impact. | Final decisions, final requirements, tasks. |
+| `docs/review/question-resolution.md` | User-confirmed answers, resolution mapping, conversion targets. | New unresolved questions, implementation tasks. |
+| `docs/review/project-decisions.md` | `DEC-*`, project-level choices, rejected alternatives. | Product requirements, API contracts, FE/BE implementation, tasks. |
+| `docs/review/flow-composition-review.md` | Candidate flows, UI flow surface checks, Side Effect Flow mapping, foundation readiness, flow-to-task seeds, validation seeds. | Final `FLOW-*`, `TASK-*`, `VAL-*`. |
+| `docs/review/cross-document-review-report.md` | Consistency findings, readiness verdict, issue register. | Source-of-truth rewrites unless explicitly requested. |
+| `docs/reference/product-spec.md` | `REQ-*`, product-facing flows, scope, feedback, recovery, completion signals. | Domain source definitions, API contracts, UI structure, FE/BE implementation, tasks. |
+| `docs/reference/domain-model.md` | `ENT-*`, `REL-*`, `BR-*`, `STATE-*`. | DB schema, API payloads, UI structure, frontend/backend implementation. |
+| `docs/reference/architecture.md` | `ARCH-*`, boundaries, dependency direction, runtime/storage/security rules. | API payloads, DB schema, UI structure, component details, tasks. |
+| `docs/reference/data-api-contract.md` | `DB-*`, `API-*`, `ERR-*`, `TYPE-*`. | Frontend client implementation, backend service implementation, UI action structure, tasks. |
+| `docs/reference/frontend-design.md` | `FE-*`, frontend implementation responsibilities and UI reference consumption responsibilities. | UI_PAGE structure, UI token source, UI visual presentation source, API contracts, DB schema, backend service definitions, tasks. |
+| `docs/reference/backend-design.md` | `BE-*`, backend implementation responsibilities. | API contracts as source definitions, DB schema source definitions, frontend/UI behavior, tasks. |
+| `docs/reference/dev-environment.md` | `ENV-*`, command policies, runtime/package/service rules. | Task-specific validation selection, product requirements, UI implementation standards. |
+| `docs/reference/ui/UI_PAGE.yaml` | Flow-facing semantic UI surface, routes, pages, sections, actions, states, feedback/recovery/artifact/completion mappings. | Visual token values, styling stack, React/JSX, API payloads, backend logic. |
+| `docs/reference/ui/UI_TOKENS.yaml` | Technology-agnostic design token intent. | CSS variables, Tailwind mappings, shadcn compatibility, page structure, component implementation. |
+| `docs/reference/ui/UI_VISUAL_SPEC.yaml` | Visual and interaction presentation rules. | Routes, page section source definitions, raw token values, class names, JSX, API/backend logic. |
+| `docs/execution/execution-validation.md` | Final executable `FLOW-*`, `TASK-*`, `VAL-*`, validation mapping, release validation. | Source definitions owned by reference catalogs or UI files. |
+| `docs/execution/AGENTS.md` | Codex runtime policy, task reading policy, UI consumption policy, worklog policy. | Product/API/UI/task/validation source definitions. |
+| `docs/execution/codex-execution-report.md` | Runtime worklog entries created by Codex. | New requirements, UI references, decisions, tasks, validation criteria. |
+
+---
+
+## 13. Prompt Integration Requirements
+
+Prompts that generate non-UI reference documents must include or apply:
 
 ```text
-[ ] The document owns only its assigned area.
-[ ] Entries are compact and independently readable.
-[ ] Owned IDs use stable headings where applicable.
-[ ] The document references other catalogs instead of redefining them.
-[ ] Open questions are visible when needed.
-[ ] The document does not contain execution tasks unless it is execution-validation.md.
-[ ] The document does not contain Codex runtime policy unless it is AGENTS.md.
-[ ] The document supports task-scoped reading.
+Apply standards/document-responsibilities.md to enforce ownership boundaries.
+
+For non-UI reference catalogs:
+- entries must be ownership-decoupled
+- entries must be self-contained
+- related IDs are traceability hints only
+- do not generate content owned by another document
+- do not create unresolved Open Questions
 ```
+
+Prompts that generate UI reference files must include or apply:
+
+```text
+Apply standards/document-responsibilities.md and standards/ui-reference-system.md.
+
+For UI reference files:
+- include codex_consumption
+- remain technology-agnostic
+- do not assume a concrete styling stack
+- do not redefine non-UI reference content
+- support flow-facing UI surfaces, actions, feedback, recovery, artifacts, and completion signals
+- do not create unresolved Open Questions
+```
+
+Prompts that generate execution documents must include or apply:
+
+```text
+Execution docs may reference UI files task-by-task, but must not redefine UI content.
+Codex must read codex_consumption before implementing UI tasks that reference UI YAML files.
+```
+
+---
+
+## 14. Cross-Document Review Checklist
+
+Cross-document review should check:
+
+| Check | Failure Example |
+|---|---|
+| Review/reference/execution role separation | `question-resolution.md` becomes a final API catalog. |
+| Non-UI reference ownership boundary | `frontend-design.md` defines API response shapes. |
+| UI ownership boundary | `UI_VISUAL_SPEC.yaml` defines routes or page sections. |
+| UI technology-agnostic rule | `UI_TOKENS.yaml` contains Tailwind mappings or shadcn compatibility. |
+| UI Codex consumption rule | A UI YAML file lacks `codex_consumption`. |
+| UI flow support | A Core User Flow has no visible UI surface or completion signal. |
+| Traceability without dependency | A related ID replaces the current entry's content. |
+| Duplicate source of truth | Backend design repeats DB schema as source definition. |
+| Flow placement | Reference docs attempt final `FLOW-*` task assembly. |
+| OQ leakage | `OQ-*` appears in final reference, UI, or execution docs. |
+| Runtime worklog clarity | `AGENTS.md` does not define creation/update policy for the worklog. |
+
+---
+
+## 15. Forbidden Patterns
+
+Do not write in non-UI reference catalogs:
+
+```text
+See REQ-001 for behavior.
+```
+
+when the current document owns behavior details for its own layer.
+
+Do not write in `UI_PAGE.yaml`:
+
+```yaml
+calls_api:
+  path: /api/run
+  request:
+    file: File
+```
+
+because API contracts belong in `data-api-contract.md`.
+
+Do not write in `UI_TOKENS.yaml` in this revision:
+
+```yaml
+implementation:
+  css_variables:
+    primary: --primary
+  tailwind_mapping:
+    primary: primary
+  shadcn_compatibility: true
+```
+
+because implementation mappings are intentionally removed from the current UI reference system.
+
+Do not write in `UI_VISUAL_SPEC.yaml`:
+
+```yaml
+button:
+  className: "rounded-md bg-primary px-4 py-2"
+```
+
+because UI visual specs must remain technology-agnostic.
+
+Do not write in final reference, UI, or execution documents:
+
+```text
+Open Questions
+TBD
+unclear
+ask user later
+```
+
+---
+
+## 16. Final Rule
+
+Review documents may connect.
+
+Non-UI reference documents must define ownership-decoupled source entries.
+
+UI reference documents must define the technology-agnostic user-visible shape, token intent, and visual/interaction presentation of the application.
+
+Execution documents must direct Codex through task-scoped reading, validation, blocker handling, and runtime worklog behavior.
+
+Codex must not infer missing decisions from reference catalogs or UI YAML files.

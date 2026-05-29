@@ -1,384 +1,738 @@
 # Domain Model Prompt
 
-## Target File
+## Role
+
+You are ChatGPT acting as a domain model writer for a Codex-ready Web App project.
+
+Your task is to generate the current implementation domain model from resolved review records and the product specification.
+
+This prompt is used after:
 
 ```text
-docs/domain-model.md
+docs/review/project-design-brief.md
+docs/review/question-resolution.md
+docs/review/project-decisions.md
+docs/reference/product-spec.md
 ```
 
-## Purpose
+have been generated or discussed.
 
-Generate a compact domain reference catalog for a Codex-ready Web App project.
+Do not generate architecture, API contracts, UI YAML, frontend design, backend design, environment docs, execution tasks, or code.
 
-`domain-model.md` owns:
+## Target Output
+
+Generate exactly one document:
+
+```text
+docs/reference/domain-model.md
+```
+
+This document is a final reference catalog.
+
+It owns the domain concepts, domain relationships, business rules, and domain states required by the current implementation pass.
+
+It does not own database schema, API payloads, frontend implementation, backend implementation, validation commands, or execution tasks.
+
+## Document System Context
+
+Generated projects use:
+
+```text
+docs/
+├── review/
+├── reference/
+└── execution/
+```
+
+This prompt writes only:
+
+```text
+docs/reference/domain-model.md
+```
+
+Downstream prompts will later generate:
+
+```text
+docs/reference/architecture.md
+docs/reference/data-api-contract.md
+docs/reference/ui/UI_PAGE.yaml
+docs/reference/frontend-design.md
+docs/reference/backend-design.md
+docs/reference/dev-environment.md
+docs/reference/ui/UI_TOKENS.yaml
+docs/reference/ui/UI_VISUAL_SPEC.yaml
+docs/execution/execution-validation.md
+docs/execution/AGENTS.md
+```
+
+## Inputs
+
+Use these inputs when available:
+
+```text
+docs/reference/product-spec.md
+docs/review/project-decisions.md
+docs/review/question-resolution.md
+docs/review/project-design-brief.md
+prior project discussion
+user corrections
+uploaded project materials
+repository notes
+```
+
+Primary source priority:
+
+```text
+1. user-confirmed answers and corrections
+2. docs/reference/product-spec.md
+3. docs/review/project-decisions.md
+4. docs/review/question-resolution.md
+5. docs/review/project-design-brief.md
+6. prior project discussion
+```
+
+Do not invent domain objects or rules that are not required by the current implementation pass.
+
+## Primary Objective
+
+Define the domain vocabulary required to implement the requested capability.
+
+The domain model should answer:
+
+```text
+what domain objects exist in the current implementation pass
+how those objects relate to each other
+which domain rules must hold
+which lifecycle or workflow states matter
+which artifacts have domain meaning
+which concepts should not be modeled yet
+```
+
+## Current Implementation Framing
+
+Use current-implementation framing.
+
+Prefer:
+
+```text
+current implementation pass
+current implementation scope
+scope boundary
+requested capability
+core user flow
+interaction effect
+system feedback
+state transition
+completion signal
+```
+
+Avoid:
+
+```text
+MVP
+future scope
+deferred feature
+roadmap
+later version
+full product
+```
+
+If a concept is not needed for the current implementation, mark it as outside current scope only when this prevents over-modeling.
+
+## Open Questions Policy
+
+Final reference documents must not contain unresolved Open Questions.
+
+Do not include:
+
+```text
+Open Questions
+OQ-*
+TBD
+to be decided
+unclear
+unknown
+ask user later
+decide later
+```
+
+If required domain context remains unresolved, do not generate a normal domain model. Output a blocked-generation report using the format in the "Blocked Generation" section.
+
+## Domain Model Ownership
+
+`docs/reference/domain-model.md` owns:
 
 ```text
 ENT-* domain entities
 REL-* domain relationships
 BR-* business rules
-STATE-* state concepts when needed
-open domain questions
+STATE-* lifecycle or workflow states
+domain vocabulary
+domain-level artifact meaning
 ```
 
-It exists so `execution-validation.md` can reference precise domain concepts and rules from `TASK-*`.
-
----
-
-## Source Context
-
-Use the available conversation context and upstream documents already generated in the current conversation.
-
-Recommended upstream context:
+It must not define:
 
 ```text
-Project Design Brief
-docs/product-spec.md
-docs/project-decisions.md
-current project discussion
-uploaded project notes
+DEC-* project decisions
+REQ-* product requirements
+ARCH-* architecture boundaries
+DB-* database schema
+API-* API contracts
+ERR-* error contracts
+TYPE-* shared types
+FE-* frontend implementation details
+BE-* backend implementation details
+ENV-* command rules
+TASK-* implementation tasks
+VAL-* validation commands
+UI YAML structures
 ```
 
-Use `product-spec.md` for:
-
-- MVP boundary
-- user roles
-- `REQ-*`
-- open product questions
-
-Use `project-decisions.md` for:
-
-- `DEC-*`
-- decisions that affect domain ownership, auth, tenancy, persistence, or workflow behavior
-
-If upstream documents are unavailable, use the available context and state assumptions.
-
-If a domain concept is unclear and affects later implementation tasks, list it under `Open Domain Questions`.
-
----
-
-## Relevant Standards
-
-Apply only the standards relevant to this document:
+Database fields belong to:
 
 ```text
-standards/document-responsibilities.md
-standards/document-length-budgets.md
-standards/codex-ready-writing-rules.md
+docs/reference/data-api-contract.md
 ```
 
-Do not restate these standards in the generated document.
-
----
-
-## Output Rules
-
-Generate only:
+Backend implementation responsibilities belong to:
 
 ```text
-docs/domain-model.md
+docs/reference/backend-design.md
 ```
 
-Do not generate other project documents.
-
-Create only:
+Frontend implementation responsibilities belong to:
 
 ```text
-ENT-*
-REL-*
-BR-*
-STATE-*
+docs/reference/frontend-design.md
 ```
 
-Do not create:
+## ID Rules
+
+Use these ID families:
 
 ```text
-REQ-*
-DEC-*
-DB-*
-API-*
-FE-*
-BE-*
-TASK-*
-VAL-*
+ENT-*    domain entities
+REL-*    domain relationships
+BR-*     business rules
+STATE-*  lifecycle or workflow states
 ```
 
-You may reference existing:
+Format:
 
 ```text
-REQ-*
-DEC-*
+ENT-001
+REL-001
+BR-001
+STATE-001
 ```
 
-Every catalog ID must be heading-addressable.
+Each entry must be heading-addressable.
 
-Use these heading formats:
+Use:
 
 ```markdown
-### ENT-001: Entity Name
-### REL-001: Relationship Name
-### BR-001: Business Rule Name
-### STATE-001: State Concept Name
+### ENT-001: <Entity Name>
 ```
 
-Do not write a long domain narrative.
+## Required Output Structure
 
-Do not include implementation design.
-
-Do not include database schema, API contracts, command lines, or validation commands.
-
----
-
-## Required Document Structure
-
-Use this structure:
+Generate `docs/reference/domain-model.md` with this exact top-level structure:
 
 ```markdown
 # Domain Model
 
-## Entity Catalog
+## 1. Domain Model Scope
 
-## Relationship Catalog
+## 2. Domain Vocabulary
 
-## Business Rule Catalog
+## 3. Entity Catalog
 
-## State Catalog
+## 4. Relationship Catalog
 
-## Open Domain Questions
+## 5. Business Rule Catalog
+
+## 6. State Catalog
+
+## 7. Artifact and Output Concepts
+
+## 8. Experience Flow Domain Notes
+
+## 9. Scope Boundaries
+
+## 10. Downstream Reference Seeds
+
+## 11. Source Traceability
+
+## 12. Readiness for Downstream Documents
 ```
 
-If the project has no meaningful state concepts, keep `State Catalog` and write `None required for MVP`.
+## Section 1: Domain Model Scope
 
-Do not add extra sections unless they are necessary for the project.
+Summarize sources and ownership.
 
----
-
-## Section Rules
-
-### Entity Catalog
-
-Generate compact `ENT-*` entries.
-
-Recommended format:
+Use:
 
 ```markdown
-### ENT-001: Case
+## 1. Domain Model Scope
 
-Meaning:
-- A case is the main assessment record created and managed by a user.
+Sources Used:
+- `docs/reference/product-spec.md`
+- `docs/review/project-decisions.md`
+- `docs/review/question-resolution.md`
 
-Key Domain Attributes:
-- name
-- status
-- owner
-- created time
-- latest result reference
+This document owns:
+- domain entities
+- domain relationships
+- business rules
+- lifecycle/workflow states
+- domain vocabulary
 
-Ownership:
-- Belongs to one workspace or user, depending on the project decision.
+This document does not own:
+- database schema
+- API contracts
+- frontend/backend implementation
+- validation commands
+- execution tasks
+```
 
-Related:
-- REQ-001
-- REQ-004
-- DEC-001
+## Section 2: Domain Vocabulary
+
+Define important domain terms.
+
+Use:
+
+```markdown
+## 2. Domain Vocabulary
+
+| Term | Meaning | Related Requirements |
+|---|---|---|
 ```
 
 Rules:
 
-- Keep attributes conceptual, not database fields.
-- Do not include column types.
-- Do not define API response fields.
-- Do not define frontend components.
-- Do not define backend services.
-- Include ownership only when it affects access, persistence, or workflow behavior.
-- Each `ENT-*` should be independently readable.
+```text
+Define terms needed by the current implementation pass.
+Avoid broad glossary expansion.
+Do not define implementation-specific class names unless the user already treats them as domain terms.
+```
 
----
+## Section 3: Entity Catalog
 
-### Relationship Catalog
+Create `ENT-*` entries.
 
-Generate compact `REL-*` entries only for relationships that affect implementation.
-
-Recommended format:
+Use this format:
 
 ```markdown
-### REL-001: Case Owns Results
+## 3. Entity Catalog
 
-From:
-- ENT-001 Case
-
-To:
-- ENT-003 Result
-
-Cardinality:
-- one-to-many
+### ENT-001: <Entity Name>
 
 Meaning:
-- A case may have multiple generated results over time.
+- ...
+
+Current Implementation Role:
+- ...
+
+Key Properties at Domain Level:
+- ...
+
+Related Requirements:
+- ...
 
 Related Rules:
-- BR-003
+- ...
+
+Not Responsible For:
+- ...
 ```
 
-Rules:
+### Entity Rules
 
-- Use relationships when they affect DB, API, backend logic, UI behavior, or validation.
-- Do not define foreign key names here.
-- Do not duplicate database schema.
-- If a relationship is obvious and has no implementation impact, omit it.
+Entities should describe domain meaning, not database columns.
 
----
+Good domain entity:
 
-### Business Rule Catalog
+```text
+Proposal Run
+```
 
-Generate compact `BR-*` entries.
+Weak entity:
 
-Recommended format:
+```text
+runs table
+```
+
+A domain entity may later map to a database object, but the database contract belongs in `data-api-contract.md`.
+
+## Section 4: Relationship Catalog
+
+Create `REL-*` entries.
+
+Use this format:
 
 ```markdown
-### BR-001: No Concurrent Active Run
+## 4. Relationship Catalog
+
+### REL-001: <Relationship Name>
+
+From:
+- ENT-...
+
+To:
+- ENT-...
+
+Cardinality:
+- one-to-one / one-to-many / many-to-one / many-to-many
+
+Meaning:
+- ...
+
+Rules:
+- ...
+```
+
+Only define relationships required by the current implementation pass.
+
+## Section 5: Business Rule Catalog
+
+Create `BR-*` entries.
+
+Use this format:
+
+```markdown
+## 5. Business Rule Catalog
+
+### BR-001: <Rule Title>
 
 Rule:
-- A case must not have more than one active run at the same time.
-
-Enforcement Expectation:
-- Backend service must enforce this rule.
-- Data layer may support it with a constraint when practical.
-
-Failure Behavior:
-- Return a conflict-style error through the documented API error envelope.
-
-Related:
-- REQ-008
-- ENT-001
-- STATE-002
-```
-
-Rules:
-
-- Every `BR-*` must be enforceable.
-- Use direct language: `must`, `must not`, `required`, `forbidden`.
-- Include expected failure behavior when useful.
-- Do not define exact API error codes unless they already exist.
-- Do not define database constraints in detail.
-- Do not define validation commands.
-- Each `BR-*` should be independently readable.
-
----
-
-### State Catalog
-
-Generate `STATE-*` entries only when state affects implementation.
-
-Recommended format:
-
-```markdown
-### STATE-001: Case Status
+- ...
 
 Applies To:
-- ENT-001 Case
+- ENT-...
 
-States:
-| State | Meaning |
-|---|---|
-| draft | Case exists but required inputs are incomplete. |
-| ready | Case is ready for the next workflow step. |
-| archived | Case is no longer active. |
+Reason:
+- ...
 
-Allowed Transitions:
-| From | To | Trigger | Related Rule |
-|---|---|---|---|
-| draft | ready | Required inputs completed. | BR-002 |
+Violation Meaning:
+- ...
 
-Forbidden Transitions:
-| From | To | Reason |
-|---|---|---|
-| archived | ready | Archived cases cannot be reactivated in MVP. |
+Related Requirements:
+- ...
 ```
 
-Rules:
+### Business Rule Guidance
 
-- Use `STATE-*` only for meaningful lifecycle or workflow state.
-- Do not create state entries for simple display labels.
-- Keep state definitions compact.
-- Do not define database enum implementation here.
-- Do not define frontend state management here.
+Business rules should be enforceable or observable.
 
----
+Good:
 
-### Open Domain Questions
+```text
+A failed run must expose a failure reason that can be displayed to the user.
+```
 
-List unresolved domain questions.
+Weak:
 
-Recommended format:
+```text
+Runs should be handled well.
+```
+
+If a rule affects UX recovery or system feedback, state that clearly.
+
+## Section 6: State Catalog
+
+Create `STATE-*` entries.
+
+Use this format:
 
 ```markdown
-| Question | Blocking? | Affected Area |
-|---|---:|---|
-| Can archived cases be restored? | no | case lifecycle |
-| Can two users edit the same case at the same time? | yes | concurrency, backend, UI |
+## 6. State Catalog
+
+### STATE-001: <State Model Name>
+
+Applies To:
+- ENT-...
+
+States:
+| State | Meaning | Terminal? | User-Visible? |
+|---|---|---:|---:|
+
+Allowed Transitions:
+| From | To | Trigger |
+|---|---|---|
+
+Related Requirements:
+- ...
+
+Related Experience Flow:
+- ...
+```
+
+### State Guidance
+
+Use `STATE-*` when a domain object has meaningful lifecycle or workflow states.
+
+Examples:
+
+```text
+ProposalRunStatus
+ArtifactAvailability
+ValidationStatus
+```
+
+Do not create state catalogs for purely local UI states unless they reflect domain-visible workflow state.
+
+Local UI states belong in `UI_PAGE.yaml` and `frontend-design.md`.
+
+## Section 7: Artifact and Output Concepts
+
+Define artifacts and outputs that have domain meaning.
+
+Use:
+
+```markdown
+## 7. Artifact and Output Concepts
+
+| Artifact / Output | Meaning | Produced By | User-Visible? | Related Entity / State |
+|---|---|---|---:|---|
+```
+
+Examples:
+
+```text
+source upload
+normalized input
+proposal document
+generation log
+error report
+artifact manifest
+```
+
+Do not define storage paths or file schema here unless they are domain-relevant. Storage details belong in downstream data/API or backend design docs.
+
+## Section 8: Experience Flow Domain Notes
+
+Map domain concepts to UX experience flows.
+
+Use:
+
+```markdown
+## 8. Experience Flow Domain Notes
+
+| Experience Flow Area | Domain Implication | Related Domain IDs |
+|---|---|---|
+| Core User Flow | ... | ENT-001, STATE-001 |
+| Interaction Effect | ... | ENT-002 |
+| System Feedback | ... | STATE-001, BR-001 |
+| Recovery Path | ... | BR-002 |
+| Completion Signal | ... | STATE-001 |
 ```
 
 Rules:
 
-- Include only questions that affect entities, relationships, rules, states, ownership, or implementation tasks.
-- Mark blocking questions clearly.
-- Do not hide uncertainty inside entity or rule text.
-
----
-
-## Catalog Design Rules
-
-The generated file should behave like a task-scoped reference catalog.
-
-This means:
-
-- each ID entry must be short enough to read independently
-- each ID entry must have a stable Markdown heading
-- each ID entry should include related upstream IDs when useful
-- task authors should be able to reference entries like:
-
 ```text
-docs/domain-model.md#ENT-001
-docs/domain-model.md#BR-001
-docs/domain-model.md#STATE-001
+State and rule entries should support visible feedback, recovery, and completion signals when relevant.
+Do not reduce UX to UI layout.
 ```
 
-Avoid broad narrative sections that Codex would need to read globally.
+## Section 9: Scope Boundaries
 
----
+List domain concepts intentionally not modeled for the current implementation pass.
 
-## Writing Rules
+Use:
 
-- Write a reference catalog, not a narrative domain document.
-- Use stable heading-addressable IDs.
-- Keep every entry compact and independently readable.
-- Keep attributes conceptual.
-- Make business rules enforceable.
-- Reference existing `REQ-*` and `DEC-*` where useful.
-- Do not create non-domain IDs.
-- Do not include DB column types.
-- Do not include API contracts.
-- Do not include frontend/backend implementation details.
-- Do not include implementation tasks.
-- Do not include validation commands.
-- Use `Open Domain Questions` for unresolved domain decisions.
+```markdown
+## 9. Scope Boundaries
 
----
+| Boundary | Reason |
+|---|---|
+```
 
-## Quality Checklist
-
-Before finalizing, verify:
+Rules:
 
 ```text
-[ ] The file is a compact domain reference catalog.
-[ ] Core entities have ENT-* headings.
-[ ] Important relationships have REL-* headings.
-[ ] Enforceable business rules have BR-* headings.
-[ ] Meaningful state concepts have STATE-* headings when needed.
-[ ] Every ID entry is independently readable.
-[ ] IDs are heading-addressable.
-[ ] Domain attributes are conceptual, not DB fields.
-[ ] No DB/API/FE/BE/TASK/VAL IDs are created.
-[ ] No implementation commands are included.
-[ ] Open domain questions are marked blocking or non-blocking.
+Only include boundaries that prevent over-modeling.
+Do not create future-roadmap language.
+```
+
+Good:
+
+```text
+Multi-user ownership is not modeled in the current implementation pass.
+```
+
+Avoid:
+
+```text
+Multi-user ownership will be added later.
+```
+
+## Section 10: Downstream Reference Seeds
+
+List what downstream documents should absorb.
+
+Use:
+
+```markdown
+## 10. Downstream Reference Seeds
+
+| Downstream Document | Seed Content |
+|---|---|
+| `docs/reference/architecture.md` | ... |
+| `docs/reference/data-api-contract.md` | ... |
+| `docs/reference/ui/UI_PAGE.yaml` | ... |
+| `docs/reference/frontend-design.md` | ... |
+| `docs/reference/backend-design.md` | ... |
+| `docs/execution/execution-validation.md` | ... |
+```
+
+Rules:
+
+```text
+Seeds are not final downstream entries.
+Do not create API-* or TASK-* IDs here.
+```
+
+## Section 11: Source Traceability
+
+Map domain entries to product requirements and decisions.
+
+Use:
+
+```markdown
+## 11. Source Traceability
+
+| Domain Item | Source |
+|---|---|
+| ENT-001 | `docs/reference/product-spec.md#REQ-001` |
+| BR-001 | `docs/review/project-decisions.md#DEC-001` |
+```
+
+If a final DEC ID is not available, cite the decision title or review source section.
+
+Do not cite `OQ-*` as final source. Use resolved content from `question-resolution.md`.
+
+## Section 12: Readiness for Downstream Documents
+
+End with:
+
+```markdown
+## 12. Readiness for Downstream Documents
+
+Status: ready / blocked
+
+Summary:
+- ...
+
+Next Step:
+- Continue to `prompts/architecture-prompt.md`.
+```
+
+If blocked, list missing domain decisions.
+
+## Blocked Generation
+
+If required domain context is missing, output:
+
+```markdown
+# Domain Model
+
+## Blocked Domain Model Generation
+
+Status: blocked
+
+Reason:
+- ...
+
+Missing Domain Decisions:
+| Missing Decision | Why Required | Affected Downstream Docs |
+|---|---|---|
+
+Next Step:
+- Resolve the missing decision in `docs/review/question-resolution.md` or `docs/review/project-decisions.md`, then rerun this prompt.
+```
+
+## Path Rules
+
+Use only new document paths:
+
+```text
+docs/review/project-design-brief.md
+docs/review/question-resolution.md
+docs/review/project-decisions.md
+docs/reference/product-spec.md
+docs/reference/domain-model.md
+docs/reference/architecture.md
+docs/reference/data-api-contract.md
+docs/reference/frontend-design.md
+docs/reference/backend-design.md
+docs/reference/dev-environment.md
+docs/reference/ui/UI_PAGE.yaml
+docs/reference/ui/UI_TOKENS.yaml
+docs/reference/ui/UI_VISUAL_SPEC.yaml
+docs/execution/execution-validation.md
+```
+
+Do not use old flat paths such as:
+
+```text
+docs/domain-model.md
+docs/product-spec.md
+docs/project-decisions.md
+docs/execution-validation.md
+AGENTS.md
+```
+
+## Prohibited Output
+
+Do not generate:
+
+```text
+docs/reference/architecture.md
+docs/reference/data-api-contract.md
+docs/reference/frontend-design.md
+docs/reference/backend-design.md
+docs/reference/dev-environment.md
+docs/reference/ui/UI_PAGE.yaml
+docs/reference/ui/UI_TOKENS.yaml
+docs/reference/ui/UI_VISUAL_SPEC.yaml
+docs/execution/execution-validation.md
+docs/execution/AGENTS.md
+```
+
+Do not generate final:
+
+```text
+ARCH-* entries
+API-* entries
+DB-* entries
+ERR-* entries
+TYPE-* entries
+FE-* entries
+BE-* entries
+ENV-* entries
+TASK-* entries
+VAL-* entries
+code
+implementation plan
+Open Questions section
+OQ-* IDs
+```
+
+## Final Self-Check
+
+Before finalizing the output, verify:
+
+```text
+[ ] The document uses current implementation framing, not MVP framing.
+[ ] Domain concepts are required by the current implementation pass.
+[ ] ENT-* entries describe domain meaning, not database tables.
+[ ] REL-* entries describe meaningful relationships.
+[ ] BR-* entries are enforceable or observable.
+[ ] STATE-* entries support meaningful lifecycle or workflow states.
+[ ] Experience flow implications are captured when relevant.
+[ ] Database/API/frontend/backend/task details are not defined here.
+[ ] No Open Questions or OQ-* IDs appear.
+[ ] Downstream seeds are present but not final downstream catalogs.
+[ ] Readiness for downstream documents is explicit.
 ```

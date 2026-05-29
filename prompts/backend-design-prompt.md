@@ -1,610 +1,408 @@
 # Backend Design Prompt
 
-## Target File
-
-```text
-docs/backend-design.md
-```
-
 ## Purpose
 
-Generate a compact backend implementation reference catalog for a Codex-ready Web App project.
+Use this prompt to generate the backend implementation responsibility catalog for the current implementation.
 
-`backend-design.md` owns:
+The backend design document defines stable `BE-*` entries for backend responsibilities such as API handler behavior, service orchestration, repository/storage usage, artifact handling, background run execution, state transition handling, error production, security checks, and backend-side validation responsibilities.
 
-```text
-BE-* backend implementation entries
-backend API handler responsibilities
-backend service responsibilities
-repository/data access responsibilities
-transaction and consistency responsibilities
-auth and permission enforcement responsibilities
-structured error handling responsibilities
-background job and integration responsibilities when needed
-open backend questions
-```
+It is a non-UI reference catalog. It must be ownership-decoupled and entry-self-contained.
 
-It exists so `execution-validation.md` can reference precise backend implementation guidance from `TASK-*`.
+It is not an API contract file, not a database schema file, not a frontend behavior file, and not an execution task file.
 
----
+## Target Output
 
-## Source Context
-
-Use the available conversation context and upstream documents already generated in the current conversation.
-
-Recommended upstream context:
+Generate exactly one document:
 
 ```text
-Project Design Brief
-docs/product-spec.md
-docs/project-decisions.md
-docs/domain-model.md
-docs/architecture.md
-docs/data-api-contract.md
-docs/frontend-design.md
-current project discussion
-uploaded project notes
+docs/reference/backend-design.md
 ```
 
-Use `product-spec.md` for:
+## Standards to Apply
 
-- `REQ-*`
-- MVP boundary
-- user roles
+Read only the standards listed below.
 
-Use `project-decisions.md` for:
+| Standard | Required? | Use For |
+|---|---:|---|
+| `standards/document-responsibilities.md` | yes | Enforces non-UI reference ownership, entry self-containment, and traceability without dependency. |
+| `standards/flow-concepts-and-composition.md` | yes | Helps identify backend responsibilities required by Core User Flows, Side Effect Flows, artifacts, background work, state transitions, recovery behavior, and foundation readiness. |
+| `standards/frontend-backend-boundary.md` | yes | Ensures backend fulfills the data/API contract without redefining frontend behavior or API ownership. |
+| `standards/open-questions-policy.md` | yes | Prevents unresolved questions from entering final reference docs. |
+| `standards/codex-ready-writing-rules.md` | yes | Ensures stable IDs, resolved wording, and Codex-safe reference entries. |
+| `standards/document-length-budgets.md` | optional | Use to keep backend entries compact and addressable. |
 
-- `DEC-*`
-- backend framework
-- runtime choices
-- repository layout
-- database/ORM direction
-- API style
-- auth direction
-- container-first direction
+## Standard Application Rules
 
-Use `domain-model.md` for:
+Standards constrain how this prompt generates its target document. Standards do not create additional output targets.
 
-- `ENT-*`
-- `REL-*`
-- `BR-*`
-- `STATE-*`
-- business rules
-- lifecycle behavior
-- ownership and permission meaning
+Rules:
+1. Read only the standards listed in this prompt.
+2. Do not load all standards by default.
+3. The current prompt defines the target output and required output structure.
+4. Standards define reusable terminology, ownership boundaries, quality rules, and review constraints.
+5. Do not copy large sections from standards into the generated document.
+6. Do not generate documents requested by a standard unless this prompt explicitly targets them.
+7. If required context remains unresolved under the standards, output a blocked-generation report instead of inventing missing decisions.
 
-Use `architecture.md` for:
+## Priority Rule
 
-- `ARCH-*`
-- backend boundary
-- data access boundary
-- dependency direction
-- request lifecycle
-- auth boundary
-- error boundary
-- configuration boundary
+When generating the target document, use this priority order:
 
-Use `data-api-contract.md` for:
+1. User-confirmed answers and corrections.
+2. This prompt's target output and required output structure.
+3. Required standards listed in this prompt.
+4. Upstream generated project documents.
+5. Prior project discussion.
 
-- `DB-*`
-- `API-*`
-- `ERR-*`
-- `TYPE-*`
-- request and response shapes
-- error contracts
-- persistence needs
-- auth and permission expectations
+If a conflict involves unresolved blockers, Open Questions leakage, unsafe scope invention, missing required decisions, or reference ownership dependency, output a blocked-generation report instead of generating a normal final document.
 
-Use `frontend-design.md` only to understand frontend expectations that affect backend support.
+## Required Inputs
 
-If upstream documents are unavailable, use available context and state assumptions.
-
-If a backend design choice is unclear and affects execution tasks, list it under `Open Backend Questions`.
-
----
-
-## Relevant Standards
-
-Apply only the standards relevant to this document:
+Use these upstream documents when available:
 
 ```text
-standards/document-responsibilities.md
-standards/document-length-budgets.md
-standards/codex-ready-writing-rules.md
-standards/frontend-backend-boundary.md
+docs/review/project-decisions.md
+docs/review/question-resolution.md
+docs/reference/product-spec.md
+docs/reference/domain-model.md
+docs/reference/architecture.md
+docs/reference/data-api-contract.md
+docs/reference/frontend-design.md
 ```
 
-Do not restate these standards in the generated document.
+Do not require every reference document to understand this output. The generated backend entries must be self-contained in their own backend responsibility layer.
 
----
+## Backend Design Ownership
 
-## Output Rules
-
-Generate only:
-
-```text
-docs/backend-design.md
-```
-
-Do not generate other project documents.
-
-Create only:
+`docs/reference/backend-design.md` owns:
 
 ```text
 BE-*
+backend responsibility catalog
+API handler responsibilities
+service responsibilities
+repository responsibilities
+storage responsibilities
+artifact handling responsibilities
+background job and run execution responsibilities
+state transition responsibilities
+error production responsibilities
+security and trust-boundary responsibilities
+backend-side validation responsibilities
+integration adapter responsibilities
 ```
 
-Do not create:
+It must not own:
 
 ```text
-REQ-*
-DEC-*
-ENT-*
-REL-*
-BR-*
-STATE-*
-ARCH-*
-DB-*
-API-*
-ERR-*
-TYPE-*
-FE-*
+product requirements
+domain source definitions
+architecture source rules
+API request/response source contracts
+database schema source definitions
+frontend state behavior
+frontend UI behavior
+UI token values
+environment command catalog
+execution task sequencing
+validation commands
+final executable FLOW-*
 TASK-*
 VAL-*
+Open Questions
 ```
 
-You may reference existing:
+## Reference Decoupling Rules
 
-```text
-REQ-*
-DEC-*
-ENT-*
-REL-*
-BR-*
-STATE-*
-ARCH-*
-DB-*
-API-*
-ERR-*
-TYPE-*
-FE-*
-```
+Because this is a non-UI reference catalog:
 
-Every `BE-*` must be heading-addressable.
+1. Every `BE-*` entry must be entry-self-contained.
+2. Related IDs may be included only for traceability.
+3. Do not write "see data-api-contract.md for details" as a substitute for backend responsibility content.
+4. Do not copy API request/response tables into backend design.
+5. Do not copy DB schema as a backend-owned source definition.
+6. Do not redefine API contracts, database contracts, frontend behavior, domain rules, or architecture boundaries.
+7. Backend entries may mention related flow areas, but must not perform full flow composition.
 
-Use this heading format:
+Allowed:
 
 ```markdown
-### BE-001: Backend Item Name
+Related Contracts:
+- API-001
+- DB-001
+- ERR-001
 ```
 
-Do not write a long backend design narrative.
+Forbidden:
 
-Do not include frontend implementation, database schema definitions, API contract definitions, command catalogs, task lists, or validation commands.
+```markdown
+BE-001 implements API-001. See API-001 for details.
+```
 
----
+## Flow-Aware Backend Rules
 
-## Required Document Structure
+The backend design must support flow-first execution without becoming an execution plan.
 
-Use this structure:
+Required:
+- Identify backend responsibilities needed by current Core User Flows and Side Effect Flows.
+- Describe how backend handlers, services, repositories, storage, and background work fulfill documented contracts without redefining those contracts.
+- Describe backend responsibility for generated artifacts and intermediate artifacts when applicable.
+- Describe state transition responsibilities required by current flows.
+- Describe backend-side production of recoverable, failed, blocked, validation, not-found, and unauthorized errors when applicable.
+- Describe recovery-support responsibilities when current scope requires retries, idempotency, cleanup, or preserved state.
+- Describe security and trust-boundary responsibilities needed by backend behavior.
+- Keep final executable `FLOW-*`, `TASK-*`, and `VAL-*` out of this document.
+
+Forbidden:
+- Generating a final flow catalog.
+- Generating frontend behavior.
+- Generating API source contract fields.
+- Generating DB schema source definitions.
+- Generating task order.
+- Generating validation commands.
+
+## Required Output Structure
 
 ```markdown
 # Backend Design
 
-## Backend Catalog
+## 1. Backend Scope
 
-## Open Backend Questions
-```
+State what this document owns and what it does not own.
 
-Do not add extra sections unless they are necessary for the project.
+## 2. Backend Summary
 
----
+Summarize the backend responsibility model in current-scope terms.
 
-## Backend Catalog
+## 3. Backend Responsibility Catalog
 
-Generate compact `BE-*` entries.
+### BE-001: <Backend Responsibility Name>
 
-Each entry should be independently readable because `TASK-*` items in `execution-validation.md` will reference individual backend implementation entries directly.
+Type:
+- api_handler / service / repository / storage / artifact_handling / background_job / state_transition / error_production / security / validation / integration_adapter / cleanup
 
-Recommended format:
+Responsibility:
+- ...
 
-```markdown
-### BE-001: Case Query Service
+Allowed:
+- ...
 
-Kind: service
+Forbidden:
+- ...
 
-Purpose:
-- Provide backend case query behavior for case list and case detail APIs.
+Inputs Consumed:
+- ...
 
-Code Impact:
-- `apps/api/services/case-query-service.ts`
-- `apps/api/repositories/case-repository.ts`
-- `apps/api/errors/case-errors.ts`
+Outputs / Side Effects:
+- ...
 
-Inputs:
-- API-001
-- API-002
-- DB-001
-- ENT-001
-- BR-002
-- ARCH-004
-- ERR-002
-- ERR-004
+Related IDs:
+- ...
 
-Rules:
-- Enforce case visibility before returning records.
-- Return domain results that API handlers can translate to API-001 and API-002 responses.
-- Do not return framework-specific response objects from the service.
-- Do not expose records that the current user cannot access.
+Flow Support:
+- ...
 
 Out of Scope:
-- Frontend API client implementation.
-- API response shape changes.
-- Database schema changes.
+- ...
+
+## 4. Handler Responsibilities
+
+Describe backend handler responsibilities for documented API contracts.
+
+Do not redefine API request/response fields.
+
+## 5. Service and Workflow Responsibilities
+
+Describe backend service orchestration responsibilities.
+
+Do not turn this into execution tasks.
+
+## 6. Repository, Data, and Storage Responsibilities
+
+Describe backend responsibility for using documented data/storage contracts.
+
+Do not redefine DB schema.
+
+## 7. Artifact Responsibilities
+
+Describe backend handling of uploads, generated artifacts, artifact metadata, safe access, cleanup, or download support when relevant.
+
+## 8. State Transition Responsibilities
+
+Describe backend responsibility for state changes and lifecycle enforcement.
+
+Do not redefine domain states as source definitions.
+
+## 9. Error and Recovery Responsibilities
+
+Describe backend responsibility for producing documented errors and supporting recovery behavior.
+
+## 10. Security and Trust Boundary Responsibilities
+
+Describe backend checks, isolation, file safety, input validation, authorization, or trust boundaries when relevant.
+
+## 11. Out-of-Scope Backend Behavior
+
+List backend responsibilities intentionally excluded from the current implementation.
+
+## 12. Downstream Seeds
+
+List concise seeds for flow composition, execution, and validation documents.
+
+## 13. Final Readiness
+
+Status: ready / blocked
+
+If blocked, list missing decisions and affected downstream documents.
 ```
 
-Rules:
+## BE Entry Requirements
 
-- Use `BE-*` for backend implementation items that later tasks may execute.
-- Keep entries compact.
-- Include `Kind`.
-- Include `Purpose`.
-- Include `Code Impact` when possible.
-- Include `Inputs`.
-- Include `Rules`.
-- Include `Out of Scope` when useful.
-- Reference source IDs rather than copying full definitions.
-- Do not define API response shapes.
-- Do not define DB fields.
-- Do not define frontend behavior.
-- Do not define validation commands.
-
-Recommended `Kind` values:
+Each `BE-*` entry must include:
 
 ```text
-app-bootstrap
-api-handler
-service
-repository
-data-access
-transaction
-request-validation
-auth-policy
-permission-policy
-error-handling
-background-job
-worker
-integration-adapter
-configuration
-logging
-test-support
+ID
+name
+type
+responsibility
+allowed
+forbidden
+inputs consumed
+outputs or side effects
+out-of-scope where useful
 ```
 
----
-
-## Recommended Backend Entries
-
-Generate entries only when they apply to the project.
-
-Common entries include:
+Optional but useful:
 
 ```text
-BE-001 API App Bootstrap
-BE-002 Structured Error Handling
-BE-003 Request Validation
-BE-004 Auth and Permission Policy
-BE-005 Repository: <core data object>
-BE-006 Service: <core workflow>
-BE-007 API Handler: <core endpoint group>
-BE-008 Transaction Boundary: <critical workflow>
-BE-009 Background Job: <async workflow>
-BE-010 Integration Adapter: <external provider>
-BE-011 Backend Test Support
+related IDs
+flow support
+security impact
+recovery behavior
+artifact behavior
+state transition impact
+downstream seeds
 ```
 
-Do not force all entries if they are not useful.
+## API Boundary Rules
 
----
-
-## Entry Guidance
-
-### API App Bootstrap Entry
-
-Should define:
-
-- backend app startup responsibility
-- route registration responsibility
-- middleware registration responsibility
-- structured error handling registration
-- health endpoint if needed
-
-Should reference:
+Backend design may say:
 
 ```text
-ARCH-* runtime/request lifecycle entries
-DEC-* backend framework decisions
+The backend handler validates the documented create-run request, invokes the run creation service, persists the initial state through the documented data object, and returns the documented response or error contract.
 ```
 
-Do not include full code.
-
----
-
-### API Handler Entry
-
-Should define:
-
-- request parsing responsibility
-- request validation responsibility
-- service call responsibility
-- response translation responsibility
-- error translation responsibility
-
-Should reference:
+Backend design must not say:
 
 ```text
-API-*
-ERR-*
-TYPE-*
-ARCH-* request lifecycle
+The create-run API request has fields ...
 ```
 
-Do not define the API contract here.
+unless those fields are only referred to as traceability and are already defined in `data-api-contract.md`.
 
----
+The source of truth for API request/response/error fields is always `docs/reference/data-api-contract.md`.
 
-### Service Entry
+## Data Boundary Rules
 
-Should define:
-
-- business workflow responsibility
-- `BR-*` enforcement
-- permission checks when domain-specific
-- transaction coordination when needed
-- repository and integration orchestration
-- domain error return behavior
-
-Should reference:
+Backend design may say:
 
 ```text
-ENT-*
-BR-*
-STATE-*
-API-*
-DB-*
-ERR-*
+The backend repository writes and reads the documented run data object.
 ```
 
-Do not return frontend-specific shapes.
-
----
-
-### Repository / Data Access Entry
-
-Should define:
-
-- persistence read/write responsibility
-- query responsibility required by `API-*`
-- constraint-aware behavior
-- data mapping expectations
-
-Should reference:
+Backend design must not redefine:
 
 ```text
-DB-*
-REL-*
-BR-* when constraints affect persistence
+DB fields
+database schema
+ORM columns
+migration details
 ```
 
-Do not define DB fields here.
+unless those are implementation responsibilities and not source-of-truth schema definitions.
 
----
+The source of truth for data objects and schema-like contracts is `docs/reference/data-api-contract.md`.
 
-### Transaction Entry
+## Frontend Boundary Rules
 
-Should define:
-
-- which workflow must be atomic
-- which data objects are affected
-- which business rules require consistency
-- expected conflict behavior
-
-Should reference:
+Backend design must not define:
 
 ```text
-BR-*
-DB-*
-API-*
-ERR-*
+frontend local state
+React component structure
+UI layout
+UI tokens
+frontend API client behavior
 ```
 
-Do not define database-specific transaction syntax unless the project requires it.
-
----
-
-### Request Validation Entry
-
-Should define:
-
-- request shape validation responsibility
-- relation to shared schemas or `TYPE-*`
-- expected validation error behavior
-
-Should reference:
+Backend design may mention frontend-visible effects only as backend outputs, such as:
 
 ```text
-API-*
-TYPE-*
-ERR-* validation errors
+The backend returns a documented blocked error that the frontend can display.
 ```
 
-Do not define full schemas here if they already exist in `data-api-contract.md`.
+## Writing Constraints
 
----
+Use direct, resolved backend responsibility language.
 
-### Auth / Permission Entry
-
-Should define:
-
-- backend is authoritative for permissions
-- frontend permission rendering is UX only
-- domain ownership checks belong in service or policy helpers
-- coarse auth checks may happen in handlers
-
-Should reference:
+Prefer:
 
 ```text
-ARCH-* auth boundary
-REQ-* role requirements
-API-* auth requirements
-BR-* ownership rules
+The backend creates a run record, persists the initial queued status, stores the uploaded source artifact reference, and returns the documented create-run response.
 ```
 
-If auth is out of scope for MVP, state the assumed backend behavior and what must remain easy to add later.
-
----
-
-### Error Handling Entry
-
-Should define:
-
-- known domain errors
-- translation to `ERR-*`
-- unexpected error behavior
-- no leaking internal details
-
-Should reference:
+Avoid:
 
 ```text
-ERR-*
-ARCH-* error boundary
+The backend might create something and then the frontend handles it.
 ```
 
-Do not redefine the error envelope.
-
----
-
-### Background Job Entry
-
-Use only when async work exists.
-
-Should define:
-
-- trigger
-- job owner
-- related workflow
-- idempotency/duplicate prevention expectations
-- success/failure behavior
-
-Should reference:
+Avoid dependency-only wording:
 
 ```text
-REQ-*
-BR-*
-STATE-*
-API-*
-DB-*
-ERR-*
+See API-001 for backend behavior.
 ```
 
----
+Instead, state the backend responsibility here and use related IDs only as traceability.
 
-### Integration Adapter Entry
+## Blocked Generation Rules
 
-Use only when external systems exist.
+Output a blocked-generation report instead of a normal backend design if:
 
-Should define:
+- required backend responsibilities are unclear
+- API contracts required for backend responsibilities are unresolved
+- data/storage contracts required by backend behavior are unresolved
+- artifact handling behavior is required but undecided
+- background job or run execution behavior is required but undecided
+- state transition behavior affects backend responsibilities but is unresolved
+- security or trust-boundary responsibilities are required but undecided
+- unresolved Open Questions would enter the final backend doc
 
-- provider boundary
-- secret handling
-- provider error translation
-- retry/idempotency expectations when needed
-
-Should reference:
-
-```text
-ARCH-* configuration boundary
-ERR-*
-```
-
----
-
-## Open Backend Questions
-
-List unresolved backend questions.
-
-Recommended format:
+Blocked-generation report structure:
 
 ```markdown
-| Question | Blocking? | Affected Area |
-|---|---:|---|
-| Should risk calculation run synchronously or as a background job? | yes | service design, jobs, API behavior |
-| Which ORM/query layer should be used? | yes | repositories, migrations, tests |
+# Backend Design Generation Blocked
+
+## Blocking Issues
+
+| Issue | Decision Needed | Affected Docs | Flow Impact |
+|---|---|---|---|
+
+## Partial Safe Content
+
+## Required User Decisions
 ```
 
-Rules:
-
-- Include only questions that affect backend implementation entries, API implementation, data access, transactions, auth, jobs, integrations, or execution tasks.
-- Mark blocking questions clearly.
-- Do not hide uncertainty inside `BE-*` entries.
-
----
-
-## Catalog Design Rules
-
-The generated file should behave like a task-scoped reference catalog.
-
-This means:
-
-- each `BE-*` entry must be short enough to read independently
-- each `BE-*` entry must have a stable Markdown heading
-- each `BE-*` entry should include related upstream IDs when useful
-- task authors should be able to reference entries like:
-
-```text
-docs/backend-design.md#BE-001
-docs/backend-design.md#BE-004
-```
-
-Avoid broad narrative sections that Codex would need to read globally.
-
----
-
-## Writing Rules
-
-- Write a reference catalog, not a narrative backend design document.
-- Use stable heading-addressable `BE-*` IDs.
-- Keep every entry compact and independently readable.
-- Reference existing `REQ-*`, `DEC-*`, `ENT-*`, `REL-*`, `BR-*`, `STATE-*`, `ARCH-*`, `DB-*`, `API-*`, `ERR-*`, `TYPE-*`, and `FE-*` where useful.
-- Include code impact when possible.
-- Implement API contracts from `data-api-contract.md`; do not define them here.
-- Keep backend design separate from frontend design.
-- Do not create non-BE IDs.
-- Do not include DB schema definitions.
-- Do not include API contract definitions.
-- Do not include frontend implementation.
-- Do not include implementation tasks.
-- Do not include validation commands.
-- Use `Open Backend Questions` for unresolved backend decisions.
-
----
-
-## Quality Checklist
+## Final Checks
 
 Before finalizing, verify:
 
-```text
-[ ] The file is a compact backend reference catalog.
-[ ] Important backend items have BE-* headings.
-[ ] Every BE-* is independently readable.
-[ ] IDs are heading-addressable.
-[ ] BE entries reference API/DB/ERR/TYPE IDs where useful.
-[ ] BE entries reference ENT/BR/STATE IDs where useful.
-[ ] Code impact is included where possible.
-[ ] Backend/frontend boundary is respected.
-[ ] No DB/API/FE/TASK/VAL IDs are created.
-[ ] No API contracts are defined here.
-[ ] No database schema is defined here.
-[ ] No frontend implementation is included.
-[ ] No implementation commands are included.
-[ ] Open backend questions are marked blocking or non-blocking.
-```
+- No unresolved Open Questions remain.
+- No API request/response source contracts are defined.
+- No DB schema source definitions are defined.
+- No frontend behavior is defined.
+- No environment command catalog is defined.
+- No `TASK-*`, `VAL-*`, or final executable `FLOW-*` entries are created.
+- Every `BE-*` entry is self-contained.
+- Related IDs are traceability hints only.
+- Backend design supports flow-first execution without becoming a flow composition document.

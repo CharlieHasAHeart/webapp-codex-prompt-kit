@@ -1,779 +1,382 @@
 # Dev Environment Prompt
 
-## Target File
-
-```text
-docs/dev-environment.md
-```
-
 ## Purpose
 
-Generate a compact development environment and command reference catalog for a Codex-ready Web App project.
+Use this prompt to generate the development environment and command policy catalog for the current implementation.
 
-`dev-environment.md` owns:
+The dev environment document defines stable `ENV-*` entries for runtime versions, package manager policy, service names, container/local execution policy, install commands, development commands, build commands, test command patterns, lint/typecheck command patterns, environment variable policy, and forbidden host commands.
 
-```text
-ENV-* environment and command entries
-container-first command policy
-service names
-runtime and package manager assumptions
-setup/start/stop command patterns
-dependency command patterns
-database command patterns
-test command patterns
-milestone/release command patterns
-forbidden host commands
-open environment questions
-```
+It is a non-UI reference catalog. It must be ownership-decoupled and entry-self-contained.
 
-It exists so `execution-validation.md` can reference precise command and environment entries from `TASK-*`.
+It is not a product requirements file, not an implementation design file, not an execution task file, and not a task-specific validation plan.
 
----
+## Target Output
 
-## Source Context
-
-Use the available conversation context and upstream documents already generated in the current conversation.
-
-Recommended upstream context:
+Generate exactly one document:
 
 ```text
-Project Design Brief
-docs/product-spec.md
-docs/project-decisions.md
-docs/architecture.md
-docs/data-api-contract.md
-docs/frontend-design.md
-docs/backend-design.md
-current project discussion
-uploaded project notes
+docs/reference/dev-environment.md
 ```
 
-Use `project-decisions.md` for:
+## Standards to Apply
 
-- `DEC-*`
-- container-first development
-- package manager
-- runtime choices
-- frontend framework
-- backend framework
-- database choice
-- validation policy
-- deployment/runtime direction
+Read only the standards listed below.
 
-Use `architecture.md` for:
+| Standard | Required? | Use For |
+|---|---:|---|
+| `standards/document-responsibilities.md` | yes | Enforces non-UI reference ownership, entry self-containment, and traceability without dependency. |
+| `standards/codex-ready-writing-rules.md` | yes | Ensures stable IDs, resolved wording, and Codex-safe command policy entries. |
+| `standards/open-questions-policy.md` | yes | Prevents unresolved questions from entering final reference docs. |
+| `standards/validation-strategy.md` | yes | Separates command patterns from task-specific validation selection. |
+| `standards/document-length-budgets.md` | optional | Use to keep environment entries compact and addressable. |
+| `standards/flow-concepts-and-composition.md` | optional | Use only when environment policy must support flow-first execution or foundation readiness. |
 
-- `ARCH-*`
-- repository layout
-- runtime units
-- frontend/backend/data boundaries
-- service boundaries
+## Standard Application Rules
 
-Use `data-api-contract.md` for:
+Standards constrain how this prompt generates its target document. Standards do not create additional output targets.
 
-- `DB-*`
-- database and migration needs
-- seed data needs
-- API runtime needs
+Rules:
+1. Read only the standards listed in this prompt.
+2. Do not load all standards by default.
+3. The current prompt defines the target output and required output structure.
+4. Standards define reusable terminology, ownership boundaries, quality rules, and review constraints.
+5. Do not copy large sections from standards into the generated document.
+6. Do not generate documents requested by a standard unless this prompt explicitly targets them.
+7. If required context remains unresolved under the standards, output a blocked-generation report instead of inventing missing decisions.
 
-Use `frontend-design.md` for:
+## Priority Rule
 
-- `FE-*`
-- frontend app path
-- frontend package scripts
-- frontend test assumptions
+When generating the target document, use this priority order:
 
-Use `backend-design.md` for:
+1. User-confirmed answers and corrections.
+2. This prompt's target output and required output structure.
+3. Required standards listed in this prompt.
+4. Upstream generated project documents.
+5. Prior project discussion.
 
-- `BE-*`
-- backend app path
-- backend package scripts
-- backend test assumptions
-- worker/job runtime needs
+If a conflict involves unresolved blockers, Open Questions leakage, unsafe scope invention, missing required decisions, or reference ownership dependency, output a blocked-generation report instead of generating a normal final document.
 
-If upstream documents are unavailable, use available context and state assumptions.
+## Required Inputs
 
-If a command or environment decision is unclear and affects execution tasks, list it under `Open Environment Questions`.
-
----
-
-## Relevant Standards
-
-Apply only the standards relevant to this document:
+Use these upstream documents when available:
 
 ```text
-standards/document-responsibilities.md
-standards/document-length-budgets.md
-standards/codex-ready-writing-rules.md
-standards/frontend-backend-boundary.md
-standards/validation-strategy.md
+docs/review/project-decisions.md
+docs/review/question-resolution.md
+docs/reference/architecture.md
 ```
 
-Do not restate these standards in the generated document.
-
----
-
-## Output Rules
-
-Generate only:
+Optional upstream inputs when available:
 
 ```text
-docs/dev-environment.md
+docs/reference/data-api-contract.md
+docs/reference/frontend-design.md
+docs/reference/backend-design.md
 ```
 
-Do not generate other project documents.
+Do not require every reference document to understand this output. The generated environment entries must be self-contained in their own environment and command policy responsibility layer.
 
-Create only:
+## Dev Environment Ownership
+
+`docs/reference/dev-environment.md` owns:
 
 ```text
 ENV-*
+runtime version policy
+package manager policy
+dependency installation policy
+service naming policy
+container/local execution policy
+development command patterns
+build command patterns
+test command patterns
+lint command patterns
+typecheck command patterns
+database or migration command patterns when applicable
+environment variable policy
+secret handling policy
+generated artifact and temporary file policy for local execution
+forbidden host commands
+command safety notes
 ```
 
-Do not create:
+It must not own:
 
 ```text
-REQ-*
-DEC-*
-ENT-*
-REL-*
-BR-*
-STATE-*
-ARCH-*
-DB-*
-API-*
-ERR-*
-TYPE-*
-FE-*
-BE-*
+product requirements
+domain source definitions
+architecture source rules
+API request/response source contracts
+database schema source definitions
+frontend implementation responsibilities
+backend implementation responsibilities
+task-specific validation selection
+execution task sequencing
+validation catalog entries
+final executable FLOW-*
 TASK-*
 VAL-*
+Open Questions
 ```
 
-You may reference existing:
+## Reference Decoupling Rules
 
-```text
-DEC-*
-ARCH-*
-DB-*
-API-*
-FE-*
-BE-*
-```
+Because this is a non-UI reference catalog:
 
-Every `ENV-*` must be heading-addressable.
+1. Every `ENV-*` entry must be entry-self-contained.
+2. Related IDs may be included only for traceability.
+3. Do not write "see architecture.md for details" as a substitute for environment policy content.
+4. Do not copy architecture, frontend, backend, API, or validation source definitions.
+5. Do not redefine another document's owned content.
+6. Environment entries may mention related flow or execution areas, but must not perform full flow composition or task-specific validation selection.
 
-Use this heading format:
+Allowed:
 
 ```markdown
-### ENV-001: Environment Item Name
+Related Architecture:
+- ARCH-001
 ```
 
-Do not write a long environment guide.
+Forbidden:
 
-Do not define product requirements, frontend/backend implementation, DB/API contracts, task lists, or validation criteria here.
+```markdown
+ENV-001 follows ARCH-001. See ARCH-001 for details.
+```
 
----
+## Environment vs Validation Boundary
 
-## Required Document Structure
+This document may define command patterns such as:
 
-Use this structure:
+```text
+npm run test
+npm run lint
+npm run typecheck
+docker compose up
+docker compose run app npm test
+```
+
+This document must not decide which exact command proves completion for a specific `TASK-*`.
+
+Task-specific validation belongs to:
+
+```text
+docs/execution/execution-validation.md
+```
+
+The validation catalog may reference command patterns defined here, but `dev-environment.md` must not define `VAL-*`.
+
+## Flow-First Support Rules
+
+The environment policy may support flow-first execution by defining:
+
+- minimal project setup commands
+- service startup commands
+- test command patterns
+- build/typecheck/lint command patterns
+- container-first or local-first execution boundaries
+- safe file/artifact workspace rules
+
+It must not define:
+
+- final `FLOW-*`
+- flow slice tasks
+- execution order
+- task-specific validation mapping
+
+## Required Output Structure
 
 ```markdown
 # Dev Environment
 
-## Environment Catalog
+## 1. Environment Scope
 
-## Forbidden Host Commands
+State what this document owns and what it does not own.
 
-## Open Environment Questions
-```
+## 2. Environment Summary
 
-Do not add extra sections unless they are necessary for the project.
+Summarize the runtime, package, service, and command policy in current-scope terms.
 
----
+## 3. Environment Policy Catalog
 
-## Environment Catalog
+### ENV-001: <Environment Policy Name>
 
-Generate compact `ENV-*` entries.
-
-Each entry should be independently readable because `TASK-*` items in `execution-validation.md` will reference individual command/environment entries directly.
-
-Recommended format:
-
-```markdown
-### ENV-001: Container-First Command Policy
-
-Kind: command-policy
-
-Rule:
-- Install, test, build, migration, seed, and validation commands must run inside containers by default.
-
-Applies To:
-- all implementation tasks
-- all validation tasks
-- Codex execution
-
-Canonical Pattern:
-```bash
-docker compose exec <service> <command>
-```
-
-Allowed:
-- Use `docker compose exec <service> ...` when the service is running.
-- Use `docker compose run --rm <service> ...` for setup-specific commands when the service is not running.
-
-Forbidden:
-- Do not run host-level package install, test, build, migration, or validation commands by default.
-
-Related:
-- DEC-002
-```
-
-Rules:
-
-- Use `ENV-*` for environment and command entries that later tasks may reference.
-- Keep entries compact.
-- Include `Kind`.
-- Include exact commands or command patterns.
-- Include `Allowed` and `Forbidden` where useful.
-- Include `Related` IDs where useful.
-- Do not include task-specific validation selection.
-- Do not create `TASK-*` or `VAL-*`.
-
-Recommended `Kind` values:
-
-```text
-command-policy
-service
-runtime
-package-manager
-environment-variable
-setup-command
-start-stop-command
-dependency-command
-database-command
-test-command
-milestone-command
-release-command
-forbidden-command
-troubleshooting
-```
-
----
-
-## Recommended Environment Entries
-
-Generate entries only when they apply to the project.
-
-Common entries include:
-
-```text
-ENV-001 Container-First Command Policy
-ENV-002 Docker Compose Services
-ENV-003 Runtime Versions
-ENV-004 Package Manager Policy
-ENV-005 Environment Variables
-ENV-006 First-Time Setup Commands
-ENV-007 Start and Stop Commands
-ENV-008 Dependency Commands
-ENV-009 Database Commands
-ENV-010 Frontend Test Command Pattern
-ENV-011 Backend Test Command Pattern
-ENV-012 Milestone Validation Command Pattern
-ENV-013 Release Validation Command Pattern
-ENV-014 Optional Heavy Checks
-ENV-015 Troubleshooting Notes
-```
-
-Do not force all entries if they are not useful.
-
----
-
-## Entry Guidance
-
-### Container-First Command Policy Entry
-
-Should define:
-
-- commands run inside containers by default
-- when to use `docker compose exec`
-- when to use `docker compose run --rm`
-- host command restrictions
-
-Should reference:
-
-```text
-DEC-* container-first decision
-ARCH-* runtime/service boundary
-```
-
----
-
-### Docker Compose Services Entry
-
-Should define service names.
-
-Recommended format:
-
-```markdown
-### ENV-002: Docker Compose Services
-
-Kind: service
-
-Services:
-| Service | Purpose | Related Area |
-|---|---|---|
-| web | Frontend Web app | apps/web |
-| api | Backend API app | apps/api |
-| db | Database service | persistence |
-```
-
-Rules:
-
-- Use actual service names when known.
-- If service names are assumptions, mark them clearly.
-- Do not define Docker Compose YAML here unless requested.
-
----
-
-### Runtime Versions Entry
-
-Should define known runtime versions.
-
-Recommended format:
-
-```markdown
-### ENV-003: Runtime Versions
-
-Kind: runtime
-
-Runtimes:
-| Runtime | Version | Applies To |
-|---|---|---|
-| Node.js | 20.x | web, api |
-| PostgreSQL | 16.x | db |
-```
-
-Rules:
-
-- Use `TBD` if exact versions are unknown.
-- Do not invent exact versions unless the project has a standard.
-
----
-
-### Package Manager Entry
-
-Should define exactly one package manager per app or workspace.
-
-Recommended format:
-
-```markdown
-### ENV-004: Package Manager Policy
-
-Kind: package-manager
+Type:
+- runtime / package_manager / install / service / container / local_execution / dev_command / build_command / test_command_pattern / lint_command_pattern / typecheck_command_pattern / env_var / secret / artifact_workspace / forbidden_command / safety
 
 Policy:
-- Use npm for frontend and backend Node.js packages.
+- ...
 
-Canonical Prefixes:
-| Area | Prefix |
-|---|---|
-| web | `docker compose exec web npm` |
-| api | `docker compose exec api npm` |
+Allowed:
+- ...
 
 Forbidden:
-- Do not switch to pnpm, yarn, or bun unless DEC-* changes.
-```
-
-Rules:
-
-- Do not list multiple package managers as alternatives.
-- If backend uses Python, choose one tool such as `uv`, `poetry`, or `pip`.
-
----
-
-### Environment Variables Entry
-
-Should list local environment variables without secret values.
-
-Recommended format:
-
-```markdown
-### ENV-005: Environment Variables
-
-Kind: environment-variable
-
-Variables:
-| Variable | Used By | Required? | Notes |
-|---|---|---:|---|
-| DATABASE_URL | api | yes | Backend database connection string. |
-| NEXT_PUBLIC_API_BASE_URL | web | yes | Public API base URL. |
-```
-
-Rules:
-
-- Do not include secret values.
-- Mark public frontend variables clearly.
-- Server-only secrets must not be exposed to frontend.
-- Mention `.env.example` if it should exist.
-
----
-
-### Setup Commands Entry
-
-Should define first-time setup commands.
-
-Recommended format:
-
-```markdown
-### ENV-006: First-Time Setup Commands
-
-Kind: setup-command
+- ...
 
 Commands:
 ```bash
-docker compose up -d
-docker compose exec web npm install
-docker compose exec api npm install
-```
+...
 ```
 
-Rules:
+Applies To:
+- ...
 
-- Use canonical commands.
-- Do not include host install commands.
+Related IDs:
+- ...
 
----
+Out of Scope:
+- ...
 
-### Start and Stop Commands Entry
+## 4. Runtime and Package Policy
 
-Should define start, stop, and logs commands.
+Define runtime versions, package manager, dependency install behavior, and lockfile expectations.
 
-Recommended format:
+## 5. Service and Execution Policy
 
-```markdown
-### ENV-007: Start and Stop Commands
+Define service names, startup behavior, container/local execution rules, and process boundaries.
 
-Kind: start-stop-command
+## 6. Command Pattern Catalog
 
-Commands:
-```bash
-docker compose up -d
-docker compose logs -f web
-docker compose logs -f api
-docker compose down
-```
-```
+Define command patterns for install, dev, build, lint, typecheck, test, migration, or other environment actions.
 
----
+Do not select task-specific validation commands.
 
-### Dependency Commands Entry
+## 7. Environment Variable and Secret Policy
 
-Should define package install/add commands.
+Define variable names, required/optional status, local defaults, and forbidden secret handling.
 
-Recommended format:
+Do not include real secrets.
 
-```markdown
-### ENV-008: Dependency Commands
+## 8. Artifact and Temporary File Policy
 
-Kind: dependency-command
+Define local workspace, generated artifacts, cache, temp file, or upload/download folder rules when relevant.
 
-Commands:
-```bash
-docker compose exec web npm install
-docker compose exec api npm install
-docker compose exec web npm install <package>
-docker compose exec api npm install <package>
-```
-```
+## 9. Forbidden Commands and Safety Rules
 
-Rules:
+List commands Codex must not run and explain why.
 
-- Use the selected package manager only.
+## 10. Out-of-Scope Environment Behavior
 
----
+List environment concerns intentionally excluded from the current implementation.
 
-### Database Commands Entry
+## 11. Downstream Seeds
 
-Should define migration, seed, reset, and database test command patterns when persistence exists.
+List concise seeds for `execution-validation.md` and `AGENTS.md`.
 
-Recommended format:
+## 12. Final Readiness
 
-```markdown
-### ENV-009: Database Commands
+Status: ready / blocked
 
-Kind: database-command
-
-Commands:
-```bash
-docker compose exec api npm run db:migrate
-docker compose exec api npm run db:seed
+If blocked, list missing decisions and affected downstream documents.
 ```
 
-Related:
-- DB-001
+## ENV Entry Requirements
+
+Each `ENV-*` entry must include:
+
+```text
+ID
+name
+type
+policy
+allowed
+forbidden
+applies to
+out-of-scope where useful
 ```
 
-Rules:
+Optional but useful:
 
-- Database commands should run through the backend/API service unless project decisions say otherwise.
-- Frontend must not run database commands.
-- Do not define schema details here.
-
----
-
-### Test Command Entries
-
-Create separate entries for frontend and backend when useful.
-
-Recommended format:
-
-```markdown
-### ENV-010: Frontend Test Command Pattern
-
-Kind: test-command
-
-Command Pattern:
-```bash
-docker compose exec web npm run test -- <test-file-or-pattern>
+```text
+commands
+related IDs
+flow-first support
+security impact
+downstream seeds
 ```
 
-Use For:
-- frontend components
-- frontend pages
-- frontend hooks
-- frontend API client behavior
-```
+## Command Writing Rules
 
-```markdown
-### ENV-011: Backend Test Command Pattern
+Use concrete command patterns where known.
 
-Kind: test-command
-
-Command Pattern:
-```bash
-docker compose exec api npm run test -- <test-file-or-pattern>
-```
-
-Use For:
-- API handlers
-- backend services
-- repositories
-- business rule enforcement
-```
-
-Rules:
-
-- Prefer targeted test commands.
-- Avoid full test suite as default task validation.
-- Full test suite belongs to milestone or release validation unless task-specific.
-
----
-
-### Milestone Validation Entry
-
-Should define broader but still focused commands.
-
-Recommended format:
-
-```markdown
-### ENV-012: Milestone Validation Command Pattern
-
-Kind: milestone-command
-
-Commands:
-```bash
-docker compose exec api npm run test -- --run
-docker compose exec web npm run test -- --run
-```
-```
-
-Rules:
-
-- Milestone validation is broader than task validation.
-- Avoid unrelated heavy checks unless relevant.
-
----
-
-### Release Validation Entry
-
-Should define final release validation commands.
-
-Recommended format:
-
-```markdown
-### ENV-013: Release Validation Commands
-
-Kind: release-command
-
-Commands:
-```bash
-docker compose exec api npm run test -- --run
-docker compose exec web npm run test -- --run
-docker compose exec web npm run build
-```
-```
-
-Rules:
-
-- Include build/typecheck/lint only if project decisions require them for release.
-- Do not use release validation as a substitute for task validation.
-
----
-
-### Optional Heavy Checks Entry
-
-Should list heavy checks that are not task-default.
-
-Examples:
-
-```bash
-docker compose exec web npm run lint
-docker compose exec web npm run typecheck
-docker compose exec web npm run build
-docker compose exec api npm run lint
-docker compose exec api npm run typecheck
-```
-
-Rules:
-
-- Heavy checks must not be required for every task by default.
-- Heavy checks may be used for milestone/release validation or when a task specifically needs them.
-
----
-
-### Troubleshooting Entry
-
-Include only short practical troubleshooting notes.
-
-Recommended format:
-
-```markdown
-### ENV-015: Troubleshooting Notes
-
-Kind: troubleshooting
-
-Notes:
-| Problem | Likely Cause | Action |
-|---|---|---|
-| API cannot connect to database. | DB service not ready or DATABASE_URL missing. | Check `docker compose ps` and env vars. |
-```
-
-Do not include long debugging guides.
-
----
-
-## Forbidden Host Commands
-
-List commands Codex must not run on the host by default.
-
-Recommended format:
-
-```markdown
-## Forbidden Host Commands
+Prefer:
 
 ```bash
 npm install
-npm test
+npm run dev
 npm run build
-pnpm install
-yarn install
-bun install
-pytest
-mypy
-ruff check .
-```
+npm run typecheck
+npm run lint
+npm test
 ```
 
-Adjust based on the chosen stack.
+or container-first equivalents when the project requires container execution.
 
-Rules:
-
-- Include only commands that are actually risky for the project.
-- Host commands may be allowed only if an explicit `ENV-*` entry or `DEC-*` decision permits them.
-
----
-
-## Open Environment Questions
-
-List unresolved environment questions.
-
-Recommended format:
-
-```markdown
-| Question | Blocking? | Affected Area |
-|---|---:|---|
-| Should backend use npm or uv? | yes | install and test commands |
-| What is the exact database version? | no | Docker Compose, local development |
-```
-
-Rules:
-
-- Include only questions that affect commands, runtime, services, package manager, env vars, testing, or execution tasks.
-- Mark blocking questions clearly.
-- Do not hide uncertainty inside `ENV-*` entries.
-
----
-
-## Catalog Design Rules
-
-The generated file should behave like a task-scoped reference catalog.
-
-This means:
-
-- each `ENV-*` entry must be short enough to read independently
-- each `ENV-*` entry must have a stable Markdown heading
-- each `ENV-*` entry should include related upstream IDs when useful
-- task authors should be able to reference entries like:
+Avoid vague commands:
 
 ```text
-docs/dev-environment.md#ENV-001
-docs/dev-environment.md#ENV-010
+run the tests
+start the app
+check everything
 ```
 
-Avoid broad environment narrative that Codex would need to read globally.
+If the command is unknown, write a blocked-generation issue rather than inventing a package manager or runtime.
 
----
+## Environment Variable Rules
 
-## Writing Rules
+Define variables as policy entries when relevant.
 
-- Write a reference catalog, not a long environment guide.
-- Use stable heading-addressable `ENV-*` IDs.
-- Keep every entry compact and independently readable.
-- Use exact commands or exact command patterns.
-- Prefer container-first commands.
-- Use one package manager per app/workspace.
-- Reference existing `DEC-*`, `ARCH-*`, `DB-*`, `API-*`, `FE-*`, and `BE-*` where useful.
-- Do not create non-ENV IDs.
-- Do not define task-specific validation selection here.
-- Do not define product requirements.
-- Do not define frontend/backend implementation details.
-- Do not define DB/API schemas.
-- Do not include secret values.
-- Use `Open Environment Questions` for unresolved environment decisions.
+Allowed:
 
----
+```text
+ENV-010: Local database URL policy
+Required variable: DATABASE_URL
+Local default: provided by docker compose service
+Secret? no for local dev placeholder
+```
 
-## Quality Checklist
+Forbidden:
+
+```text
+DATABASE_URL=<real secret>
+```
+
+## Blocked Generation Rules
+
+Output a blocked-generation report instead of a normal dev environment document if:
+
+- runtime or package manager is required but unknown
+- container/local execution policy is required but unresolved
+- service names are required but unresolved
+- install/build/test command patterns cannot be safely determined
+- secret handling policy is unclear
+- environment variables required for current scope are unknown
+- unresolved Open Questions would enter the final environment doc
+
+Blocked-generation report structure:
+
+```markdown
+# Dev Environment Generation Blocked
+
+## Blocking Issues
+
+| Issue | Decision Needed | Affected Docs | Flow / Execution Impact |
+|---|---|---|---|
+
+## Partial Safe Content
+
+## Required User Decisions
+```
+
+## Final Checks
 
 Before finalizing, verify:
 
-```text
-[ ] The file is a compact environment and command reference catalog.
-[ ] Important environment entries have ENV-* headings.
-[ ] Every ENV-* is independently readable.
-[ ] IDs are heading-addressable.
-[ ] Container-first policy is explicit.
-[ ] Docker service names are defined or clearly assumed.
-[ ] Package manager choices are explicit.
-[ ] Setup commands are exact.
-[ ] Start/stop commands are exact.
-[ ] Dependency commands are exact.
-[ ] Database command patterns are defined when DB exists.
-[ ] Test command patterns are targeted.
-[ ] Milestone/release command patterns are defined.
-[ ] Heavy checks are not task-default.
-[ ] Forbidden host commands are listed.
-[ ] No TASK/VAL IDs are created.
-[ ] No product or implementation design content is included.
-[ ] No secrets are included.
-```
+- No unresolved Open Questions remain.
+- No product requirements are defined.
+- No API contracts are defined.
+- No frontend or backend implementation responsibilities are defined.
+- No task-specific validation mapping is defined.
+- No `TASK-*`, `VAL-*`, or final executable `FLOW-*` entries are created.
+- Every `ENV-*` entry is self-contained.
+- Related IDs are traceability hints only.
+- The document defines command patterns, not task-specific proof obligations.

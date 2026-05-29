@@ -1,10 +1,342 @@
 # Changelog
 
-## v0.4.0
+## v0.5.0
 
 ### Summary
 
-v0.4.0 restructures the kit around:
+v0.5.0 is a major Flow-first document-system revision.
+
+This release changes the prompt kit from the v0.4.x execution-spine model into a full Flow-first generation system:
+
+```text
+Discovery
+→ Question Resolution
+→ Project Decisions
+→ Non-UI References
+→ UI References
+→ Flow Composition
+→ Execution Validation
+→ AGENTS Runtime Policy
+→ Cross-Document Review
+```
+
+The main change is that UI references are no longer treated as late visual/reference artifacts. They now sit after non-UI references and before flow composition, because user-visible flows must be checked for:
+
+```text
+operability
+observability
+feedback
+recovery
+artifact visibility
+completion signal visibility
+```
+
+This release also removes concrete UI styling-stack assumptions from the active system. The UI reference system is now technology-agnostic.
+
+---
+
+## Added
+
+### Flow-first document system
+
+- Added a Flow-first explanation to `README.md`.
+- Defined Flow-first as the reason for organizing generation around complete user/system behavior instead of broad technical layers.
+- Clarified that Flow-first does not mean foundation-free.
+- Clarified that foundation tasks should exist only when they unlock named flows.
+- Added stronger language that Codex should implement one validated slice at a time instead of wiring disconnected layers together at the end.
+
+### Open Questions and decision flow
+
+- Added the Open Questions flow as a first-class generation path:
+  - `prompts/open-questions-extraction-prompt.md`
+  - `prompts/question-resolution-prompt.md`
+- Added these outputs to the active generated document system:
+  - `docs/review/open-questions-review.md`
+  - `docs/review/question-resolution.md`
+- Added Open Questions handling to the generation matrix.
+- Clarified that unresolved Open Questions must not leak into final reference, UI, or execution documents.
+
+### UI reference system
+
+- Added `standards/ui-reference-system.md`.
+- Added a technology-agnostic UI reference model:
+  - `UI_PAGE.yaml` = flow-facing semantic UI surface
+  - `UI_TOKENS.yaml` = technology-agnostic design token reference
+  - `UI_VISUAL_SPEC.yaml` = visual and interaction presentation rules
+- Added the rule that every generated UI YAML file must include:
+  ```yaml
+  codex_consumption:
+  ```
+- Added Codex runtime consumption rules for UI YAML files.
+- Added UI field dictionary behavior through `codex_consumption` rather than a separate generated project dictionary.
+
+### UI authoring specifications
+
+- Added or renamed active UI authoring specs:
+  - `standards/ui-authoring-specs/UI_PAGE.yaml-Authoring-Specification.md`
+  - `standards/ui-authoring-specs/UI_TOKENS.yaml-Authoring-Specification.md`
+  - `standards/ui-authoring-specs/UI_VISUAL_SPEC.yaml-Authoring-Specification.md`
+- `UI_PAGE.yaml` authoring now supports:
+  - flow surface mapping
+  - action effect mapping
+  - feedback state mapping
+  - recovery path mapping
+  - artifact surface mapping
+  - completion signal mapping
+  - `codex_consumption`
+- `UI_TOKENS.yaml` authoring now supports technology-agnostic token intent only.
+- `UI_VISUAL_SPEC.yaml` authoring now supports technology-agnostic state, feedback, recovery, artifact, completion, responsive, and accessibility presentation rules.
+
+### README generation matrix
+
+- Added a simplified Generation Matrix to `README.md`.
+- The matrix now focuses on:
+  - step number
+  - prompt file
+  - standards to read
+  - target output
+- Removed duplicated role explanations from the matrix because the README now explains file responsibilities separately.
+
+### Release process
+
+- Added a simplified release command order to `README.md`.
+- Added GitHub CLI release creation guidance.
+- Standardized on `CHANGELOG.md` as the release note source.
+- Added guidance to use pinned tags or commits when stability matters.
+
+---
+
+## Changed
+
+### Overall generation order
+
+The active generation order now becomes:
+
+```text
+1. discovery-workshop-prompt.md
+2. open-questions-extraction-prompt.md
+3. question-resolution-prompt.md
+4. project-decisions-prompt.md
+
+5. product-spec-prompt.md
+6. domain-model-prompt.md
+7. architecture-prompt.md
+8. data-api-contract-prompt.md
+9. frontend-design-prompt.md
+10. backend-design-prompt.md
+11. dev-environment-prompt.md
+
+12. ui-page-prompt.md
+13. ui-tokens-prompt.md
+14. ui-visual-spec-prompt.md
+
+15. flow-composition-review-prompt.md
+16. execution-validation-prompt.md
+17. AGENTS-prompt.md
+18. cross-document-review-prompt.md
+```
+
+This replaces the v0.4.x order where UI files existed inside reference generation but did not yet function as the formal flow-facing surface before flow composition.
+
+### Generated document structure
+
+The generated project structure now uses three explicit layers:
+
+```text
+docs/review/
+docs/reference/
+docs/execution/
+```
+
+Reference UI files now live under:
+
+```text
+docs/reference/ui/
+```
+
+Execution files now live under:
+
+```text
+docs/execution/
+```
+
+The runtime worklog remains:
+
+```text
+docs/execution/codex-execution-report.md
+```
+
+but it is created and maintained by Codex, not normally generated by ChatGPT.
+
+### `README.md`
+
+- Rewritten into four sections:
+  1. Flow-first introduction
+  2. Document systems
+  3. Generation Matrix
+  4. Release Command Order
+- Removed the separate “Manual File Upload” and “GitHub Repository Usage” framing.
+- Replaced that framing with a normal usage rule:
+  - read README
+  - identify the current step
+  - read the current prompt
+  - read only the standards listed by that prompt
+  - read only required upstream documents
+- Added a repository-based usage pattern without making it a separate mode.
+
+### `standards/document-system.md`
+
+- Updated to include `docs/review/`, `docs/reference/`, and `docs/execution/`.
+- Added the UI reference layer under `docs/reference/ui/`.
+- Removed the old flat generated-doc structure as the active model.
+- Marked `codex-execution-report-format.md` as inactive.
+- Marked `shadcn-tailwind-implementation-standard.md` as inactive in the current active system.
+
+### `standards/document-generation-order.md`
+
+- Updated the canonical generation order to include:
+  - Open Questions extraction
+  - Question resolution
+  - UI reference generation before flow composition
+  - Flow composition before execution validation
+- Clarified regeneration rules for UI changes.
+- Clarified that UI must not move after execution.
+
+### `standards/document-responsibilities.md`
+
+- Added UI reference responsibilities.
+- Added ownership boundaries for:
+  - `UI_PAGE.yaml`
+  - `UI_TOKENS.yaml`
+  - `UI_VISUAL_SPEC.yaml`
+- Added UI technology-agnostic rules.
+- Added UI `codex_consumption` requirements.
+- Added UI flow support checks.
+- Strengthened the distinction between review, non-UI reference, UI reference, and execution documents.
+
+### `standards/webapp-execution-spine.md`
+
+- Reworked from the v0.4.x P0-P10 execution-spine model toward a Flow-first execution spine.
+- Execution planning now follows:
+  ```text
+  minimal foundation tasks
+  → executable flow slices
+  → cross-flow hardening
+  → release validation
+  ```
+- Added UI work as part of user-visible flow slices.
+- Added UI validation claims.
+- Added the rule that UI work should not be postponed into a later full-UI phase when required by the current flow.
+- Added the rule that broad UI/system/styling tasks are forbidden unless narrowly required by a flow.
+
+### `standards/validation-strategy.md`
+
+- Added UI validation strategy.
+- Added validation claims for:
+  - action affordance
+  - visible pending/running/submitting states
+  - failed / blocked / validation_failed states
+  - recovery actions
+  - artifact surfaces
+  - completion signals
+  - accessibility and focus behavior
+- Clarified that backend success alone is not enough to validate a user-visible flow.
+- Added UI evidence types such as frontend interaction tests, component tests, E2E tests, manual smoke evidence, screenshot evidence, accessibility checks, and DOM/state inspection evidence.
+
+### `prompts/frontend-design-prompt.md`
+
+- Updated to consume UI references without redefining them.
+- Added `standards/ui-reference-system.md` as a required standard.
+- Added explicit boundary rules:
+  - frontend design may describe how implementation consumes UI references
+  - frontend design must not redefine UI_PAGE, UI_TOKENS, or UI_VISUAL_SPEC
+- Removed default styling-stack assumptions.
+
+### `prompts/flow-composition-review-prompt.md`
+
+- Updated to include UI flow-surface review.
+- Flow composition now checks:
+  - visible UI surface
+  - primary action affordance
+  - feedback states
+  - recovery paths
+  - artifact surfaces
+  - completion signals
+  - UI `codex_consumption`
+- Added UI gaps as blockers or warnings.
+- Added UI prerequisites to foundation readiness analysis.
+
+### `prompts/execution-validation-prompt.md`
+
+- Updated to generate flow-first execution instead of layer-first execution.
+- Added UI task-scoped source behavior.
+- Added the requirement that UI tasks read UI YAML `codex_consumption` before modifying UI code.
+- Added UI-level validation table expectations.
+- Added explicit warning not to assume Tailwind, shadcn/ui, CSS variables, MUI, Chakra, CSS Modules, Styled Components, or any concrete styling stack.
+
+### `prompts/AGENTS-prompt.md`
+
+- Added UI runtime policy.
+- Added UI ownership safety policy.
+- Added the rule that Codex must read `codex_consumption` for referenced UI YAML files before UI implementation.
+- Added the rule that Codex must use existing project stack and code conventions for UI implementation.
+- Added worklog expectations for UI source consumption.
+
+### `prompts/cross-document-review-prompt.md`
+
+- Added UI reference review.
+- Added UI flow-surface review.
+- Added checks for:
+  - missing `codex_consumption`
+  - UI technology-stack assumptions
+  - CSS variable / Tailwind / shadcn leakage
+  - UI flow surface gaps
+  - UI validation gaps
+  - AGENTS UI runtime policy gaps
+- Added checks that `codex-execution-report.md` is treated as a runtime worklog, not a prompt-generated source file.
+
+### UI prompts
+
+- `ui-page-prompt.md` now generates a flow-facing semantic UI surface.
+- `ui-tokens-prompt.md` now generates technology-agnostic design token intent only.
+- `ui-visual-spec-prompt.md` now generates technology-agnostic visual and interaction presentation rules.
+- All three UI prompts now require `codex_consumption` in generated YAML.
+
+---
+
+## Removed / Inactive
+
+The following files are no longer part of the active v0.5.0 system:
+
+```text
+standards/codex-execution-report-format.md
+standards/ui-authoring-strategy.md
+standards/ui-authoring-specs/shadcn-tailwind-implementation-standard.md
+```
+
+Removal / inactive reasons:
+
+### `codex-execution-report-format.md`
+
+- Runtime worklog behavior is now owned by `AGENTS.md`.
+- `codex-execution-report.md` remains active as a Codex-created runtime worklog, but its format is not maintained as a separate active standard.
+
+### `ui-authoring-strategy.md`
+
+- Replaced by the more explicit `standards/ui-reference-system.md`.
+
+### `shadcn-tailwind-implementation-standard.md`
+
+- Removed from the active UI system because UI references are now technology-agnostic.
+- A future implementation standard may be introduced separately when a concrete styling stack is selected.
+
+---
+
+## Migration Notes from v0.4.1
+
+### Main migration
+
+v0.4.1 was organized around:
 
 ```text
 Discovery Workshop
@@ -14,320 +346,127 @@ AGENTS Runtime Policy
 Cross-Document Review
 ```
 
-The main change is that `docs/execution-validation.md` becomes the primary Codex execution spine.
-
-Codex should default to reading only:
+v0.5.0 changes the active system to:
 
 ```text
-AGENTS.md
+Discovery
+Question Resolution
+Project Decisions
+Non-UI References
+UI References
+Flow Composition
+Execution Validation
+AGENTS Runtime Policy
+Cross-Document Review
+```
+
+### Prompt order migration
+
+Replace the v0.4.1 prompt order with the v0.5.0 18-step generation matrix in `README.md`.
+
+Important changes:
+
+- Add `open-questions-extraction-prompt.md`.
+- Add `question-resolution-prompt.md`.
+- Move UI references after all non-UI references and before flow composition.
+- Add `flow-composition-review-prompt.md` before `execution-validation-prompt.md`.
+- Keep `AGENTS-prompt.md` after `execution-validation-prompt.md`.
+- Keep `cross-document-review-prompt.md` as the final review step.
+
+### Path migration
+
+Update generated project paths:
+
+```text
+docs/product-spec.md
+```
+
+to:
+
+```text
+docs/reference/product-spec.md
+```
+
+and similarly for non-UI reference files.
+
+Update UI paths:
+
+```text
+docs/ui/UI_PAGE.yaml
+docs/ui/UI_TOKENS.yaml
+docs/ui/UI_VISUAL_SPEC.yaml
+```
+
+to:
+
+```text
+docs/reference/ui/UI_PAGE.yaml
+docs/reference/ui/UI_TOKENS.yaml
+docs/reference/ui/UI_VISUAL_SPEC.yaml
+```
+
+Update execution paths:
+
+```text
 docs/execution-validation.md
+AGENTS.md
+codex-execution-report.md
 ```
 
-All other generated documents become task-scoped reference catalogs, read only when a `TASK-*` explicitly references them.
-
----
-
-## Added
-
-### Discovery workflow
-
-- Added `prompts/discovery-workshop-prompt.md`.
-- Introduced an optional `Project Design Brief` working output before formal document generation.
-- Clarified that discovery is for ChatGPT and the user to think deeply before producing runtime documents.
-- Clarified that discovery notes are not Codex runtime documents by default.
-
-### Execution spine standard
-
-- Added `standards/webapp-execution-spine.md`.
-- Defined the default P0-P10 Web App execution route:
-  - P0 Project Bootstrap
-  - P1 Development Environment
-  - P2 Shared Contracts and Types
-  - P3 Data Layer
-  - P4 Backend API Foundation
-  - P5 Backend Feature Workflows
-  - P6 Frontend App Shell
-  - P7 Frontend Feature Workflows
-  - P8 UI System and Interaction States
-  - P9 Cross-Cutting Hardening
-  - P10 Final Validation and Handoff
-
-### Reference catalog model
-
-- Added `ARCH-*` architecture reference entries.
-- Added `ENV-*` environment and command reference entries.
-- Added `ERR-*` API error contract entries.
-- Added `TYPE-*` shared contract type entries.
-- Added `STATE-*` domain state entries.
-
-### Task-scoped reading model
-
-- Added task-scoped source reference requirements for `TASK-*`.
-- Added guidance for `Read before this task`.
-- Added guidance for `Do not read unless needed`.
-- Added guidance to reference specific headings, IDs, or YAML keys instead of full documents.
-
-### Runtime execution report updates
-
-- Expanded `codex-execution-report.md` expectations to include:
-  - sources read
-  - files changed
-  - required validation
-  - result
-  - claim proven
-  - blocker details
-
----
-
-## Changed
-
-### Prompt structure
-
-The prompt order is now:
+to:
 
 ```text
-0. discovery-workshop-prompt.md
-
-1. product-spec-prompt.md
-2. project-decisions-prompt.md
-3. domain-model-prompt.md
-4. architecture-prompt.md
-5. data-api-contract-prompt.md
-6. ui-page-prompt.md
-7. frontend-design-prompt.md
-8. backend-design-prompt.md
-9. dev-environment-prompt.md
-10. ui-tokens-prompt.md
-11. ui-visual-spec-prompt.md
-
-12. execution-validation-prompt.md
-13. AGENTS-prompt.md
-14. cross-document-review-prompt.md
+docs/execution/execution-validation.md
+docs/execution/AGENTS.md
+docs/execution/codex-execution-report.md
 ```
 
-### `product-spec-prompt.md`
+### Execution migration
 
-- Changed generated `product-spec.md` into a compact `REQ-*` reference catalog.
-- Reduced product narrative.
-- Kept only:
-  - MVP boundary
-  - user roles
-  - requirement catalog
-  - open questions
-
-### `project-decisions-prompt.md`
-
-- Changed generated `project-decisions.md` into a compact `DEC-*` reference catalog.
-- Added rejected alternatives and open decision questions.
-- Removed long ADR-style narrative.
-
-### `domain-model-prompt.md`
-
-- Changed generated `domain-model.md` into a compact domain reference catalog.
-- Owns:
-  - `ENT-*`
-  - `REL-*`
-  - `BR-*`
-  - `STATE-*`
-
-### `architecture-prompt.md`
-
-- Changed generated `architecture.md` into an `ARCH-*` architecture boundary catalog.
-- Focuses on:
-  - repository boundaries
-  - frontend/backend boundaries
-  - data access boundaries
-  - shared package boundaries
-  - runtime/configuration boundaries
-
-### `data-api-contract-prompt.md`
-
-- Changed generated `data-api-contract.md` into a `DB-*`, `API-*`, `ERR-*`, and `TYPE-*` contract catalog.
-- Preserves enough detail for DB and API implementation while avoiding frontend/backend implementation content.
-
-### `frontend-design-prompt.md`
-
-- Changed generated `frontend-design.md` into an `FE-*` frontend implementation reference catalog.
-- Each `FE-*` entry can include:
-  - kind
-  - purpose
-  - code impact
-  - inputs
-  - rules
-  - out of scope
-
-### `backend-design-prompt.md`
-
-- Changed generated `backend-design.md` into a `BE-*` backend implementation reference catalog.
-- Each `BE-*` entry can include:
-  - kind
-  - purpose
-  - code impact
-  - inputs
-  - rules
-  - out of scope
-
-### `dev-environment-prompt.md`
-
-- Changed generated `dev-environment.md` into an `ENV-*` environment and command reference catalog.
-- Strengthened container-first command policy.
-- Added forbidden host command handling.
-
-### UI prompts
-
-- Kept UI prompts lightweight.
-- `ui-page-prompt.md` generates semantic page structure.
-- `ui-tokens-prompt.md` generates reusable token references.
-- `ui-visual-spec-prompt.md` generates visual usage rules.
-- UI prompt behavior now aligns with task-scoped reading.
-
-### `execution-validation-prompt.md`
-
-- Reworked as the primary Codex execution spine generator.
-- Must cover engineering foundation tasks and product workflow tasks.
-- Must evaluate P0-P10 phases.
-- Must generate `TASK-*` and `VAL-*`.
-- Must include:
-  - task dependencies
-  - task-scoped source references
-  - implementation scope
-  - expected code impact
-  - out-of-scope boundaries
-  - required validation
-  - milestone validation
-  - release validation
-
-### `AGENTS-prompt.md`
-
-- Reworked to enforce:
-  - `AGENTS.md` + `docs/execution-validation.md` as primary runtime documents
-  - task-scoped reading
-  - no full-document reading by default
-  - no task inference from reference catalogs
-  - container-first command usage
-  - task validation requirements
-
-### `cross-document-review-prompt.md`
-
-- Reworked to check:
-  - reference catalog quality
-  - execution spine completeness
-  - P0-P10 phase coverage
-  - task-scoped reading quality
-  - source-of-truth conflicts
-  - undefined IDs
-  - AGENTS runtime policy
-  - validation quality
-
----
-
-## Removed
-
-The following files are no longer part of the recommended v0.4.0 structure:
+Replace P0-P10 as the top-level execution structure with Flow-first execution:
 
 ```text
-master-prompt.md
-implementation-map-prompt.md
-final-codex-handoff-prompt.md
-codex-metrics.json
+minimal foundation tasks
+→ executable flow slices
+→ cross-flow hardening
+→ release validation
 ```
 
-### Removal reasons
+P0-P10-style thinking may still inform engineering completeness, but it should not be the top-level task structure.
 
-`master-prompt.md`
+### UI migration
 
-- Removed because the workflow begins with discussion and discovery, not a single master prompt.
+Replace the v0.4.1 UI strategy with the v0.5.0 technology-agnostic UI reference system.
 
-`implementation-map-prompt.md`
+Required changes:
 
-- Removed because practical traceability is now embedded in `execution-validation.md` through task-scoped source references.
+- Add `standards/ui-reference-system.md`.
+- Replace older UI authoring spec filenames with:
+  - `UI_PAGE.yaml-Authoring-Specification.md`
+  - `UI_TOKENS.yaml-Authoring-Specification.md`
+  - `UI_VISUAL_SPEC.yaml-Authoring-Specification.md`
+- Remove active dependency on `shadcn-tailwind-implementation-standard.md`.
+- Ensure every generated UI YAML file includes `codex_consumption`.
 
-`final-codex-handoff-prompt.md`
+### Runtime worklog migration
 
-- Removed because `AGENTS.md` and `execution-validation.md` are enough after cross-document review and fixes.
+Do not require `codex-execution-report-format.md`.
 
-`codex-metrics.json`
-
-- Removed because runtime progress is recorded in `codex-execution-report.md`.
-
----
-
-## Updated Standards
-
-Updated or added standards:
+Instead:
 
 ```text
-standards/document-system.md
-standards/document-responsibilities.md
-standards/document-generation-order.md
-standards/document-length-budgets.md
-standards/codex-ready-writing-rules.md
-standards/frontend-backend-boundary.md
-standards/validation-strategy.md
-standards/codex-execution-report-format.md
-standards/webapp-execution-spine.md
-standards/ui-authoring-strategy.md
+AGENTS.md defines when and how Codex creates or updates docs/execution/codex-execution-report.md.
 ```
 
-### Key standard changes
+### README migration
 
-- `document-system.md` now defines the Discovery → Reference Catalogs → Execution Spine → Runtime Policy model.
-- `document-responsibilities.md` now defines strict catalog ownership.
-- `document-generation-order.md` now reflects the v0.4.0 generation flow.
-- `document-length-budgets.md` allows `execution-validation.md` to be longer because it is the execution spine.
-- `codex-ready-writing-rules.md` now requires heading-addressable IDs and task-scoped references.
-- `frontend-backend-boundary.md` now supports FE/BE catalog entries and task-scoped execution.
-- `validation-strategy.md` now emphasizes targeted, container-first task validation.
-- `codex-execution-report-format.md` now records sources read and exact validation evidence.
-- `ui-authoring-strategy.md` now aligns UI docs with task-scoped reading.
-- `webapp-execution-spine.md` defines the P0-P10 engineering route.
-
----
-
-## Migration Notes from v0.3.0
-
-### Main migration
-
-Replace the v0.3.0 multi-document understanding model with:
+Replace the v0.4.1 README structure with four sections:
 
 ```text
-execution-validation.md as the single execution spine
-reference catalogs as task-scoped sources
-AGENTS.md as runtime policy
-```
-
-### What to change in generated project docs
-
-- Convert narrative documents into ID-first catalogs.
-- Make every referenceable ID heading-addressable.
-- Remove long background from runtime documents.
-- Move task planning into `execution-validation.md`.
-- Move command patterns into `dev-environment.md`.
-- Move runtime behavior policy into `AGENTS.md`.
-- Remove `implementation-map.md` unless manually retained for human review.
-- Make `TASK-*` entries reference exact catalog IDs or YAML keys.
-
-### What Codex should do after migration
-
-Codex should:
-
-```text
-1. Read AGENTS.md.
-2. Read docs/execution-validation.md.
-3. Execute the current TASK-*.
-4. Read only sources listed by that task.
-5. Run required validation.
-6. Update codex-execution-report.md.
-```
-
-Codex should not:
-
-```text
-read all docs before every task
-infer tasks from reference catalogs
-use host commands in a container-first project
-change contracts silently
-mark tasks complete without validation
+1. Why Flow-first
+2. Document Systems
+3. Generation Matrix
+4. Release Command Order
 ```
 
 ---
@@ -335,17 +474,18 @@ mark tasks complete without validation
 ## Recommended Commit Message
 
 ```bash
-git commit -m "Release v0.4.0 execution spine workflow"
+git commit -m "Release v0.5.0 flow-first UI reference system"
 ```
 
 ## Release Commands
 
 ```bash
 git status
-git add .
-git commit -m "Release v0.4.0 execution spine workflow"
-git tag -a v0.4.0 -m "Release v0.4.0"
+git diff -- README.md CHANGELOG.md prompts standards
+git add README.md CHANGELOG.md prompts standards
+git commit -m "Release v0.5.0 flow-first UI reference system"
+git tag v0.5.0
 git push origin main
-git push origin v0.4.0
-gh release create v0.4.0 --title "v0.4.0" --notes-file CHANGELOG.md
+git push origin v0.5.0
+gh release create v0.5.0 --title "v0.5.0" --notes-file CHANGELOG.md
 ```

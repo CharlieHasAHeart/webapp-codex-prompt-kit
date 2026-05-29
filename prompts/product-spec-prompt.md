@@ -1,305 +1,728 @@
 # Product Spec Prompt
 
-## Target File
+## Role
+
+You are ChatGPT acting as a product specification writer for a Codex-ready Web App project.
+
+Your task is to generate the current implementation product specification from the resolved review records.
+
+This prompt is used after:
 
 ```text
-docs/product-spec.md
+docs/review/project-design-brief.md
+docs/review/question-resolution.md
+docs/review/project-decisions.md
 ```
 
-## Purpose
+have been generated or discussed.
 
-Generate a compact product requirement reference catalog for a Codex-ready Web App project.
+Do not generate domain model, architecture, API contracts, UI YAML, frontend design, backend design, environment docs, execution tasks, or code.
 
-`product-spec.md` owns:
+## Target Output
+
+Generate exactly one document:
 
 ```text
-MVP boundary
-user roles
-REQ-* requirement entries
-open product questions
+docs/reference/product-spec.md
 ```
 
-It exists so `execution-validation.md` can reference precise product requirements from `TASK-*`.
+This document is a final reference catalog.
 
----
+It owns product-facing current implementation requirements and completion criteria.
 
-## Source Context
+It does not own architecture, API contracts, domain rules, UI implementation, backend implementation, frontend implementation, validation commands, or execution tasks.
 
-Use the available conversation context and the output from `discovery-workshop-prompt.md` when available.
+## Document System Context
 
-Recommended upstream context:
+Generated projects use:
 
 ```text
-Project Design Brief
-current project discussion
-uploaded project notes
+docs/
+├── review/
+├── reference/
+└── execution/
 ```
 
-If no usable product context exists, ask for a concise project brief before generating.
-
-If information is incomplete but the user wants to proceed, state explicit assumptions inside the generated file only when those assumptions affect requirements.
-
----
-
-## Relevant Standards
-
-Apply only the standards relevant to this document:
+This prompt writes only:
 
 ```text
-standards/document-system.md
-standards/document-responsibilities.md
-standards/document-length-budgets.md
-standards/codex-ready-writing-rules.md
+docs/reference/product-spec.md
 ```
 
-Do not restate these standards in the generated document.
-
----
-
-## Output Rules
-
-Generate only:
+Downstream prompts will later generate:
 
 ```text
-docs/product-spec.md
+docs/reference/domain-model.md
+docs/reference/architecture.md
+docs/reference/data-api-contract.md
+docs/reference/ui/UI_PAGE.yaml
+docs/reference/frontend-design.md
+docs/reference/backend-design.md
+docs/reference/dev-environment.md
+docs/reference/ui/UI_TOKENS.yaml
+docs/reference/ui/UI_VISUAL_SPEC.yaml
+docs/execution/execution-validation.md
+docs/execution/AGENTS.md
 ```
 
-Do not generate other project documents.
+## Inputs
 
-Create only:
+Use these inputs when available:
 
 ```text
-REQ-*
+docs/review/project-design-brief.md
+docs/review/question-resolution.md
+docs/review/project-decisions.md
+prior project discussion
+user corrections
+uploaded project materials
+repository notes
 ```
 
-Do not create:
+Primary source priority:
 
 ```text
-DEC-*
-ENT-*
-REL-*
-BR-*
-DB-*
-API-*
-FE-*
-BE-*
-TASK-*
-VAL-*
+1. user-confirmed answers and corrections
+2. docs/review/question-resolution.md
+3. docs/review/project-decisions.md
+4. docs/review/project-design-brief.md
+5. prior project discussion
 ```
 
-Every `REQ-*` must be heading-addressable.
+Do not invent product requirements.
 
-Use this heading format:
+Do not turn speculative future capabilities into current requirements.
+
+## Primary Objective
+
+Define what the current implementation pass must allow the user to do.
+
+The product spec should answer:
+
+```text
+what capability is requested
+who uses it
+what user goals it serves
+what is included in the current implementation scope
+what boundaries prevent over-implementation
+what core user flows must work
+what system feedback and recovery behavior are product-visible requirements
+what completion criteria define done
+```
+
+## Current Implementation Framing
+
+Use current-implementation framing.
+
+Prefer:
+
+```text
+requested capability
+current implementation scope
+scope boundary
+implementation pass
+completion criteria
+validation criteria
+core user flow
+supporting interaction flow
+system feedback
+recovery path
+state transition
+completion signal
+```
+
+Avoid:
+
+```text
+MVP
+future scope
+deferred feature
+roadmap
+later version
+full product
+```
+
+If something is excluded, describe it as a current implementation boundary.
+
+Good:
+
+```text
+PDF parsing is not part of the current implementation pass.
+```
+
+Avoid:
+
+```text
+PDF parsing will be implemented in a future version.
+```
+
+## Open Questions Policy
+
+Final reference documents must not contain unresolved Open Questions.
+
+Do not include:
+
+```text
+Open Questions
+OQ-*
+TBD
+to be decided
+unclear
+unknown
+ask user later
+decide later
+```
+
+If required product context remains unresolved, do not generate a normal product spec. Output a blocked-generation report using the format in the "Blocked Generation" section.
+
+## Product Spec Ownership
+
+`docs/reference/product-spec.md` owns:
+
+```text
+Requested Capability
+Current Implementation Scope
+Scope Boundaries
+User Roles
+Core User Flows
+Supporting Interaction Flows
+Functional Requirements
+Product-visible System Feedback
+Product-visible Recovery Requirements
+Completion Criteria
+```
+
+It may define `REQ-*` entries.
+
+It must not define:
+
+```text
+DEC-* project decisions
+ENT-* domain entities
+BR-* domain rules
+STATE-* state catalogs
+ARCH-* architecture boundaries
+DB-* data contracts
+API-* API contracts
+ERR-* error contracts
+TYPE-* shared types
+FE-* frontend implementation details
+BE-* backend implementation details
+ENV-* command rules
+TASK-* implementation tasks
+VAL-* validation commands
+UI YAML structures
+```
+
+Reference those downstream areas only as implications or seeds.
+
+## Requirement ID Rules
+
+Use `REQ-*` IDs for product-facing requirements.
+
+Format:
+
+```text
+REQ-001
+REQ-002
+REQ-003
+```
+
+Each `REQ-*` should be heading-addressable.
+
+Use:
 
 ```markdown
-### REQ-001: Requirement Name
+### REQ-001: <Requirement Title>
 ```
 
-Do not write a long PRD narrative.
+A `REQ-*` should describe user-visible or product-visible behavior.
 
-Do not include implementation design.
+Do not use `REQ-*` for internal implementation details.
 
-Do not include command lines.
+## Required Output Structure
 
----
-
-## Required Document Structure
-
-Use this structure:
+Generate `docs/reference/product-spec.md` with this exact top-level structure:
 
 ```markdown
 # Product Spec
 
-## MVP Boundary
+## 1. Product Spec Scope
 
-## User Roles
+## 2. Requested Capability
 
-## Requirement Catalog
+## 3. Current Implementation Scope
 
-## Open Questions
+## 4. Scope Boundaries
+
+## 5. User Roles
+
+## 6. Core User Flows
+
+## 7. Supporting Interaction Flows
+
+## 8. Functional Requirement Catalog
+
+## 9. Product-Visible Feedback and Recovery
+
+## 10. Completion Criteria
+
+## 11. Downstream Reference Seeds
+
+## 12. Source Traceability
+
+## 13. Readiness for Downstream Documents
 ```
 
-Do not add extra sections unless they are necessary for the project.
+## Section 1: Product Spec Scope
 
----
+Summarize the source inputs and ownership.
 
-## Section Rules
-
-### MVP Boundary
-
-Define what is included, excluded, future, or unknown.
-
-Recommended format:
+Use:
 
 ```markdown
-| Area | Status | Notes |
-|---|---|---|
-| Case management | included | Core MVP workflow. |
-| Export | future | Not required for MVP. |
-| Enterprise SSO | excluded | Not part of current scope. |
+## 1. Product Spec Scope
+
+Sources Used:
+- `docs/review/project-design-brief.md`
+- `docs/review/question-resolution.md`
+- `docs/review/project-decisions.md`
+
+This document owns:
+- requested capability
+- current implementation scope
+- product-facing requirements
+- user flows
+- completion criteria
+
+This document does not own:
+- API contracts
+- domain model
+- architecture
+- frontend/backend implementation
+- execution tasks
+- validation commands
 ```
 
-Use these status values:
+## Section 2: Requested Capability
+
+State the requested capability clearly.
+
+Use concise language.
+
+Example:
+
+```markdown
+## 2. Requested Capability
+
+The requested capability is to provide a web application workflow that lets the user submit source material, start a proposal generation run, monitor progress, inspect generated artifacts, and download the final proposal output.
+```
+
+Rules:
 
 ```text
-included
-excluded
-future
-unknown
+Describe only the current requested capability.
+Do not include future product direction.
+Do not mention MVP.
+```
+
+## Section 3: Current Implementation Scope
+
+List what is included in the current implementation pass.
+
+Use:
+
+```markdown
+## 3. Current Implementation Scope
+
+The current implementation pass includes:
+
+- ...
 ```
 
 Rules:
 
-- Keep this section short.
-- Use it to prevent overbuilding.
-- Do not define implementation details.
-- If a boundary affects a requirement, reference it in the relevant `REQ-*` entry.
+```text
+Each item should be implementable.
+Each item should map to requirements or flows.
+Avoid architecture-level wording unless user-visible behavior depends on it.
+```
 
----
+## Section 4: Scope Boundaries
 
-### User Roles
+List explicit boundaries that prevent over-implementation.
 
-Define product-level roles only.
-
-Recommended format:
+Use:
 
 ```markdown
-| Role | Goal | MVP Permissions |
+## 4. Scope Boundaries
+
+The following are outside the current implementation pass:
+
+- ...
+```
+
+Rules:
+
+```text
+Only include boundaries that matter.
+Do not write a future roadmap.
+Do not promise later implementation.
+```
+
+## Section 5: User Roles
+
+Define current user roles.
+
+Use:
+
+```markdown
+## 5. User Roles
+
+| Role | Description | Current Capabilities |
 |---|---|---|
-| Analyst | Create and evaluate cases. | Create, read, update own cases. |
-| Viewer | Review results. | Read-only access. |
+```
+
+If there is only one role, define it clearly.
+
+Avoid adding roles not mentioned or required by the current implementation.
+
+## Section 6: Core User Flows
+
+Define the main user flows.
+
+Use:
+
+```markdown
+## 6. Core User Flows
+
+### Core User Flow: <Name>
+
+Start Condition:
+- ...
+
+Completion Signal:
+- ...
+
+| Step | User Action | System Response | Product Requirement |
+|---|---|---|---|
 ```
 
 Rules:
 
-- Keep roles product-level.
-- Do not define backend middleware, frontend guards, or database permission logic.
-- If auth/permission details are unknown, state them in `Open Questions`.
+```text
+Core User Flows should map to current implementation scope.
+Include system response and completion signal.
+Do not reduce flows to UI layout.
+```
 
----
+## Section 7: Supporting Interaction Flows
 
-### Requirement Catalog
+Define auxiliary flows that help users complete the core flow.
 
-Generate compact `REQ-*` entries.
+Examples:
 
-Each entry should be independently readable because `TASK-*` items in `execution-validation.md` will reference individual requirements directly.
+```text
+replace uploaded file
+retry failed run
+view validation details
+refresh status
+download artifact
+copy error message
+```
 
-Recommended format:
+Use:
 
 ```markdown
-### REQ-001: Create Case
+## 7. Supporting Interaction Flows
 
-Type: functional
-Priority: must
-MVP: yes
+| Flow | Purpose | Trigger | Expected System Response |
+|---|---|---|---|
+```
 
-Actor:
-- Analyst
+## Section 8: Functional Requirement Catalog
+
+Create `REQ-*` entries.
+
+Use this format:
+
+```markdown
+## 8. Functional Requirement Catalog
+
+### REQ-001: <Requirement Title>
+
+Type: functional / feedback / recovery / boundary / content / workflow
+Priority: required / conditional
+User Role:
+- ...
 
 Requirement:
-- The user can create a new case with the minimum required information.
+- ...
 
 Acceptance Intent:
-- A created case persists and can be opened from the case list.
+- ...
 
-Out of Scope:
-- Bulk import.
-- Advanced templates.
+Scope Boundary:
+- ...
 
-Related Workflow:
-- Case creation
+Related Flow:
+- ...
+
+Downstream Implications:
+- ...
 ```
 
-Rules:
+### Requirement Type Guidance
 
-- Use stable `REQ-*` IDs.
-- Keep each entry compact.
-- Split unrelated behaviors into separate requirements.
-- Use direct product language.
-- Mark future requirements clearly.
-- Include `Out of Scope` inside a requirement when needed to prevent overbuilding.
-- Do not define database fields.
-- Do not define API endpoints.
-- Do not define frontend components.
-- Do not define backend services.
-- Do not define validation commands.
-- Do not define task IDs.
-
-Recommended requirement types:
+Use:
 
 ```text
-functional
-non-functional
-constraint
-security
-usability
-data
-workflow
+functional = user-visible capability
+feedback = visible state/status/progress requirement
+recovery = failure or blocked path requirement
+boundary = explicit current scope boundary
+content = generated or displayed content requirement
+workflow = sequence or flow requirement
 ```
 
-Recommended priorities:
+### Priority Guidance
+
+Use:
 
 ```text
-must
-should
-could
-future
+required
+conditional
 ```
 
----
+Do not use MoSCoW or roadmap-style priority labels unless the user requested them.
 
-### Open Questions
+## Section 9: Product-Visible Feedback and Recovery
 
-List unresolved product questions.
+Summarize product-visible UX behavior.
 
-Recommended format:
+Use:
 
 ```markdown
-| Question | Blocking? | Affected Area |
-|---|---:|---|
-| Is authentication required in MVP? | yes | roles, API, backend, frontend |
+## 9. Product-Visible Feedback and Recovery
+
+| Scenario | Required Feedback | Recovery Path | Related Requirements |
+|---|---|---|---|
+```
+
+Include:
+
+```text
+pending/submitting feedback
+running/progress feedback
+validation feedback
+success feedback
+failure feedback
+blocked feedback
+artifact availability
+retry behavior
 ```
 
 Rules:
 
-- Include only questions that affect requirements, scope, roles, or execution planning.
-- Mark blocking questions clearly.
-- Do not hide uncertainty inside requirement text.
+```text
+Critical states must include visible text.
+Do not rely on color alone.
+Do not describe component implementation details.
+```
 
----
+## Section 10: Completion Criteria
 
-## Writing Rules
+Define product-level done conditions.
 
-- Write a reference catalog, not a narrative PRD.
-- Keep the file compact.
-- Use stable `REQ-*` headings.
-- Make every `REQ-*` independently readable.
-- Keep `MVP Boundary` short.
-- Keep `User Roles` short.
-- Use `Open Questions` for unresolved product decisions.
-- Do not create non-REQ IDs.
-- Do not include implementation commands.
-- Do not include validation commands.
-- Do not include DB schema.
-- Do not include API contracts.
-- Do not include frontend/backend implementation details.
-- Separate MVP from future scope.
+Use:
 
----
+```markdown
+## 10. Completion Criteria
 
-## Quality Checklist
+The current implementation pass is product-complete when:
 
-Before finalizing, verify:
+- ...
+```
+
+Completion criteria should be user-visible or behavior-visible.
+
+Do not include final test commands here.
+
+Validation commands belong in:
 
 ```text
-[ ] The file is a compact product requirement reference catalog.
-[ ] MVP boundary is explicit.
-[ ] User roles are defined at product level.
-[ ] Every requirement has a REQ-* heading.
-[ ] Every REQ-* is compact and independently readable.
-[ ] Future scope is clearly marked.
-[ ] Open questions are marked blocking or non-blocking.
-[ ] No DB/API/FE/BE/TASK/VAL/ENT/BR/DEC IDs are created.
-[ ] No implementation commands are included.
-[ ] No long PRD narrative is included.
+docs/execution/execution-validation.md
+```
+
+## Section 11: Downstream Reference Seeds
+
+List what downstream documents should absorb.
+
+Use:
+
+```markdown
+## 11. Downstream Reference Seeds
+
+| Downstream Document | Seed Content |
+|---|---|
+| `docs/reference/domain-model.md` | ... |
+| `docs/reference/data-api-contract.md` | ... |
+| `docs/reference/ui/UI_PAGE.yaml` | ... |
+| `docs/reference/frontend-design.md` | ... |
+| `docs/reference/backend-design.md` | ... |
+| `docs/execution/execution-validation.md` | ... |
+```
+
+Rules:
+
+```text
+Seeds are not final downstream entries.
+Do not create API-* or TASK-* IDs here.
+```
+
+## Section 12: Source Traceability
+
+Map product requirements to review sources.
+
+Use:
+
+```markdown
+## 12. Source Traceability
+
+| Product Item | Source |
+|---|---|
+| REQ-001 | `docs/review/project-decisions.md#DEC-...` or description |
+```
+
+If final DEC IDs are not available, cite the decision title or review source section.
+
+Do not cite `OQ-*` as final source. Use the resolved content from `question-resolution.md`.
+
+## Section 13: Readiness for Downstream Documents
+
+End with:
+
+```markdown
+## 13. Readiness for Downstream Documents
+
+Status: ready / blocked
+
+Summary:
+- ...
+
+Next Step:
+- Continue to `prompts/domain-model-prompt.md`.
+```
+
+If blocked, list missing product decisions.
+
+## Blocked Generation
+
+If required product context is missing, output:
+
+```markdown
+# Product Spec
+
+## Blocked Product Spec Generation
+
+Status: blocked
+
+Reason:
+- ...
+
+Missing Product Decisions:
+| Missing Decision | Why Required | Affected Downstream Docs |
+|---|---|---|
+
+Next Step:
+- Resolve the missing decision in `docs/review/question-resolution.md` or `docs/review/project-decisions.md`, then rerun this prompt.
+```
+
+## Path Rules
+
+Use only new document paths:
+
+```text
+docs/review/project-design-brief.md
+docs/review/question-resolution.md
+docs/review/project-decisions.md
+docs/reference/product-spec.md
+docs/reference/domain-model.md
+docs/reference/architecture.md
+docs/reference/data-api-contract.md
+docs/reference/frontend-design.md
+docs/reference/backend-design.md
+docs/reference/dev-environment.md
+docs/reference/ui/UI_PAGE.yaml
+docs/reference/ui/UI_TOKENS.yaml
+docs/reference/ui/UI_VISUAL_SPEC.yaml
+docs/execution/execution-validation.md
+```
+
+Do not use old flat paths such as:
+
+```text
+docs/product-spec.md
+docs/project-decisions.md
+docs/execution-validation.md
+AGENTS.md
+```
+
+## Prohibited Output
+
+Do not generate:
+
+```text
+docs/reference/domain-model.md
+docs/reference/architecture.md
+docs/reference/data-api-contract.md
+docs/reference/frontend-design.md
+docs/reference/backend-design.md
+docs/reference/dev-environment.md
+docs/reference/ui/UI_PAGE.yaml
+docs/reference/ui/UI_TOKENS.yaml
+docs/reference/ui/UI_VISUAL_SPEC.yaml
+docs/execution/execution-validation.md
+docs/execution/AGENTS.md
+```
+
+Do not generate final:
+
+```text
+ENT-* entries
+BR-* entries
+STATE-* entries
+ARCH-* entries
+API-* entries
+DB-* entries
+ERR-* entries
+TYPE-* entries
+FE-* entries
+BE-* entries
+ENV-* entries
+TASK-* entries
+VAL-* entries
+code
+implementation plan
+Open Questions section
+OQ-* IDs
+```
+
+## Final Self-Check
+
+Before finalizing the output, verify:
+
+```text
+[ ] The requested capability is clear.
+[ ] The document uses current implementation framing, not MVP framing.
+[ ] Current implementation scope is explicit.
+[ ] Scope boundaries prevent over-implementation without becoming a roadmap.
+[ ] Core User Flows are defined.
+[ ] Supporting Interaction Flows are defined when relevant.
+[ ] Product-visible feedback and recovery behavior are captured.
+[ ] REQ-* entries are product-facing and heading-addressable.
+[ ] API, DB, frontend, backend, and task details are not defined here.
+[ ] No Open Questions or OQ-* IDs appear.
+[ ] Downstream seeds are present but not final downstream catalogs.
+[ ] Readiness for downstream documents is explicit.
 ```

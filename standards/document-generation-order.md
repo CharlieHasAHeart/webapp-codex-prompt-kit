@@ -1,81 +1,53 @@
 # Document Generation Order Standard
 
-## Purpose
+## 1. Purpose
 
-This standard defines the recommended order for generating a Codex-ready Web App document set.
+This standard defines the recommended generation order for the WebApp Codex Prompt Kit.
 
-The order is designed for this workflow:
+The order is designed to help ChatGPT move from discovery to stable references, then to UI references, then to flow-first Codex execution documents.
 
-```text
-Discovery Workshop
-→ Reference Catalogs
-→ Execution Spine
-→ AGENTS Runtime Policy
-→ Cross-Document Review
-```
-
-The goal is to let ChatGPT think deeply first, then generate compact reference catalogs, then generate a complete `execution-validation.md` that Codex can execute from.
-
----
-
-## Core Rule
-
-Generate documents in dependency order.
-
-Earlier documents provide compact reference entries for later documents.
-
-Later documents should reference earlier entries instead of redefining them.
-
-`docs/execution-validation.md` is generated after the reference catalogs because it must assemble:
+It prevents:
 
 ```text
-P0-P10 execution phases
-TASK-*
-VAL-*
-task-scoped source references
-implementation scopes
-validation commands
+premature execution planning
+unresolved Open Questions leaking into final docs
+UI references inventing product/API/frontend/backend behavior
+Codex inferring tasks from reference catalogs
+layer-first implementation planning
+technology-specific UI assumptions before an implementation stack is selected
 ```
 
----
+## 2. Core Ordering Principle
 
-## Recommended Generation Order
-
-Use this order:
+Generate documents in this order:
 
 ```text
-0. discovery-workshop-prompt.md
-
-1. product-spec-prompt.md
-2. project-decisions-prompt.md
-3. domain-model-prompt.md
-4. architecture-prompt.md
-5. data-api-contract-prompt.md
-6. ui-page-prompt.md
-7. frontend-design-prompt.md
-8. backend-design-prompt.md
-9. dev-environment-prompt.md
-10. ui-tokens-prompt.md
-11. ui-visual-spec-prompt.md
-
-12. execution-validation-prompt.md
-13. AGENTS-prompt.md
-14. cross-document-review-prompt.md
+review discovery
+→ question resolution
+→ project decisions
+→ non-UI reference catalogs
+→ UI reference catalogs
+→ flow composition review
+→ execution validation
+→ AGENTS runtime policy
+→ cross-document review
 ```
 
-Step 0 is recommended, not mandatory.
+The reason is:
 
-Steps 1-11 generate reference catalogs.
+```text
+review docs clarify what is known
+reference docs define stable source content
+UI references define the user-visible shape
+flow composition connects references into executable candidates
+execution documents define Codex tasks and validation
+AGENTS defines Codex runtime behavior
+cross-document review checks consistency and readiness
+```
 
-Step 12 generates the primary execution spine.
+## 3. Full Recommended Generation Order
 
-Step 13 generates Codex runtime policy.
-
-Step 14 checks readiness.
-
----
-
-## Stage 0: Discovery Workshop
+### 1. Discovery Workshop
 
 Prompt:
 
@@ -83,84 +55,75 @@ Prompt:
 prompts/discovery-workshop-prompt.md
 ```
 
-Target output:
+Output:
 
 ```text
-Project Design Brief
+docs/review/project-design-brief.md
 ```
 
-Purpose:
+Role:
+- Captures initial project context, user goals, constraints, rough flows, artifacts, risks, and raw design signals.
 
-```text
-Help ChatGPT and the user think through the project before generating runtime documents.
-```
-
-This stage should explore:
-
-```text
-product boundary
-MVP workflows
-non-goals
-domain concepts
-data/API needs
-frontend pages
-backend workflows
-UI direction
-engineering constraints
-execution risks
-open questions
-```
-
-The output is working context. It is not a Codex runtime document by default.
-
-If saved, put it outside the default runtime path, for example:
-
-```text
-notes/project-design-brief.md
-```
-
-Codex should not read notes by default.
+Must not:
+- Create final requirements.
+- Create final API contracts.
+- Create final UI YAML.
+- Create execution tasks.
 
 ---
 
-## Stage 1: Reference Catalogs
-
-Reference catalogs should be generated before `execution-validation.md`.
-
-They provide compact, heading-addressable entries for later task references.
-
-### 1. Product Spec
+### 2. Open Questions Extraction
 
 Prompt:
 
 ```text
-prompts/product-spec-prompt.md
+prompts/open-questions-extraction-prompt.md
 ```
 
-Target:
+Output:
 
 ```text
-docs/product-spec.md
+docs/review/open-questions-review.md
 ```
 
-Owns:
+Role:
+- Extracts unresolved decisions as temporary `OQ-*`.
+- Classifies blockers and affected future documents.
+- Identifies flow, UI, API, architecture, and execution risks.
 
-```text
-REQ-*
-MVP boundary
-user roles
-open product questions
-```
-
-Why first:
-
-```text
-It defines product scope and requirements for all later catalogs.
-```
+Must not:
+- Resolve questions without user input.
+- Generate final reference entries.
+- Generate execution tasks.
 
 ---
 
-### 2. Project Decisions
+### 3. Question Resolution
+
+Prompt:
+
+```text
+prompts/question-resolution-prompt.md
+```
+
+Output:
+
+```text
+docs/review/question-resolution.md
+```
+
+Role:
+- Records user-confirmed answers.
+- Maps each answer to its target owner document.
+- Converts raw questions into durable decisions or reference inputs.
+
+Must not:
+- Leave unresolved questions as final content.
+- Generate final reference docs by itself.
+
+---
+
+### 4. Project Decisions
 
 Prompt:
 
@@ -168,36 +131,67 @@ Prompt:
 prompts/project-decisions-prompt.md
 ```
 
-Target:
+Output:
 
 ```text
-docs/project-decisions.md
+docs/review/project-decisions.md
 ```
 
-Owns:
+Role:
+- Records `DEC-*` project-level decisions.
+- Preserves accepted decisions, rejected alternatives, and cross-document implications.
 
-```text
-DEC-*
-rejected alternatives
-open decision questions
-```
-
-Why second:
-
-```text
-It formalizes shared technical and execution decisions that affect later catalogs.
-```
-
-Uses:
-
-```text
-docs/product-spec.md
-Project Design Brief
-```
+Must not:
+- Replace reference catalogs.
+- Define executable tasks.
 
 ---
 
-### 3. Domain Model
+## 4. Non-UI Reference Generation Order
+
+Generate non-UI references in this order:
+
+```text
+product-spec
+domain-model
+architecture
+data-api-contract
+frontend-design
+backend-design
+dev-environment
+```
+
+This order lets later references consume earlier context without redefining earlier owners.
+
+---
+
+### 5. Product Spec
+
+Prompt:
+
+```text
+prompts/product-spec-prompt.md
+```
+
+Output:
+
+```text
+docs/reference/product-spec.md
+```
+
+Role:
+- Defines `REQ-*`, product scope, product-facing flows, feedback/recovery expectations, artifacts, and completion signals.
+
+Must not:
+- Define domain schema.
+- Define API payloads.
+- Define UI page structure.
+- Define frontend/backend implementation.
+- Define execution tasks.
+
+---
+
+### 6. Domain Model
 
 Prompt:
 
@@ -205,39 +199,24 @@ Prompt:
 prompts/domain-model-prompt.md
 ```
 
-Target:
+Output:
 
 ```text
-docs/domain-model.md
+docs/reference/domain-model.md
 ```
 
-Owns:
+Role:
+- Defines `ENT-*`, `REL-*`, `BR-*`, and `STATE-*`.
 
-```text
-ENT-*
-REL-*
-BR-*
-STATE-*
-open domain questions
-```
-
-Why here:
-
-```text
-Data, API, backend, and frontend behavior depend on domain concepts and enforceable business rules.
-```
-
-Uses:
-
-```text
-docs/product-spec.md
-docs/project-decisions.md
-Project Design Brief
-```
+Must not:
+- Define DB schema as source of truth.
+- Define API payloads.
+- Define UI structure.
+- Define execution tasks.
 
 ---
 
-### 4. Architecture
+### 7. Architecture
 
 Prompt:
 
@@ -245,43 +224,23 @@ Prompt:
 prompts/architecture-prompt.md
 ```
 
-Target:
+Output:
 
 ```text
-docs/architecture.md
+docs/reference/architecture.md
 ```
 
-Owns:
+Role:
+- Defines `ARCH-*`, system boundaries, dependency direction, runtime/storage/security rules, and architectural constraints.
 
-```text
-ARCH-*
-repository boundary
-runtime boundary
-frontend/backend boundary
-data access boundary
-shared package boundary
-configuration boundary
-open architecture questions
-```
-
-Why here:
-
-```text
-Architecture boundaries guide data/API, frontend, backend, and environment catalogs.
-```
-
-Uses:
-
-```text
-docs/product-spec.md
-docs/project-decisions.md
-docs/domain-model.md
-Project Design Brief
-```
+Must not:
+- Define API request/response fields.
+- Define UI structures.
+- Define frontend/backend task plans.
 
 ---
 
-### 5. Data API Contract
+### 8. Data and API Contract
 
 Prompt:
 
@@ -289,88 +248,23 @@ Prompt:
 prompts/data-api-contract-prompt.md
 ```
 
-Target:
+Output:
 
 ```text
-docs/data-api-contract.md
+docs/reference/data-api-contract.md
 ```
 
-Owns:
+Role:
+- Defines `DB-*`, `API-*`, `ERR-*`, and `TYPE-*`.
 
-```text
-DB-*
-API-*
-ERR-*
-TYPE-*
-open data/API questions
-```
-
-Why before frontend/backend:
-
-```text
-Frontend and backend catalogs should consume data/API contracts, not invent them independently.
-```
-
-Uses:
-
-```text
-docs/product-spec.md
-docs/project-decisions.md
-docs/domain-model.md
-docs/architecture.md
-Project Design Brief
-```
+Must not:
+- Define frontend UI behavior.
+- Define backend service implementation.
+- Define Codex tasks.
 
 ---
 
-### 6. UI Page
-
-Prompt:
-
-```text
-prompts/ui-page-prompt.md
-```
-
-Target:
-
-```text
-docs/ui/UI_PAGE.yaml
-```
-
-Owns:
-
-```text
-app shell
-routes
-navigation
-pages
-sections
-actions
-page states
-route-backed state
-local UI state
-```
-
-Why before frontend design:
-
-```text
-Frontend design should consume semantic page structure rather than invent routes, pages, actions, and states.
-```
-
-Uses:
-
-```text
-docs/product-spec.md
-docs/project-decisions.md
-docs/domain-model.md
-docs/architecture.md
-docs/data-api-contract.md
-Project Design Brief
-```
-
----
-
-### 7. Frontend Design
+### 9. Frontend Design
 
 Prompt:
 
@@ -378,43 +272,28 @@ Prompt:
 prompts/frontend-design-prompt.md
 ```
 
-Target:
+Output:
 
 ```text
-docs/frontend-design.md
+docs/reference/frontend-design.md
 ```
 
-Owns:
+Role:
+- Defines `FE-*` frontend implementation responsibilities.
+- Describes how frontend implementation consumes UI references when available.
+- Defines frontend state, API client, feedback, recovery, artifact, and accessibility responsibilities.
 
-```text
-FE-*
-frontend code impact
-frontend implementation rules
-frontend API client responsibilities
-frontend state/form/error behavior
-open frontend questions
-```
-
-Why here:
-
-```text
-It needs product, domain, architecture, data/API, and UI_PAGE inputs.
-```
-
-Uses:
-
-```text
-docs/product-spec.md
-docs/project-decisions.md
-docs/domain-model.md
-docs/architecture.md
-docs/data-api-contract.md
-docs/ui/UI_PAGE.yaml
-```
+Must not:
+- Define UI_PAGE source structure.
+- Define UI_TOKENS source tokens.
+- Define UI_VISUAL_SPEC presentation rules.
+- Define API request/response fields.
+- Define backend behavior.
+- Define concrete styling-stack rules unless a future project-specific implementation standard explicitly establishes them.
 
 ---
 
-### 8. Backend Design
+### 10. Backend Design
 
 Prompt:
 
@@ -422,46 +301,24 @@ Prompt:
 prompts/backend-design-prompt.md
 ```
 
-Target:
+Output:
 
 ```text
-docs/backend-design.md
+docs/reference/backend-design.md
 ```
 
-Owns:
+Role:
+- Defines `BE-*` backend implementation responsibilities.
 
-```text
-BE-*
-backend code impact
-API handler responsibilities
-service responsibilities
-repository/data access responsibilities
-transaction responsibilities
-auth/permission responsibilities
-structured error handling responsibilities
-open backend questions
-```
-
-Why here:
-
-```text
-It needs product, domain, architecture, and data/API contracts. It may also use frontend expectations where backend support is required.
-```
-
-Uses:
-
-```text
-docs/product-spec.md
-docs/project-decisions.md
-docs/domain-model.md
-docs/architecture.md
-docs/data-api-contract.md
-docs/frontend-design.md
-```
+Must not:
+- Define API contracts as source definitions.
+- Define DB schema as source definitions.
+- Define frontend/UI behavior.
+- Define execution tasks.
 
 ---
 
-### 9. Dev Environment
+### 11. Dev Environment
 
 Prompt:
 
@@ -469,45 +326,81 @@ Prompt:
 prompts/dev-environment-prompt.md
 ```
 
-Target:
+Output:
 
 ```text
-docs/dev-environment.md
+docs/reference/dev-environment.md
 ```
 
-Owns:
+Role:
+- Defines `ENV-*`, runtime/package/service policy, command patterns, environment variable policy, and command safety.
+
+Must not:
+- Select task-specific validation.
+- Define product behavior.
+- Define UI implementation standards.
+
+---
+
+## 5. UI Reference Generation Order
+
+Generate UI references after non-UI references and before flow composition.
+
+Order:
 
 ```text
-ENV-*
-container-first command policy
-service names
-runtime/package manager assumptions
-setup/start/stop command patterns
-dependency/database/test command patterns
-milestone/release command patterns
-forbidden host commands
-open environment questions
+ui-page
+ui-tokens
+ui-visual-spec
 ```
 
-Why here:
+Reason:
 
 ```text
-It needs architecture, frontend, backend, data, and project decisions to define useful commands and service names.
-```
-
-Uses:
-
-```text
-docs/project-decisions.md
-docs/architecture.md
-docs/data-api-contract.md
-docs/frontend-design.md
-docs/backend-design.md
+UI_PAGE.yaml uses product, API, and frontend context to define what the user can see and do.
+UI_TOKENS.yaml uses product/UI context to define technology-agnostic visual token intent.
+UI_VISUAL_SPEC.yaml uses UI_PAGE and UI_TOKENS to define presentation intent.
+flow-composition-review then checks whether user-visible flows are operable, observable, recoverable, artifact-aware, and completion-visible.
 ```
 
 ---
 
-### 10. UI Tokens
+### 12. UI Page
+
+Prompt:
+
+```text
+prompts/ui-page-prompt.md
+```
+
+Output:
+
+```text
+docs/reference/ui/UI_PAGE.yaml
+```
+
+Role:
+- Defines flow-facing semantic UI surface.
+- Defines app shell, navigation, routes, pages, sections, actions, states, local UI state, flow surface mapping, feedback mapping, recovery paths, artifact surfaces, and completion signals.
+
+Must include:
+
+```yaml
+codex_consumption:
+```
+
+Must not:
+- Define visual token values.
+- Define CSS variables.
+- Define Tailwind classes.
+- Define React or JSX.
+- Define API request/response shapes.
+- Define backend behavior.
+- Assume a concrete styling stack.
+
+---
+
+### 13. UI Tokens
 
 Prompt:
 
@@ -515,40 +408,35 @@ Prompt:
 prompts/ui-tokens-prompt.md
 ```
 
-Target:
+Output:
 
 ```text
-docs/ui/UI_TOKENS.yaml
+docs/reference/ui/UI_TOKENS.yaml
 ```
 
-Owns:
+Role:
+- Defines technology-agnostic reusable UI token intent.
+- Defines semantic color roles, typography, spacing, radius, border, shadow, layout, breakpoint, motion, z-index, status roles, and accessibility token intent.
 
-```text
-semantic token names
-theme tokens
-CSS variable mapping
-Tailwind/shadcn token compatibility
+Must include:
+
+```yaml
+codex_consumption:
 ```
 
-Why after frontend design:
-
-```text
-Frontend design and UI_PAGE provide enough context for useful token generation.
-```
-
-Uses:
-
-```text
-docs/product-spec.md
-docs/project-decisions.md
-docs/architecture.md
-docs/frontend-design.md
-docs/ui/UI_PAGE.yaml
-```
+Must not:
+- Define CSS variable names.
+- Define Tailwind mappings.
+- Define shadcn compatibility.
+- Define MUI or Chakra mappings.
+- Define className strings.
+- Define component implementation.
+- Define page structure.
+- Assume a concrete styling stack.
 
 ---
 
-### 11. UI Visual Spec
+### 14. UI Visual Spec
 
 Prompt:
 
@@ -556,44 +444,63 @@ Prompt:
 prompts/ui-visual-spec-prompt.md
 ```
 
-Target:
+Output:
 
 ```text
-docs/ui/UI_VISUAL_SPEC.yaml
+docs/reference/ui/UI_VISUAL_SPEC.yaml
 ```
 
-Owns:
+Role:
+- Defines visual and interaction presentation rules.
+- Defines layout presentation, surface hierarchy, component visual roles, state presentation, feedback, recovery, artifact presentation, completion signal presentation, responsive behavior, accessibility, density, and status mapping.
 
-```text
-visual layout rules
-component visual rules
-state visual rules
-responsive behavior
-accessibility visual rules
-shadcn/ui and Tailwind usage boundaries
-token usage rules
+Must include:
+
+```yaml
+codex_consumption:
 ```
 
-Why after UI tokens:
-
-```text
-Visual rules should reference token names from UI_TOKENS.yaml instead of redefining token values.
-```
-
-Uses:
-
-```text
-docs/product-spec.md
-docs/project-decisions.md
-docs/architecture.md
-docs/frontend-design.md
-docs/ui/UI_PAGE.yaml
-docs/ui/UI_TOKENS.yaml
-```
+Must not:
+- Define routes.
+- Define page section source structure.
+- Duplicate raw token values.
+- Define CSS variables.
+- Define Tailwind classes.
+- Define React or JSX.
+- Assume a concrete styling stack.
 
 ---
 
-## Stage 2: Execution Spine
+## 6. Flow Composition and Execution Order
+
+### 15. Flow Composition Review
+
+Prompt:
+
+```text
+prompts/flow-composition-review-prompt.md
+```
+
+Output:
+
+```text
+docs/review/flow-composition-review.md
+```
+
+Role:
+- Converts reference catalogs and UI references into candidate execution flow analysis.
+- Checks Core User Flows, Side Effect Flows, feedback flows, recovery flows, artifact flows, blocked flows, UI surfaces, action affordances, feedback states, recovery paths, artifact surfaces, completion signals, and foundation readiness.
+- Produces task seeds and validation seeds.
+
+Must not:
+- Generate final `FLOW-*`.
+- Generate final `TASK-*`.
+- Generate final `VAL-*`.
+- Redefine reference or UI source content.
+
+---
+
+### 16. Execution Validation
 
 Prompt:
 
@@ -601,62 +508,25 @@ Prompt:
 prompts/execution-validation-prompt.md
 ```
 
-Target:
+Output:
 
 ```text
-docs/execution-validation.md
+docs/execution/execution-validation.md
 ```
 
-Owns:
+Role:
+- Defines final executable `FLOW-*` where used, `TASK-*`, `VAL-*`, flow-first sequencing, validation mapping, UI-level validation, and release validation.
+- Provides task-scoped source references.
+- Requires UI tasks to read relevant UI YAML `codex_consumption`.
 
-```text
-TASK-*
-VAL-*
-P0-P10 execution phases
-phase applicability
-task dependencies
-task-scoped source references
-implementation scopes
-expected code impact
-out-of-scope boundaries
-required validation
-milestone validation
-release validation
-Codex execution report rules
-```
-
-Why after catalogs:
-
-```text
-It must assemble a complete task plan from all reference catalogs.
-```
-
-Uses:
-
-```text
-docs/product-spec.md
-docs/project-decisions.md
-docs/domain-model.md
-docs/architecture.md
-docs/data-api-contract.md
-docs/ui/UI_PAGE.yaml
-docs/frontend-design.md
-docs/backend-design.md
-docs/dev-environment.md
-docs/ui/UI_TOKENS.yaml
-docs/ui/UI_VISUAL_SPEC.yaml
-standards/webapp-execution-spine.md
-```
-
-Critical requirement:
-
-```text
-Codex should not need to infer missing tasks from reference catalogs.
-```
+Must not:
+- Redefine product, API, frontend, backend, environment, or UI source content.
+- Ask Codex to infer tasks from reference catalogs or UI YAML files.
+- Use P0-P10 as the top-level execution structure.
 
 ---
 
-## Stage 3: Runtime Policy
+### 17. AGENTS Runtime Policy
 
 Prompt:
 
@@ -664,52 +534,23 @@ Prompt:
 prompts/AGENTS-prompt.md
 ```
 
-Target:
+Output:
 
 ```text
-AGENTS.md
+docs/execution/AGENTS.md
 ```
 
-Owns:
+Role:
+- Defines Codex runtime policy, reading policy, flow-first execution policy, UI reference consumption policy, validation-before-completion policy, blocker policy, and worklog policy.
 
-```text
-Codex runtime policy
-primary runtime documents
-task-scoped reading rules
-source-of-truth hierarchy
-repository boundaries
-command policy
-validation policy
-conflict handling
-codex-execution-report policy
-forbidden actions
-```
-
-Why after execution-validation:
-
-```text
-AGENTS.md must enforce execution-validation-first execution and task-scoped reading.
-```
-
-Uses:
-
-```text
-docs/execution-validation.md
-docs/dev-environment.md
-docs/project-decisions.md
-docs/architecture.md
-all reference catalogs for source-of-truth hierarchy
-```
-
-Critical requirement:
-
-```text
-Codex should start with only AGENTS.md and docs/execution-validation.md.
-```
+Must not:
+- Define `TASK-*` or `VAL-*`.
+- Redefine reference or UI source content.
+- Treat `codex-execution-report.md` as source of truth.
 
 ---
 
-## Stage 4: Cross-Document Review
+### 18. Cross-Document Review
 
 Prompt:
 
@@ -717,90 +558,175 @@ Prompt:
 prompts/cross-document-review-prompt.md
 ```
 
-Target output:
+Output:
 
 ```text
-cross-document-review-report.md
+docs/review/cross-document-review-report.md
 ```
 
-Purpose:
+Role:
+- Reviews the generated document set for consistency, readiness, ownership, UI coverage, flow continuity, validation quality, runtime policy, and Open Question leakage.
 
-```text
-Check whether the document set is ready for Codex execution.
-```
-
-Review must check:
-
-```text
-reference catalog quality
-heading-addressable IDs
-P0-P10 execution spine coverage
-task-scoped reading references
-source-of-truth conflicts
-undefined IDs
-frontend/backend boundary
-validation quality
-AGENTS runtime policy
-document bloat
-```
-
-This report is not a core runtime document by default.
+Must not:
+- Silently rewrite source documents.
+- Generate final task or validation entries.
 
 ---
 
-## Input Rule for Each Step
+## 7. Active UI Standards
 
-Do not provide all standards and all documents at every step.
-
-For each prompt, provide:
+The active UI standards in the current system are:
 
 ```text
-current prompt
-relevant standards
-required upstream project documents
-current project discussion if useful
+standards/ui-reference-system.md
+standards/ui-authoring-specs/UI_PAGE.yaml-Authoring-Specification.md
+standards/ui-authoring-specs/UI_TOKENS.yaml-Authoring-Specification.md
+standards/ui-authoring-specs/UI_VISUAL_SPEC.yaml-Authoring-Specification.md
 ```
 
-This keeps generation focused and avoids unnecessary context.
-
----
-
-## Regeneration Rules
-
-If an upstream document changes materially, regenerate or review downstream documents.
-
-Common regeneration paths:
+The current system intentionally does not include:
 
 ```text
-product-spec.md changes -> review all downstream catalogs and execution-validation.md
-project-decisions.md changes -> review architecture, data-api, frontend, backend, dev-environment, execution-validation, AGENTS
-domain-model.md changes -> review data-api, frontend, backend, execution-validation
-architecture.md changes -> review data-api, frontend, backend, dev-environment, execution-validation, AGENTS
-data-api-contract.md changes -> review frontend, backend, execution-validation
-UI_PAGE.yaml changes -> review frontend, UI tokens/visual spec when relevant, execution-validation
-frontend-design.md changes -> review execution-validation
-backend-design.md changes -> review execution-validation
-dev-environment.md changes -> review execution-validation and AGENTS
-execution-validation.md changes -> review AGENTS and cross-document readiness
+shadcn-tailwind-implementation-standard.md
+standards/ui-implementation-standards/
 ```
 
-Do not regenerate everything automatically if a targeted review is enough.
+A technology-specific UI implementation standard may be added later, but it is outside the current generation order.
 
----
+## 8. Removed or Inactive Files
 
-## Quality Checklist
-
-Before completing generation, verify:
+The current active document system does not require:
 
 ```text
-[ ] Discovery or equivalent project context exists.
-[ ] Reference catalogs are generated before execution-validation.md.
-[ ] data-api-contract.md is generated before frontend/backend design.
-[ ] UI_PAGE.yaml is generated before frontend-design.md.
-[ ] UI_TOKENS.yaml is generated before UI_VISUAL_SPEC.yaml.
-[ ] execution-validation.md is generated after all relevant catalogs.
-[ ] AGENTS.md is generated after execution-validation.md.
-[ ] cross-document review is run after AGENTS.md.
-[ ] Downstream documents are reviewed after upstream changes.
-[ ] Codex runtime defaults to AGENTS.md + execution-validation.md.
+codex-execution-report-format.md
+shadcn-tailwind-implementation-standard.md
 ```
+
+`codex-execution-report.md` is still used, but only as a runtime worklog created and maintained by Codex according to `AGENTS.md`.
+
+`shadcn-tailwind-implementation-standard.md` is removed from the active UI system because concrete styling-stack standards are deferred.
+
+## 9. Codex Runtime Reading Model
+
+Codex should start from:
+
+```text
+docs/execution/AGENTS.md
+docs/execution/execution-validation.md
+```
+
+Codex should not read all reference files by default.
+
+Codex should read only task-scoped sources listed under the current `TASK-*`.
+
+For UI tasks, Codex must read:
+
+```text
+the referenced UI YAML files
+each referenced UI YAML file's codex_consumption section
+```
+
+before modifying UI code.
+
+## 10. Flow-First Execution Model
+
+Execution planning should follow:
+
+```text
+minimal foundation tasks
+→ executable flow slices
+→ cross-flow hardening
+→ release validation
+```
+
+It should not follow:
+
+```text
+all data first
+all backend second
+all frontend third
+all UI fourth
+wire together later
+```
+
+UI work should be included inside the relevant user-visible flow slices, not postponed as a separate full-UI phase.
+
+## 11. Regeneration Rules
+
+If a document changes, regenerate downstream documents that depend on it.
+
+Examples:
+
+```text
+If product-spec.md changes:
+- domain-model.md may need review
+- data-api-contract.md may need review
+- frontend-design.md may need review
+- UI_PAGE.yaml may need review
+- flow-composition-review.md must be reviewed
+- execution-validation.md must be reviewed
+
+If UI_PAGE.yaml changes:
+- UI_TOKENS.yaml may need review if visual roles change
+- UI_VISUAL_SPEC.yaml must be reviewed if states, surfaces, or actions change
+- frontend-design.md may need review
+- flow-composition-review.md must be reviewed
+- execution-validation.md must be reviewed
+
+If UI_TOKENS.yaml changes:
+- UI_VISUAL_SPEC.yaml must be reviewed
+- execution-validation.md may need review if UI validation claims change
+
+If UI_VISUAL_SPEC.yaml changes:
+- flow-composition-review.md may need review
+- execution-validation.md may need review for UI validation claims
+
+If flow-composition-review.md changes:
+- execution-validation.md must be regenerated or reviewed
+- AGENTS.md may need review if runtime policy assumptions change
+```
+
+## 12. Blocked Generation Ordering Rule
+
+If a document cannot be generated safely because a required decision is missing:
+
+```text
+do not skip ahead by inventing content
+generate the blocked-generation report required by that prompt
+resolve the missing decision
+regenerate the affected document
+then continue downstream
+```
+
+This applies especially to:
+
+```text
+Open Questions
+UI surfaces
+API contracts
+artifact behavior
+recovery behavior
+completion signals
+validation command availability
+styling-stack assumptions
+```
+
+## 13. Final Rule
+
+The order is designed to preserve a safe chain:
+
+```text
+decisions
+→ non-UI references
+→ UI references
+→ flow composition
+→ execution
+→ runtime policy
+→ review
+```
+
+Do not move UI after execution.
+
+Do not generate execution before UI when user-visible flows require UI surface, feedback, recovery, artifact, or completion signal information.
+
+Do not generate technology-specific UI implementation standards unless the project has explicitly selected a styling stack.

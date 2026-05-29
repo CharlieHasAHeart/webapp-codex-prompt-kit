@@ -1,443 +1,322 @@
 # Architecture Prompt
 
-## Target File
-
-```text
-docs/architecture.md
-```
-
 ## Purpose
 
-Generate a compact architecture reference catalog for a Codex-ready Web App project.
+Use this prompt to generate the architecture and boundary catalog for the current implementation.
 
-`architecture.md` owns:
+The architecture document defines stable `ARCH-*` rules for repository boundaries, runtime boundaries, dependency direction, frontend/backend separation, data and storage boundaries, artifact boundaries, configuration boundaries, security boundaries, and flow-first support boundaries.
 
-```text
-ARCH-* architecture boundary entries
-repository layout rules
-runtime unit rules
-dependency direction rules
-shared package rules
-configuration boundary rules
-open architecture questions
-```
+It is a non-UI reference catalog. It must be ownership-decoupled and entry-self-contained.
 
-It exists so `execution-validation.md` can reference precise architecture rules from `TASK-*`.
+## Target Output
 
----
-
-## Source Context
-
-Use the available conversation context and upstream documents already generated in the current conversation.
-
-Recommended upstream context:
+Generate exactly one document:
 
 ```text
-Project Design Brief
-docs/product-spec.md
-docs/project-decisions.md
-docs/domain-model.md
-current project discussion
-uploaded project notes
+docs/reference/architecture.md
 ```
 
-Use `product-spec.md` for:
+## Standards to Apply
 
-- MVP boundary
-- user roles
-- `REQ-*`
+Read only the standards listed below.
 
-Use `project-decisions.md` for:
+| Standard | Required? | Use For |
+|---|---:|---|
+| `standards/document-responsibilities.md` | yes | Enforces non-UI reference ownership, entry self-containment, and traceability without dependency. |
+| `standards/flow-concepts-and-composition.md` | yes | Ensures architecture supports Core User Flows, Side Effect Flows, Foundation Readiness, and later flow composition without creating executable `FLOW-*`. |
+| `standards/frontend-backend-boundary.md` | yes | Defines the separation between frontend, backend, and data/API contracts. |
+| `standards/open-questions-policy.md` | yes | Prevents unresolved questions from entering final reference docs. |
+| `standards/codex-ready-writing-rules.md` | yes | Ensures stable IDs, resolved wording, and Codex-safe reference entries. |
+| `standards/document-length-budgets.md` | optional | Use to keep the architecture catalog compact and boundary-focused. |
 
-- `DEC-*`
-- repository layout
-- frontend/backend split
-- container-first development
-- package manager
-- framework choices
-- deployment/runtime choices
+## Standard Application Rules
 
-Use `domain-model.md` for:
+Standards constrain how this prompt generates its target document. Standards do not create additional output targets.
 
-- domain objects and business rules that affect boundaries
-- ownership and permission meaning
-- state concepts that affect runtime workflows
+Rules:
+1. Read only the standards listed in this prompt.
+2. Do not load all standards by default.
+3. The current prompt defines the target output and required output structure.
+4. Standards define reusable terminology, ownership boundaries, quality rules, and review constraints.
+5. Do not copy large sections from standards into the generated document.
+6. Do not generate documents requested by a standard unless this prompt explicitly targets them.
+7. If required context remains unresolved under the standards, output a blocked-generation report instead of inventing missing decisions.
 
-If upstream documents are unavailable, use the available context and state assumptions.
+## Priority Rule
 
-If an architecture decision is unclear and affects execution tasks, list it under `Open Architecture Questions`.
+When generating the target document, use this priority order:
 
----
+1. User-confirmed answers and corrections.
+2. This prompt's target output and required output structure.
+3. Required standards listed in this prompt.
+4. Upstream generated project documents.
+5. Prior project discussion.
 
-## Relevant Standards
+If a conflict involves unresolved blockers, Open Questions leakage, unsafe scope invention, missing required decisions, or reference ownership dependency, output a blocked-generation report instead of generating a normal final document.
 
-Apply only the standards relevant to this document:
+## Required Inputs
+
+Use these upstream documents when available:
 
 ```text
-standards/document-system.md
-standards/document-responsibilities.md
-standards/document-length-budgets.md
-standards/codex-ready-writing-rules.md
-standards/frontend-backend-boundary.md
+docs/review/project-decisions.md
+docs/review/question-resolution.md
+docs/reference/product-spec.md
+docs/reference/domain-model.md
 ```
 
-Do not restate these standards in the generated document.
+Do not require every reference document to understand this output. The generated architecture entries must be self-contained in their own architecture responsibility layer.
 
----
+## Architecture Ownership
 
-## Output Rules
-
-Generate only:
-
-```text
-docs/architecture.md
-```
-
-Do not generate other project documents.
-
-Create only:
+`docs/reference/architecture.md` owns:
 
 ```text
 ARCH-*
+repository and package boundaries
+runtime boundaries
+dependency direction rules
+frontend/backend/API separation
+data access boundaries
+storage and artifact boundaries
+configuration boundaries
+security boundaries
+integration boundaries
+migration boundaries when applicable
+flow-first support boundaries
 ```
 
-Do not create:
+It must not own:
 
 ```text
-REQ-*
-DEC-*
-ENT-*
-REL-*
-BR-*
-STATE-*
-DB-*
-API-*
-FE-*
-BE-*
+product requirements
+domain entity definitions
+database schema
+API request/response payload fields
+frontend component behavior
+backend service implementation
+environment command catalogs
+execution task sequencing
+validation commands
+final executable FLOW-*
 TASK-*
 VAL-*
+Open Questions
 ```
 
-You may reference existing:
+## Reference Decoupling Rules
 
-```text
-REQ-*
-DEC-*
-ENT-*
-REL-*
-BR-*
-STATE-*
-```
+Because this is a non-UI reference catalog:
 
-Every `ARCH-*` must be heading-addressable.
+1. Every `ARCH-*` entry must be entry-self-contained.
+2. Related IDs may be included only for traceability.
+3. Do not write "see product-spec.md for details" as a substitute for architecture content.
+4. Do not copy product, domain, API, frontend, backend, or environment source definitions.
+5. Do not redefine another document's owned content.
+6. Architecture entries may mention related flow areas, but must not perform full flow composition.
 
-Use this heading format:
+Allowed:
 
 ```markdown
-### ARCH-001: Architecture Rule Name
+Related Requirements:
+- REQ-001
 ```
 
-Do not write a long architecture narrative.
+Forbidden:
 
-Do not include database schema, API contracts, frontend component details, backend service details, command catalogs, task lists, or validation commands.
+```markdown
+This boundary follows REQ-001. See REQ-001 for details.
+```
 
----
+## Flow-Aware Architecture Rules
 
-## Required Document Structure
+The architecture must support flow-first execution without becoming an execution plan.
 
-Use this structure:
+Required:
+- Identify the architecture boundaries needed to support current Core User Flows and Side Effect Flows.
+- Define boundaries for system effects such as artifact creation, storage, background work, status updates, and recovery.
+- Define minimum reusable boundaries that support Foundation Readiness.
+- Keep architecture independent of final `FLOW-*`, `TASK-*`, and `VAL-*` assembly.
+- Avoid layer-first implementation instructions such as "implement all backend before frontend."
+
+Forbidden:
+- Generating a final flow catalog.
+- Generating task order.
+- Generating validation commands.
+- Turning P0-P10 or any phase model into the architecture structure.
+
+## Required Output Structure
 
 ```markdown
 # Architecture
 
-## Architecture Catalog
+## 1. Architecture Scope
 
-## Open Architecture Questions
-```
+State what this architecture document owns and what it does not own.
 
-Do not add extra sections unless they are necessary for the project.
+## 2. Architecture Summary
 
----
+Summarize the selected architecture in current-scope terms.
 
-## Architecture Catalog
+## 3. Boundary Catalog
 
-Generate compact `ARCH-*` entries.
+### ARCH-001: <Boundary or Rule Name>
 
-Each entry should be independently readable because `TASK-*` items in `execution-validation.md` will reference individual architecture rules directly.
-
-Recommended format:
-
-```markdown
-### ARCH-001: Repository Layout
-
-Kind: repository-boundary
+Type:
+- repository_boundary / runtime_boundary / dependency_rule / data_boundary / storage_boundary / artifact_boundary / configuration_boundary / security_boundary / integration_boundary / flow_support_boundary
 
 Rule:
-- Use a monorepo with:
-  - `apps/web`
-  - `apps/api`
-  - `packages/*`
-
-Applies To:
-- frontend tasks
-- backend tasks
-- shared package tasks
-- dev environment tasks
+- ...
 
 Allowed:
-- `apps/web` may import app-agnostic code from `packages/*`.
-- `apps/api` may import app-agnostic code from `packages/*`.
+- ...
 
 Forbidden:
-- `apps/web` must not import from `apps/api`.
-- `apps/api` must not import from `apps/web`.
-- `packages/*` must not import from either app.
+- ...
 
-Related:
-- DEC-001
+Applies To:
+- ...
+
+Rationale:
+- ...
+
+Related IDs:
+- ...
+
+Flow Support:
+- ...
+
+Out of Scope:
+- ...
+
+## 4. Dependency Direction Rules
+
+Describe allowed dependency directions without defining implementation tasks.
+
+## 5. Runtime and Service Boundaries
+
+Describe runtime separation, service ownership, and allowed communication paths.
+
+## 6. Data, Storage, and Artifact Boundaries
+
+Describe boundaries only. Do not define DB schema or API payloads.
+
+## 7. Frontend / Backend / Contract Boundaries
+
+Describe how frontend and backend relate to the data/API contract without defining that contract.
+
+## 8. Configuration and Environment Boundaries
+
+Describe configuration ownership at an architecture level only. Command details belong to `dev-environment.md`.
+
+## 9. Security and Safety Boundaries
+
+Describe access, isolation, file safety, trust boundaries, and forbidden behavior where applicable.
+
+## 10. Flow-First Support Notes
+
+Describe how the architecture supports flow-first implementation without defining final `FLOW-*`, `TASK-*`, or `VAL-*`.
+
+## 11. Architecture Out-of-Scope
+
+List architecture topics intentionally excluded from the current implementation.
+
+## 12. Downstream Seeds
+
+List concise seeds for downstream data/API, frontend, backend, environment, flow composition, or execution documents.
+
+## 13. Final Readiness
+
+Status: ready / blocked
+
+If blocked, list missing decisions and affected downstream documents.
 ```
 
-Rules:
+## ARCH Entry Requirements
 
-- Use `ARCH-*` for architecture rules that later tasks must follow.
-- Keep entries compact.
-- Include `Kind`.
-- Include `Rule`.
-- Include `Allowed` and `Forbidden` when they prevent Codex drift.
-- Include `Applies To` when useful.
-- Include `Related` IDs where useful.
-- Do not define detailed file trees unless needed for task execution.
-
-Recommended `Kind` values:
+Each `ARCH-*` entry must include:
 
 ```text
-repository-boundary
-runtime-boundary
-dependency-direction
-frontend-backend-boundary
-shared-package-boundary
-data-access-boundary
-auth-boundary
-error-boundary
-configuration-boundary
-deployment-boundary
+ID
+title
+type
+rule
+allowed
+forbidden
+applies to
+rationale
+out-of-scope where useful
 ```
 
----
-
-## Recommended Architecture Entries
-
-Generate entries only when they apply to the project.
-
-Common entries include:
+Optional but useful:
 
 ```text
-ARCH-001 Repository Layout
-ARCH-002 Frontend Backend Boundary
-ARCH-003 Shared Package Boundary
-ARCH-004 Data Access Boundary
-ARCH-005 Request Lifecycle
-ARCH-006 Authentication Boundary
-ARCH-007 Error Handling Boundary
-ARCH-008 Configuration Boundary
-ARCH-009 Runtime Units
-ARCH-010 Deployment Boundary
+related IDs
+flow support
+security impact
+migration impact
+downstream seeds
 ```
 
-Do not force all entries if they are not useful.
+## Writing Constraints
 
----
+Use direct, resolved language.
 
-## Entry Guidance
-
-### Repository Layout Entry
-
-Should define:
-
-- top-level app/package layout
-- which code belongs in each area
-- forbidden cross-app imports
-
-Do not define every file.
-
-### Frontend Backend Boundary Entry
-
-Should define:
-
-- frontend communicates with backend through API contracts
-- frontend must not import backend internals
-- backend must not import frontend code
-- backend owns authoritative business rule enforcement
-
-### Shared Package Boundary Entry
-
-Should define:
-
-- what may live in `packages/*`
-- what must not live in `packages/*`
-- shared packages must stay app-agnostic
-
-Good shared contents:
+Prefer:
 
 ```text
-API contract types
-shared schemas
-shared constants
-test utilities if app-agnostic
-shared config
+The backend owns artifact file access. The frontend may request artifacts only through documented API contracts.
 ```
 
-Forbidden shared contents:
+Avoid:
 
 ```text
-frontend components
-backend services
-database clients
-server-only secrets
-browser-only code
+Maybe artifact access should be handled by the backend.
 ```
 
-### Data Access Boundary Entry
-
-Should define:
-
-- database access belongs to backend by default
-- frontend must not access database directly
-- repositories/data clients belong to backend or dedicated data packages only when explicitly allowed
-
-### Request Lifecycle Entry
-
-Should define high-level flow only.
-
-Recommended rule:
+Avoid dependency-only wording:
 
 ```text
-UI -> frontend API client -> backend API handler -> service -> repository/data layer -> service -> API response -> UI state
+See backend-design.md for backend boundaries.
 ```
 
-Do not define endpoint payloads here.
+Instead, state the architecture boundary here and leave backend implementation details to `backend-design.md`.
 
-### Authentication Boundary Entry
+## Blocked Generation Rules
 
-Should define:
+Output a blocked-generation report instead of a normal architecture document if:
 
-- backend is authoritative for auth/permissions
-- frontend permission rendering is UX only
-- route guards do not replace backend checks
+- a required architecture decision is unresolved
+- current runtime boundaries are unclear
+- frontend/backend separation cannot be determined
+- storage or artifact boundaries are required but undecided
+- security boundaries are required but undecided
+- unresolved Open Questions would enter the final architecture doc
 
-If auth is out of scope, state the MVP assumption.
-
-### Error Handling Boundary Entry
-
-Should define:
-
-- backend creates structured errors
-- API error envelope belongs to `data-api-contract.md`
-- frontend renders documented error states
-- frontend must not parse arbitrary backend strings as business logic
-
-### Configuration Boundary Entry
-
-Should define:
-
-- server-only secrets belong to backend runtime
-- public frontend env vars must be explicitly public
-- exact env vars belong in `dev-environment.md`
-- shared packages must not contain secrets
-
-### Runtime Units Entry
-
-Should define runtime units such as:
-
-```text
-web
-api
-db
-worker
-queue
-```
-
-Only include units that apply to the project.
-
-Do not define Docker commands here.
-
----
-
-## Open Architecture Questions
-
-List unresolved architecture questions.
-
-Recommended format:
+Blocked-generation report structure:
 
 ```markdown
-| Question | Blocking? | Affected Area |
-|---|---:|---|
-| Does the MVP require a worker runtime? | no | async jobs, deployment, dev environment |
-| Is authentication required for local MVP? | yes | auth boundary, API, frontend |
+# Architecture Generation Blocked
+
+## Blocking Issues
+
+| Issue | Decision Needed | Affected Docs | Flow Impact |
+|---|---|---|---|
+
+## Partial Safe Content
+
+## Required User Decisions
 ```
 
-Rules:
-
-- Include only questions that affect architecture, boundaries, runtime units, or execution tasks.
-- Mark blocking questions clearly.
-- Do not hide uncertainty inside `ARCH-*` entries.
-
----
-
-## Catalog Design Rules
-
-The generated file should behave like a task-scoped reference catalog.
-
-This means:
-
-- each `ARCH-*` entry must be short enough to read independently
-- each `ARCH-*` entry must have a stable Markdown heading
-- each `ARCH-*` entry should include related upstream IDs when useful
-- task authors should be able to reference entries like:
-
-```text
-docs/architecture.md#ARCH-001
-docs/architecture.md#ARCH-004
-```
-
-Avoid broad narrative sections that Codex would need to read globally.
-
----
-
-## Writing Rules
-
-- Write a reference catalog, not a narrative architecture document.
-- Use stable heading-addressable `ARCH-*` IDs.
-- Keep every entry compact and independently readable.
-- Use direct architecture rules.
-- Include forbidden behavior when it prevents Codex drift.
-- Reference existing `REQ-*`, `DEC-*`, `ENT-*`, `BR-*`, and `STATE-*` where useful.
-- Do not create non-ARCH IDs.
-- Do not include DB schema.
-- Do not include API contracts.
-- Do not include frontend/backend implementation details.
-- Do not include implementation tasks.
-- Do not include validation commands.
-- Use `Open Architecture Questions` for unresolved architecture decisions.
-
----
-
-## Quality Checklist
+## Final Checks
 
 Before finalizing, verify:
 
-```text
-[ ] The file is a compact architecture reference catalog.
-[ ] Architecture rules have ARCH-* headings.
-[ ] Every ARCH-* is independently readable.
-[ ] IDs are heading-addressable.
-[ ] Repository boundaries are explicit.
-[ ] Frontend/backend boundaries are explicit.
-[ ] Shared package rules are explicit when packages exist.
-[ ] Data access boundary is explicit when persistence exists.
-[ ] Runtime units are clear when needed.
-[ ] No DB/API/FE/BE/TASK/VAL IDs are created.
-[ ] No implementation commands are included.
-[ ] No long architecture narrative is included.
-[ ] Open architecture questions are marked blocking or non-blocking.
-```
+- No unresolved Open Questions remain.
+- No API payload fields are defined.
+- No DB schema is defined.
+- No frontend or backend implementation tasks are defined.
+- No `TASK-*`, `VAL-*`, or final executable `FLOW-*` entries are created.
+- Every `ARCH-*` entry is self-contained.
+- Related IDs are traceability hints only.
+- Architecture supports flow-first execution without becoming a flow composition document.

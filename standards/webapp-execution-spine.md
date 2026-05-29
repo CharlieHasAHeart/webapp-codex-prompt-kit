@@ -1,839 +1,409 @@
-# Web App Execution Spine
+# Web App Execution Spine Standard
 
-## Purpose
+## 1. Purpose
 
-This standard defines the default engineering route for generating a complete `docs/execution-validation.md` for a Codex-ready Web App project.
+This standard defines how `docs/execution/execution-validation.md` should be structured for a Codex-ready Web App project.
 
-It prevents `TASK-*` generation from covering only visible product features while missing required engineering foundation work.
+The execution spine is the primary implementation plan that Codex follows after review and reference documents are generated.
 
-Use this standard when generating:
+This standard establishes a **flow-first execution model**.
 
-```text
-docs/execution-validation.md
-```
-
----
-
-## Core Principle
-
-`execution-validation.md` is the primary Codex execution spine.
-
-Codex should execute from:
-
-```text
-AGENTS.md
-docs/execution-validation.md
-```
-
-Other project documents are task-scoped reference catalogs.
-
-Codex should read other documents only when the current `TASK-*` explicitly references a specific heading, ID, or YAML key.
-
----
-
-## Execution Spine Model
-
-Every Web App project must be evaluated against these phases:
-
-```text
-P0 Project Bootstrap
-P1 Development Environment
-P2 Shared Contracts and Types
-P3 Data Layer
-P4 Backend API Foundation
-P5 Backend Feature Workflows
-P6 Frontend App Shell
-P7 Frontend Feature Workflows
-P8 UI System and Interaction States
-P9 Cross-Cutting Hardening
-P10 Final Validation and Handoff
-```
-
-Every phase must be marked as one of:
-
-```text
-required
-conditional
-not_applicable
-deferred
-```
-
-If a phase is not applicable, the generated `execution-validation.md` must explain why.
-
----
-
-## Phase Rules
-
-### P0 Project Bootstrap
-
-Purpose:
-
-```text
-Create the repository and application skeleton required for later tasks.
-```
-
-Generate tasks when the repository or app structure is not already complete.
-
-Typical task categories:
-
-```text
-repository layout
-apps/web skeleton
-apps/api skeleton
-packages/* skeleton
-base configuration files
-codex-execution-report.md initialization
-root README or project entry files when needed
-```
-
-Common references:
-
-```text
-docs/project-decisions.md#DEC-*
-docs/architecture.md#ARCH-*
-docs/dev-environment.md#ENV-*
-```
-
-Common validation:
-
-```text
-directory existence checks
-package script checks
-basic command execution checks
-review validation for docs-only bootstrap
-```
-
-Common missing tasks:
-
-```text
-Codex starts implementing features before app skeleton exists.
-Shared package directory is omitted.
-codex-execution-report.md is not initialized.
-```
-
----
-
-### P1 Development Environment
-
-Purpose:
-
-```text
-Make install, start, test, database, and validation commands predictable.
-```
-
-Generate tasks when local development or container execution is not fully defined.
-
-Typical task categories:
-
-```text
-Docker Compose services
-container-first command setup
-package manager setup
-runtime setup
-environment example files
-test script skeletons
-database service wiring
-logs/start/stop commands
-```
-
-Common references:
-
-```text
-docs/project-decisions.md#DEC-*
-docs/architecture.md#ARCH-*
-docs/dev-environment.md#ENV-*
-```
-
-Common validation:
-
-```text
-docker compose config
-docker compose up -d
-service health command
-targeted install/test command dry run
-```
-
-Common missing tasks:
-
-```text
-Host npm install is used despite container-first policy.
-Database service exists but API cannot connect.
-Test scripts are referenced before they exist.
-```
-
----
-
-### P2 Shared Contracts and Types
-
-Purpose:
-
-```text
-Create shared contract foundations that reduce frontend/backend drift.
-```
+It does not define product requirements, domain meaning, API contracts, frontend design, backend design, UI design, or environment command details.
 
-Generate tasks when the project uses shared types, schemas, API contracts, error envelopes, or pagination models.
-
-Typical task categories:
-
-```text
-shared API contract package
-shared error envelope types
-shared pagination types
-shared enum/value-set types
-shared schemas
-API client base type helpers
-shared test utilities when app-agnostic
-```
-
-Common references:
-
-```text
-docs/data-api-contract.md#TYPE-*
-docs/data-api-contract.md#ERR-*
-docs/project-decisions.md#DEC-*
-docs/architecture.md#ARCH-*
-docs/dev-environment.md#ENV-*
-```
+## 2. Scope
 
-Common validation:
+This standard applies to:
 
-```text
-targeted type/schema tests
-package import boundary checks
-frontend/backend compile or targeted test when available
-```
+- `prompts/execution-validation-prompt.md`
+- `docs/execution/execution-validation.md`
+- `prompts/AGENTS-prompt.md`
+- `docs/execution/AGENTS.md`
+- `prompts/cross-document-review-prompt.md`
+- `docs/review/flow-composition-review.md` when present
 
-Common missing tasks:
+This standard should be used together with:
 
-```text
-Frontend and backend each define their own error shape.
-Pagination is reimplemented differently per endpoint.
-Shared package imports app-specific code.
-```
+- `standards/flow-concepts-and-composition.md`
+- `standards/document-responsibilities.md`
+- `standards/codex-ready-writing-rules.md`
+- `standards/validation-strategy.md`
 
----
+## 3. Core Principle
 
-### P3 Data Layer
+`docs/execution/execution-validation.md` must be a **flow-first execution spine**.
 
-Purpose:
+It should organize implementation around executable and verifiable flows, not around technical layers.
 
-```text
-Implement persistence foundations required by product workflows and API contracts.
-```
+The execution spine must answer:
 
-Generate tasks when persistence exists.
-
-Typical task categories:
-
-```text
-database client or ORM setup
-initial migrations
-DB-* implementation
-seed data
-repository/data access modules
-repository tests
-data constraints and indexes
-```
+- what Codex should implement
+- in what order
+- from which task-scoped sources
+- within what scope
+- with what validation
+- under what completion rule
 
-Common references:
-
-```text
-docs/data-api-contract.md#DB-*
-docs/domain-model.md#ENT-*
-docs/domain-model.md#REL-*
-docs/domain-model.md#BR-*
-docs/architecture.md#ARCH-*
-docs/backend-design.md#BE-*
-docs/dev-environment.md#ENV-*
-```
+It must not require Codex to infer implementation tasks from reference catalogs.
 
-Common validation:
+## 4. Execution Spine Ownership
 
-```text
-migration command
-seed command
-repository tests
-targeted data access tests
-```
+`docs/execution/execution-validation.md` owns:
 
-Common missing tasks:
+- execution reading policy
+- implementation strategy
+- foundation tasks
+- internal `FLOW-*` execution model entries when useful
+- flow slice tasks
+- cross-flow hardening tasks
+- `TASK-*` entries
+- `VAL-*` entries
+- flow-level validation
+- task-to-validation mapping
+- release validation
+- execution worklog update rules
 
-```text
-API tasks assume tables exist before migrations are created.
-Seed data is missing for UI/API validation.
-Business constraints are not supported by persistence where needed.
-```
+It must not own:
 
----
+- `REQ-*` product requirements
+- `ENT-*`, `BR-*`, or `STATE-*` domain definitions
+- `ARCH-*` architecture boundaries
+- `API-*`, `DB-*`, `ERR-*`, or `TYPE-*` contracts
+- `FE-*` frontend design entries
+- `BE-*` backend design entries
+- `ENV-*` command definitions
+- UI page, token, or visual source definitions
+- unresolved Open Questions
 
-### P4 Backend API Foundation
+## 5. Flow-First Rule Catalog
 
-Purpose:
+### EXEC-RULE-001: Use Flow-First Structure
 
-```text
-Create backend runtime foundations before feature endpoints are implemented.
-```
+Requirement:
 
-Generate tasks when the project includes `apps/api` or equivalent backend runtime.
-
-Typical task categories:
-
-```text
-API app bootstrap
-route registration
-request validation
-structured error handling
-auth/session placeholder or real auth
-permission policy helpers
-health endpoint
-backend test support
-configuration loading
-```
+- `execution-validation.md` must use a flow-first structure.
 
-Common references:
-
-```text
-docs/backend-design.md#BE-*
-docs/data-api-contract.md#ERR-*
-docs/data-api-contract.md#TYPE-*
-docs/architecture.md#ARCH-*
-docs/project-decisions.md#DEC-*
-docs/dev-environment.md#ENV-*
-```
+Required:
 
-Common validation:
+- Foundation tasks before flow slices only when necessary.
+- Flow model entries for executable user-facing or system-supporting flows when useful.
+- Flow slice tasks that implement one behavior at a time.
+- Flow-level validation for important flows.
 
-```text
-health endpoint test
-error handler test
-request validation test
-backend app bootstrap test
-```
+Forbidden:
 
-Common missing tasks:
+- Organizing the document as all data first, all backend second, all frontend third.
+- Exposing a P0-P10 phase catalog as the top-level structure.
+- Creating competing task catalogs.
 
-```text
-Feature handlers are implemented before structured errors exist.
-Auth is unclear, so handlers silently assume no auth.
-Validation errors do not match documented ERR-* contracts.
-```
+Check:
 
----
+- A reviewer can identify the behavior each task helps make executable.
 
-### P5 Backend Feature Workflows
+### EXEC-RULE-002: Flow-First Does Not Mean Foundation-Free
 
-Purpose:
+Requirement:
 
-```text
-Implement backend services, repositories, handlers, transactions, jobs, and integrations for product workflows.
-```
+- Every flow slice must have the minimum reusable foundation needed before Codex starts implementing it.
 
-Generate tasks from:
-
-```text
-REQ-*
-ENT-*
-BR-*
-STATE-*
-DB-*
-API-*
-ERR-*
-BE-*
-```
+Required:
 
-Typical task categories:
-
-```text
-service implementation
-API handler implementation
-repository workflow support
-transaction boundary
-background job
-integration adapter
-service tests
-API tests
-business rule tests
-```
+- Identify prerequisites before generating flow slice tasks.
+- Create narrow foundation tasks for unavoidable reusable prerequisites.
+- List dependencies from flow slice tasks to foundation tasks.
 
-Common references:
-
-```text
-docs/product-spec.md#REQ-*
-docs/domain-model.md#ENT-*
-docs/domain-model.md#BR-*
-docs/domain-model.md#STATE-*
-docs/data-api-contract.md#DB-*
-docs/data-api-contract.md#API-*
-docs/data-api-contract.md#ERR-*
-docs/backend-design.md#BE-*
-docs/dev-environment.md#ENV-*
-```
+Forbidden:
 
-Common validation:
+- Starting a flow slice that requires Codex to invent project structure, command policy, contract base, runtime wiring, or validation setup.
+- Hiding broad bootstrap work inside a flow slice.
 
-```text
-targeted service tests
-targeted API tests
-transaction/conflict tests
-integration adapter tests with mocks
-```
+Check:
 
-Common missing tasks:
+- Each flow slice can begin without Codex making unplanned foundational decisions.
 
-```text
-API handler exists but service rule enforcement is missing.
-Business rules are enforced only in frontend.
-Transaction-critical workflow is split across non-atomic operations.
-```
+### EXEC-RULE-003: Foundation Tasks Must Be Minimal and Enabling
 
----
+Requirement:
 
-### P6 Frontend App Shell
+- Foundation tasks must create only the base required to unlock one or more flow slices.
 
-Purpose:
+Required:
 
-```text
-Create the frontend runtime shell, routing foundation, navigation, and shared UI infrastructure.
-```
+- Each foundation task must state which flow or flows it unlocks.
+- Foundation work must be reusable and necessary before the flow begins.
 
-Generate tasks when the project includes a frontend app.
-
-Typical task categories:
-
-```text
-app layout
-sidebar/top navigation
-page header
-route skeletons
-frontend API client base
-shared loading/empty/error components
-auth/permission UI shell
-global providers
-frontend test support
-```
+Forbidden:
 
-Common references:
-
-```text
-docs/frontend-design.md#FE-*
-docs/ui/UI_PAGE.yaml#*
-docs/project-decisions.md#DEC-*
-docs/architecture.md#ARCH-*
-docs/data-api-contract.md#API-*
-docs/data-api-contract.md#ERR-*
-docs/dev-environment.md#ENV-*
-```
+- Implementing complete backend layers as foundation.
+- Implementing complete frontend layers as foundation.
+- Implementing all data models, all APIs, or all UI states before any flow.
 
-Common validation:
+Check:
 
-```text
-frontend route test
-component test
-API client test
-render smoke test
-```
+- Removing the foundation task would block a named flow slice.
 
-Common missing tasks:
+### EXEC-RULE-004: Absorb Engineering Coverage Into Flow Planning
 
-```text
-Feature pages are built without app shell.
-Navigation is invented instead of using UI_PAGE.yaml.
-API calls are duplicated instead of using API client base.
-```
+Requirement:
 
----
+- ChatGPT must consider full Web App implementation coverage while composing the flow-first plan.
 
-### P7 Frontend Feature Workflows
+Coverage considerations include:
 
-Purpose:
+- project bootstrap
+- development environment
+- shared contracts and types
+- data or storage foundation
+- backend API foundation
+- backend workflow support
+- frontend app shell
+- frontend workflow implementation
+- UI states and accessibility
+- cross-cutting hardening
+- release validation
 
-```text
-Implement user-facing pages and interactions from UI_PAGE.yaml, FE-* entries, and API contracts.
-```
+Required:
 
-Generate tasks from:
-
-```text
-UI pages
-UI actions
-UI states
-FE-*
-API-*
-ERR-*
-REQ-*
-```
+- These concerns should appear as foundation, flow-slice, hardening, or release-validation work when needed.
 
-Typical task categories:
-
-```text
-page implementation
-forms
-data tables/lists
-detail pages
-create/edit/delete flows
-API client calls
-frontend state handling
-frontend tests
-```
+Forbidden:
 
-Common references:
-
-```text
-docs/frontend-design.md#FE-*
-docs/ui/UI_PAGE.yaml#*
-docs/data-api-contract.md#API-*
-docs/data-api-contract.md#ERR-*
-docs/product-spec.md#REQ-*
-docs/domain-model.md#ENT-*
-docs/dev-environment.md#ENV-*
-```
+- Turning the coverage considerations into a mandatory P0-P10 phase table.
+- Treating coverage areas as permission to implement all of one layer before flows.
 
-Common validation:
-
-```text
-page tests
-component tests
-form behavior tests
-API client mock tests
-route state tests
-```
+Check:
 
-Common missing tasks:
+- The execution plan is complete enough without becoming layer-first.
 
-```text
-Page renders happy path only.
-Route-backed filters are missing.
-Frontend ignores documented error behavior.
-```
+### EXEC-RULE-005: Use One Executable Task Catalog
 
----
+Requirement:
 
-### P8 UI System and Interaction States
+- `TASK-*` entries are the only executable task source for Codex.
 
-Purpose:
+Required:
 
-```text
-Apply UI tokens, visual rules, responsive behavior, accessibility, and complete UI states.
-```
+- Flow model entries may describe behavior.
+- Task entries must define executable implementation work.
+- Validation entries must prove task or flow claims.
 
-Generate tasks when UI exists.
-
-Typical task categories:
-
-```text
-apply UI tokens
-apply visual spec
-responsive behavior
-loading states
-empty states
-error states
-permission states
-disabled/submitting/success/conflict states
-accessibility pass
-shadcn/ui and Tailwind boundary checks
-```
+Forbidden:
 
-Common references:
-
-```text
-docs/ui/UI_TOKENS.yaml#*
-docs/ui/UI_VISUAL_SPEC.yaml#*
-docs/ui/UI_PAGE.yaml#*
-docs/frontend-design.md#FE-*
-docs/data-api-contract.md#ERR-*
-docs/dev-environment.md#ENV-*
-```
+- Creating separate task catalogs that compete with the main `TASK-*` catalog.
+- Letting `FLOW-*` entries function as executable tasks.
 
-Common validation:
+Check:
 
-```text
-component visual behavior tests
-state rendering tests
-accessibility checks when available
-targeted frontend tests
-```
+- Codex can determine the next implementation step only from `TASK-*` entries.
 
-Common missing tasks:
+### EXEC-RULE-006: Keep Flow Model Internal to Execution
 
-```text
-UI only handles ready state.
-Empty/error/permission states are not implemented.
-Raw colors or ad hoc styles bypass tokens.
-Responsive behavior is undefined.
-```
+Requirement:
 
----
+- `FLOW-*` entries, when used, belong only inside `execution-validation.md`.
 
-### P9 Cross-Cutting Hardening
+Required:
 
-Purpose:
+- Use `FLOW-*` as execution assembly units.
+- Do not create `docs/reference/flow-model.md`.
+- Use `docs/review/flow-composition-review.md` only as a review-stage intermediate artifact when needed.
 
-```text
-Close gaps that often remain after feature implementation.
-```
+Forbidden:
 
-Generate tasks based on project risk.
-
-Typical task categories:
-
-```text
-structured errors across app
-permission consistency
-duplicate submission prevention
-data freshness/stale state
-input validation consistency
-sensitive data exposure check
-logging basics
-persistence after refresh
-frontend/backend contract drift check
-seed/demo data consistency
-```
+- Treating flow model entries as final reference catalogs.
+- Leaving flow candidates from review artifacts as final executable tasks.
 
-Common references:
-
-```text
-docs/domain-model.md#BR-*
-docs/architecture.md#ARCH-*
-docs/data-api-contract.md#ERR-*
-docs/frontend-design.md#FE-*
-docs/backend-design.md#BE-*
-docs/dev-environment.md#ENV-*
-```
+Check:
 
-Common validation:
-
-```text
-targeted regression tests
-contract tests
-permission tests
-error handling tests
-manual review validation when appropriate
-```
+- Final executable flow definitions appear in `execution-validation.md`, not in reference docs.
 
-Common missing tasks:
+### EXEC-RULE-007: Validate Flows, Not Only Layers
 
-```text
-Feature tests pass but permission consistency is not checked.
-Duplicate submissions create duplicate records.
-Sensitive fields leak through API response.
-```
+Requirement:
 
----
+- Important flows must have validation that proves behavior, not just isolated layer correctness.
 
-### P10 Final Validation and Handoff
+Required:
 
-Purpose:
+- Each major flow should map to task validation and, when useful, flow-level validation.
+- Validation claims must explain the user-visible or system-behavior proof.
 
-```text
-Prove MVP readiness and prepare the repository for handoff.
-```
+Forbidden:
 
-Generate tasks for:
-
-```text
-milestone validation
-release validation
-codex-execution-report completion
-deferred/skipped task documentation
-open question review
-handoff readiness
-```
+- Using only vague commands such as “run tests.”
+- Marking a flow complete because backend tests pass while frontend feedback or recovery remains unproven.
 
-Common references:
+Check:
 
-```text
-docs/execution-validation.md#VAL-*
-docs/dev-environment.md#ENV-*
-AGENTS.md
-```
+- A reviewer can see how validation proves the flow is executable, observable, recoverable, or complete.
 
-Common validation:
+## 6. Recommended Output Structure
 
-```text
-milestone validation commands
-release validation commands
-final report review
-```
+`docs/execution/execution-validation.md` should use this top-level structure:
 
-Common missing tasks:
+```markdown
+# Execution Validation
 
-```text
-No release validation is run.
-Failed or skipped tasks are not recorded.
-Open blocking questions remain hidden.
+## 1. Execution Scope
+## 2. Execution Reading Policy
+## 3. Implementation Strategy
+## 4. Foundation Task Catalog
+## 5. Flow Model
+## 6. Flow Slice Task Catalog
+## 7. Cross-Flow Hardening Task Catalog
+## 8. Validation Catalog
+## 9. Flow-Level Validation
+## 10. Task-to-Validation Mapping
+## 11. Release Validation
+## 12. Execution Worklog Rules
+## 13. Execution Readiness
 ```
 
----
+The final document may omit `Flow Model` only when the project is trivial and the task catalog itself clearly preserves flow-first sequencing.
 
-## Task Generation Rules
+## 7. Foundation Task Guidance
 
-When generating `execution-validation.md`, create tasks from two sources:
+Foundation tasks are allowed only when they are required before a flow slice can be implemented safely.
 
-```text
-Engineering Spine Tasks
-Product Flow Tasks
-```
+Common foundation task areas:
 
-### Engineering Spine Tasks
+- repository or app skeleton
+- minimal frontend/backend runtime wiring
+- service entry points
+- shared contract or type base
+- API error envelope base
+- storage or workspace base
+- minimal app shell or routing base
+- validation command wiring
 
-Generate from this standard's phases.
+A foundation task should include:
 
-These tasks make the project buildable, runnable, testable, and maintainable.
+- task type
+- priority
+- dependencies
+- goal
+- flows unlocked
+- read-before sources
+- implementation scope
+- out-of-scope boundaries
+- required validation
+- completion rule
 
-Examples:
+Foundation tasks must not implement full product behavior.
 
-```text
-bootstrap repository
-configure container services
-create API app bootstrap
-create frontend app shell
-create shared API client base
-create database migrations
-create test support
-```
+## 8. Flow Model Guidance
 
-### Product Flow Tasks
+A `FLOW-*` entry describes an executable behavior to be assembled.
 
-Generate from the project reference catalogs.
+A flow may derive from:
 
-Examples:
+- Core User Flow
+- Side Effect Flow
+- Supporting Interaction Flow
+- Feedback Flow
+- Recovery Flow
+- Artifact Flow
+- Blocked Flow
+- Status Feedback Flow
 
-```text
-implement case list API
-implement case detail page
-implement create case flow
-enforce no concurrent active run rule
-render run result state
-```
+Each important flow should include:
 
-A complete `execution-validation.md` must include both.
+- flow type
+- goal
+- trigger or start condition
+- required foundation
+- inputs
+- end-to-end slice responsibilities
+- state transitions
+- feedback
+- failure and recovery behavior
+- completion signal
+- validation strategy
 
----
+Do not turn every small interaction into a flow.
 
-## Task-Scoped Reference Rules
+## 9. Flow Slice Task Guidance
 
-Every implementation task must include:
+A flow slice task implements the minimum useful vertical path for one behavior.
 
-```text
-Read scope
-Read before this task
-Implementation Scope
-Expected Code Impact
-Out of Scope
-Required Validation
-Completion Rule
-```
+A flow slice may include the frontend, API, backend, data/storage, artifact, UI state, feedback, recovery, and validation work needed for that behavior.
 
-`Read before this task` should reference specific headings, IDs, or YAML keys.
-
-Good examples:
-
-```text
-docs/product-spec.md#REQ-001
-docs/domain-model.md#BR-001
-docs/data-api-contract.md#API-001
-docs/frontend-design.md#FE-003
-docs/backend-design.md#BE-004
-docs/dev-environment.md#ENV-010
-docs/ui/UI_PAGE.yaml#cases_list
-```
+A flow slice task should include:
 
-Avoid:
+- task type
+- related flow
+- dependencies
+- goal
+- prerequisites already satisfied
+- implementation scope
+- flow-local setup allowed
+- out-of-scope boundaries
+- expected code impact
+- required validation
+- completion rule
 
-```text
-docs/product-spec.md
-docs/domain-model.md
-docs/frontend-design.md
-```
+A flow slice must not silently broaden into unrelated flows.
 
-Full-document reads should be avoided unless the task explicitly requires them.
+## 10. Cross-Flow Hardening Guidance
 
----
+Cross-flow hardening tasks should appear only after relevant flow slices exist.
 
-## Validation Rules
+Use hardening tasks for:
 
-Each implementation task must have targeted validation.
+- shared error consistency
+- security boundaries
+- path traversal prevention
+- artifact safety
+- validation visibility
+- accessibility across implemented states
+- frontend/backend contract consistency
+- release-level regression checks
 
-Validation must be:
+Do not use hardening tasks to implement missing core behavior.
 
-```text
-container-first
-task-scoped
-evidence-driven
-minimal but meaningful
-```
+## 11. Validation Guidance
 
-Task validation should prove the task's claim.
+Validation must be task-scoped and claim-proven.
 
-Milestone and release validation may be broader.
+Validation entries should include:
 
-Do not require full lint, full typecheck, full build, mypy, or full E2E for every task by default.
+- purpose
+- command
+- claim proven
+- used by
+- failure meaning
 
----
+Flow-level validation should prove that an end-to-end behavior works or that a validation combination proves the flow in the absence of full E2E automation.
 
-## Phase Applicability Rules
+## 12. Execution Worklog Guidance
 
-Every phase must be evaluated.
+`docs/execution/codex-execution-report.md` is a Codex runtime worklog.
 
-Use:
+It is not generated by `execution-validation.md`.
 
-```text
-required
-conditional
-not_applicable
-deferred
-```
+`AGENTS.md` defines how Codex creates and updates it.
 
-Examples:
-
-```text
-P3 Data Layer: required if DB-* entries exist.
-P5 Backend Feature Workflows: required if API-* or BE-* entries exist.
-P6 Frontend App Shell: required if UI_PAGE.yaml exists or frontend UI is in scope.
-P8 UI System and Interaction States: required if UI exists.
-P10 Final Validation and Handoff: always required.
-```
+`execution-validation.md` may require tasks to update the worklog as part of completion.
 
-If a phase is skipped, explain why.
+## 13. Prompt Integration
 
----
+Prompts that use this standard should:
 
-## Common Incomplete Execution Plans
+- preserve flow-first structure
+- use `standards/flow-concepts-and-composition.md` for flow terminology
+- use `standards/validation-strategy.md` for validation rules
+- avoid P0-P10 top-level phase output
+- require foundation tasks only when they unlock flows
+- ensure the final task catalog is the single executable source for Codex
 
-Watch for these patterns:
+## 14. Review Checklist
 
-```text
-feature pages exist but no app shell task
-API endpoints exist but no API app bootstrap task
-DB contracts exist but no migration task
-business rules exist but no backend service validation
-UI pages exist but no loading/empty/error state tasks
-container-first decision exists but host commands are used
-release validation exists but task-level validation is missing
-Codex must infer missing tasks from reference catalogs
-```
+A reviewer should check:
 
-These are review failures.
-
----
-
-## Quality Checklist for execution-validation.md
-
-Before finalizing `execution-validation.md`, verify:
-
-```text
-[ ] P0-P10 phases are evaluated.
-[ ] Engineering foundation tasks are included.
-[ ] Product workflow tasks are included.
-[ ] Not-applicable phases have reasons.
-[ ] Every implementation task has task-scoped source references.
-[ ] Source references point to specific headings, IDs, or YAML keys.
-[ ] Every implementation task has Implementation Scope.
-[ ] Every implementation task has Out of Scope.
-[ ] Every implementation task has Required Validation.
-[ ] Every validation command has a claim proven.
-[ ] Validation commands are container-first.
-[ ] Broad checks are limited to milestone/release validation unless task-specific.
-[ ] Codex does not need to infer tasks from other documents.
-[ ] Final validation and handoff tasks exist.
-```
+- Does `execution-validation.md` use a flow-first structure?
+- Are foundation tasks minimal and tied to named flows?
+- Does each flow slice have required prerequisites?
+- Are tasks sequenced by executable behavior rather than technical layer?
+- Is there one `TASK-*` catalog and one `VAL-*` catalog?
+- Are important flows mapped to validation?
+- Are Open Questions absent from execution docs?
+- Is the execution worklog treated as a runtime worklog governed by `AGENTS.md`?

@@ -1,428 +1,514 @@
 # Document System Standard
 
-## Purpose
+## 1. Purpose
 
-This standard defines the document system for a Codex-ready Web App project.
+This standard defines the document system for the WebApp Codex Prompt Kit.
 
-The system is organized around:
+It explains the generated project document layers, their intended roles, and the current generation model.
+
+The system is organized so that ChatGPT can generate stable planning and reference documents, and Codex can later execute implementation tasks without inventing missing requirements, UI behavior, API contracts, or validation rules.
+
+## 2. Core Document Layers
+
+The generated project documents are organized into three major layers:
 
 ```text
-Discovery Workshop
-Reference Catalogs
-Execution Spine
-Runtime Policy
-Cross-Document Review
+docs/review/
+docs/reference/
+docs/execution/
 ```
 
-The goal is to let ChatGPT think deeply during discovery and document generation, while letting Codex execute from a small, stable runtime context.
-
----
-
-## Core Model
-
-The document system has four layers.
+Their roles are:
 
 ```text
-1. Discovery Layer
-2. Reference Catalog Layer
-3. Execution Spine Layer
-4. Runtime Policy Layer
+review     -> connect, analyze, resolve, compose, and prepare
+reference  -> define stable source catalogs and UI reference intent
+execution  -> instruct Codex what to do, what to read, and how to validate
 ```
 
-### Discovery Layer
+Review documents may connect multiple documents.
 
-The discovery layer is for ChatGPT and the user.
+Reference documents define source-of-truth catalogs.
 
-It supports:
+Execution documents define Codex task execution, validation, runtime policy, and worklog behavior.
+
+## 3. Review Layer
+
+Review documents live under:
 
 ```text
-product discussion
-design exploration
-technical tradeoff discussion
-execution risk discovery
-open question discovery
+docs/review/
 ```
 
-Default prompt:
+They are used before final reference and execution documents are generated.
+
+Expected review documents:
 
 ```text
-prompts/discovery-workshop-prompt.md
+docs/review/project-design-brief.md
+docs/review/open-questions-review.md
+docs/review/question-resolution.md
+docs/review/project-decisions.md
+docs/review/flow-composition-review.md
+docs/review/cross-document-review-report.md
 ```
 
-Default output:
+## 4. Review Layer Responsibilities
+
+Review documents may:
 
 ```text
-Project Design Brief
+summarize project context
+extract unresolved questions
+record user-confirmed answers
+record project-level decisions
+connect source documents
+analyze flow composition
+check whether UI surfaces support user-visible flows
+report cross-document inconsistencies
 ```
 
-The Project Design Brief is working context. It is not a Codex runtime document by default.
-
----
-
-### Reference Catalog Layer
-
-Reference catalogs define compact, heading-addressable facts and rules.
-
-Reference catalogs are not execution plans.
-
-They exist so `docs/execution-validation.md` can reference precise entries from `TASK-*`.
-
-Reference catalog examples:
+Review documents must not:
 
 ```text
-docs/product-spec.md
-docs/project-decisions.md
-docs/domain-model.md
-docs/architecture.md
-docs/data-api-contract.md
-docs/frontend-design.md
-docs/backend-design.md
-docs/dev-environment.md
-docs/ui/UI_PAGE.yaml
-docs/ui/UI_TOKENS.yaml
-docs/ui/UI_VISUAL_SPEC.yaml
+define final API contracts
+define final database schema
+define final frontend/backend implementation responsibilities
+define final UI YAML source content
+define final TASK-* or VAL-* entries
+act as Codex runtime source of truth
 ```
 
-Each catalog should be compact, ID-first, and independently readable at the entry level.
+## 5. Reference Layer
 
----
-
-### Execution Spine Layer
-
-The execution spine is the main Codex execution document.
-
-Default file:
+Reference documents live under:
 
 ```text
-docs/execution-validation.md
+docs/reference/
 ```
 
-It owns:
+They define source-of-truth catalogs for product, domain, architecture, contracts, implementation responsibilities, environment policy, and UI references.
+
+Expected non-UI reference documents:
 
 ```text
-TASK-*
-VAL-*
-execution phases
-task dependencies
+docs/reference/product-spec.md
+docs/reference/domain-model.md
+docs/reference/architecture.md
+docs/reference/data-api-contract.md
+docs/reference/frontend-design.md
+docs/reference/backend-design.md
+docs/reference/dev-environment.md
+```
+
+Expected UI reference documents:
+
+```text
+docs/reference/ui/UI_PAGE.yaml
+docs/reference/ui/UI_TOKENS.yaml
+docs/reference/ui/UI_VISUAL_SPEC.yaml
+```
+
+## 6. Non-UI Reference Responsibilities
+
+Non-UI reference documents define stable ownership-decoupled source catalogs.
+
+Ownership model:
+
+```text
+product-spec.md        -> REQ-*
+domain-model.md        -> ENT-*, REL-*, BR-*, STATE-*
+architecture.md        -> ARCH-*
+data-api-contract.md   -> DB-*, API-*, ERR-*, TYPE-*
+frontend-design.md     -> FE-*
+backend-design.md      -> BE-*
+dev-environment.md     -> ENV-*
+```
+
+Non-UI reference documents must be:
+
+```text
+ownership-decoupled
+entry-self-contained
+traceable without dependency
+free of unresolved Open Questions
+free of TASK-* and VAL-* entries
+```
+
+## 7. UI Reference Responsibilities
+
+The UI reference system defines the user-visible shape of the Web App.
+
+UI references are generated after non-UI reference catalogs and before flow composition.
+
+Expected UI files:
+
+```text
+docs/reference/ui/UI_PAGE.yaml
+docs/reference/ui/UI_TOKENS.yaml
+docs/reference/ui/UI_VISUAL_SPEC.yaml
+```
+
+Their responsibilities are:
+
+```text
+UI_PAGE.yaml
+= flow-facing semantic UI surface
+
+UI_TOKENS.yaml
+= technology-agnostic design token reference
+
+UI_VISUAL_SPEC.yaml
+= visual and interaction presentation rules
+```
+
+UI references must describe:
+
+```text
+what the user can see
+what the user can do
+how actions trigger effects
+how system status becomes visible
+how failure and blocked states are shown
+how recovery is offered
+where artifacts appear
+where completion becomes visible
+```
+
+UI references must not define:
+
+```text
+React or JSX code
+className strings
+Tailwind mappings
+shadcn/ui requirements
+CSS variable mappings
+MUI or Chakra mappings
+API request/response shapes
+backend behavior
+database schema
+final TASK-* or VAL-* entries
+```
+
+## 8. UI Technology-Agnostic Rule
+
+The current UI reference system is technology-agnostic.
+
+It does not assume:
+
+```text
+Tailwind
+shadcn/ui
+CSS variables
+MUI
+Chakra
+CSS Modules
+Styled Components
+Vanilla Extract
+plain CSS
+```
+
+The file previously used as a concrete implementation standard:
+
+```text
+shadcn-tailwind-implementation-standard.md
+```
+
+is removed from the current active UI document system.
+
+A future technology-specific UI implementation standard may be introduced later, but it is not part of the current system.
+
+## 9. UI Codex Consumption Rule
+
+Every generated UI YAML file must contain:
+
+```yaml
+codex_consumption:
+```
+
+This section is a compact runtime dictionary for Codex.
+
+It must explain:
+
+```text
+file role
+source-of-truth content
+traceability-only content
+what Codex should do
+what Codex must not do
+which files should be read together
+```
+
+Codex must read `codex_consumption` before implementing UI tasks that reference a UI YAML file.
+
+This avoids requiring Codex to infer UI field meaning from field names alone.
+
+## 10. Execution Layer
+
+Execution documents live under:
+
+```text
+docs/execution/
+```
+
+Expected execution documents:
+
+```text
+docs/execution/execution-validation.md
+docs/execution/AGENTS.md
+docs/execution/codex-execution-report.md
+```
+
+`codex-execution-report.md` is not normally generated by ChatGPT.
+
+It is a runtime worklog created and maintained by Codex according to `AGENTS.md`.
+
+## 11. Execution Layer Responsibilities
+
+`execution-validation.md` owns:
+
+```text
+final executable FLOW-* entries when used
+TASK-* entries
+VAL-* entries
+minimal foundation tasks
+flow slice task catalog
+cross-flow hardening task catalog
 task-scoped source references
-implementation scope
-out-of-scope boundaries
-expected code impact
-required validation
-milestone validation
+UI task-scoped source references
+flow-level validation
+UI-level validation expectations
+task-to-validation mapping
 release validation
+execution readiness
 ```
 
-Codex should not infer tasks from reference catalogs.
-
----
-
-### Runtime Policy Layer
-
-The runtime policy defines how Codex works in the repository.
-
-Default file:
+`AGENTS.md` owns:
 
 ```text
-AGENTS.md
-```
-
-It owns:
-
-```text
-primary runtime document policy
-task-scoped reading policy
-source-of-truth hierarchy
-command policy
+Codex runtime reading policy
+flow-first execution policy
+task execution policy
+UI reference consumption policy
 validation policy
-conflict handling
-execution report policy
-forbidden actions
+blocker policy
+runtime worklog policy
+forbidden behavior policy
 ```
 
----
-
-## Primary Codex Runtime Documents
-
-Codex should start with only:
+`codex-execution-report.md` owns:
 
 ```text
-AGENTS.md
-docs/execution-validation.md
+runtime task attempt notes
+sources read
+UI sources read when applicable
+files changed
+validation results
+blockers
+failed validation details
+chronological notes
 ```
 
-All other documents are task-scoped reference catalogs.
+Execution documents must not redefine product, domain, architecture, API, frontend, backend, environment, or UI source content.
 
-Codex should read other documents only when the current `TASK-*` explicitly references them.
+## 12. Current Generation Order
 
----
-
-## Generated Project Document Structure
-
-A generated project should usually contain:
+The current recommended generation order is:
 
 ```text
-AGENTS.md
-codex-execution-report.md
+1. prompts/discovery-workshop-prompt.md
+   -> docs/review/project-design-brief.md
 
-docs/
-├── product-spec.md
-├── project-decisions.md
-├── domain-model.md
-├── architecture.md
-├── data-api-contract.md
-├── frontend-design.md
-├── backend-design.md
-├── dev-environment.md
-└── execution-validation.md
+2. prompts/open-questions-extraction-prompt.md
+   -> docs/review/open-questions-review.md
 
-docs/ui/
-├── UI_PAGE.yaml
-├── UI_TOKENS.yaml
-└── UI_VISUAL_SPEC.yaml
+3. prompts/question-resolution-prompt.md
+   -> docs/review/question-resolution.md
+
+4. prompts/project-decisions-prompt.md
+   -> docs/review/project-decisions.md
+
+5. prompts/product-spec-prompt.md
+   -> docs/reference/product-spec.md
+
+6. prompts/domain-model-prompt.md
+   -> docs/reference/domain-model.md
+
+7. prompts/architecture-prompt.md
+   -> docs/reference/architecture.md
+
+8. prompts/data-api-contract-prompt.md
+   -> docs/reference/data-api-contract.md
+
+9. prompts/frontend-design-prompt.md
+   -> docs/reference/frontend-design.md
+
+10. prompts/backend-design-prompt.md
+    -> docs/reference/backend-design.md
+
+11. prompts/dev-environment-prompt.md
+    -> docs/reference/dev-environment.md
+
+12. prompts/ui-page-prompt.md
+    -> docs/reference/ui/UI_PAGE.yaml
+
+13. prompts/ui-tokens-prompt.md
+    -> docs/reference/ui/UI_TOKENS.yaml
+
+14. prompts/ui-visual-spec-prompt.md
+    -> docs/reference/ui/UI_VISUAL_SPEC.yaml
+
+15. prompts/flow-composition-review-prompt.md
+    -> docs/review/flow-composition-review.md
+
+16. prompts/execution-validation-prompt.md
+    -> docs/execution/execution-validation.md
+
+17. prompts/AGENTS-prompt.md
+    -> docs/execution/AGENTS.md
+
+18. prompts/cross-document-review-prompt.md
+    -> docs/review/cross-document-review-report.md
 ```
 
-Optional working notes may exist outside the Codex runtime path, for example:
+## 13. Why UI Comes Before Flow Composition
+
+UI references are generated after non-UI reference catalogs because UI should not invent product behavior, API contracts, domain states, or frontend/backend responsibilities.
+
+UI references are generated before flow composition because flow composition must check whether user-visible flows are:
 
 ```text
-notes/project-design-brief.md
+operable
+observable
+recoverable
+artifact-aware
+completion-visible
 ```
 
-If notes exist, Codex should not read them by default.
-
----
-
-## Reference Catalog Ownership
-
-Each reference catalog owns a specific ID family or reference area.
-
-| File | Owns | Role |
-|---|---|---|
-| `docs/product-spec.md` | `REQ-*` | Product requirement catalog. |
-| `docs/project-decisions.md` | `DEC-*` | Shared project decision catalog. |
-| `docs/domain-model.md` | `ENT-*`, `REL-*`, `BR-*`, `STATE-*` | Domain concept and rule catalog. |
-| `docs/architecture.md` | `ARCH-*` | Architecture and boundary catalog. |
-| `docs/data-api-contract.md` | `DB-*`, `API-*`, `ERR-*`, `TYPE-*` | Data and API contract catalog. |
-| `docs/frontend-design.md` | `FE-*` | Frontend implementation reference catalog. |
-| `docs/backend-design.md` | `BE-*` | Backend implementation reference catalog. |
-| `docs/dev-environment.md` | `ENV-*` | Environment and command reference catalog. |
-| `docs/ui/UI_PAGE.yaml` | UI page, route, section, action, and state IDs | Semantic UI page structure. |
-| `docs/ui/UI_TOKENS.yaml` | token names and token mappings | UI token reference. |
-| `docs/ui/UI_VISUAL_SPEC.yaml` | visual rule keys | UI visual usage reference. |
-| `docs/execution-validation.md` | `TASK-*`, `VAL-*` | Primary Codex execution spine. |
-| `AGENTS.md` | runtime policy | Codex operating rules. |
-
----
-
-## ID and Reference Rules
-
-Every Markdown catalog ID must be heading-addressable.
-
-Use stable headings such as:
-
-```markdown
-### REQ-001: Create Case
-### DEC-001: Repository Layout
-### ENT-001: Case
-### BR-001: No Concurrent Active Run
-### ARCH-001: Repository Layout
-### DB-001: cases
-### API-001: List Cases
-### ERR-001: Validation Error
-### TYPE-001: Pagination Response
-### FE-001: Case List Page
-### BE-001: Case Query Service
-### ENV-001: Container-First Command Policy
-### TASK-001: Initialize Repository Structure
-### VAL-001: Case List API Contract Validation
-```
-
-Tasks should reference precise entries:
+Flow composition should use UI references to check:
 
 ```text
-docs/data-api-contract.md#API-001
-docs/domain-model.md#BR-001
-docs/backend-design.md#BE-001
-docs/dev-environment.md#ENV-010
-docs/ui/UI_PAGE.yaml#cases_list
+Does each Core User Flow have a visible UI surface?
+Does each primary action have an affordance?
+Do pending/running/failed/blocked states have feedback?
+Does recovery have a visible path?
+Does an in-scope artifact have a surface?
+Is completion visible to the user?
 ```
 
-Avoid full-document references unless the task explicitly requires them.
+## 14. Runtime Worklog Policy
 
----
+The previous separate report-format document is not part of the active document system.
 
-## Document Generation Flow
-
-Recommended prompt order:
+Do not require:
 
 ```text
-0. discovery-workshop-prompt.md
-
-1. product-spec-prompt.md
-2. project-decisions-prompt.md
-3. domain-model-prompt.md
-4. architecture-prompt.md
-5. data-api-contract-prompt.md
-6. ui-page-prompt.md
-7. frontend-design-prompt.md
-8. backend-design-prompt.md
-9. dev-environment-prompt.md
-10. ui-tokens-prompt.md
-11. ui-visual-spec-prompt.md
-
-12. execution-validation-prompt.md
-13. AGENTS-prompt.md
-14. cross-document-review-prompt.md
+codex-execution-report-format.md
 ```
 
-Step 0 is recommended, not mandatory.
-
-Steps 1-11 generate reference catalogs.
-
-Step 12 generates the execution spine.
-
-Step 13 generates Codex runtime policy.
-
-Step 14 reviews readiness.
-
----
-
-## Document Role Rules
-
-### Reference Catalogs
-
-Reference catalogs should:
+The active rule is:
 
 ```text
-define owned IDs or stable YAML keys
-keep entries compact
-make entries independently readable
-avoid long narrative
-avoid redefining other catalogs
-include open questions when needed
+AGENTS.md tells Codex when and how to create/update codex-execution-report.md.
 ```
 
-Reference catalogs should not:
+`codex-execution-report.md` is a factual runtime worklog, not a source-of-truth document.
+
+## 15. Cross-Document Review Role
+
+`cross-document-review-report.md` is a review report.
+
+It may identify inconsistencies, blockers, missing UI flow surfaces, missing validation, ownership violations, and execution risks.
+
+It must not silently rewrite source documents.
+
+It should name the recommended owner file for each issue.
+
+## 16. Active UI Standards
+
+The active UI standard files are:
 
 ```text
-define execution tasks
-define validation commands unless they own ENV-* command patterns
-tell Codex to read the full document set
-duplicate other source-of-truth definitions
+standards/ui-reference-system.md
+standards/ui-authoring-specs/UI_PAGE.yaml-Authoring-Specification.md
+standards/ui-authoring-specs/UI_TOKENS.yaml-Authoring-Specification.md
+standards/ui-authoring-specs/UI_VISUAL_SPEC.yaml-Authoring-Specification.md
 ```
 
-### Execution Spine
+The current UI standards do not include a concrete implementation stack standard.
 
-`docs/execution-validation.md` should:
+## 17. Active Prompt Groups
+
+Prompt groups:
 
 ```text
-cover the full Web App execution route
-evaluate P0-P10 phases
-include engineering foundation tasks
-include product workflow tasks
-include task-scoped source references
-include required validation
-include completion rules
+review prompts
+non-UI reference prompts
+UI reference prompts
+execution prompts
+review/check prompts
 ```
 
-It should not:
+UI reference prompts:
 
 ```text
-redefine product requirements
-redefine domain rules
-redefine API contracts
-redefine frontend/backend catalogs
-redefine command catalogs
+prompts/ui-page-prompt.md
+prompts/ui-tokens-prompt.md
+prompts/ui-visual-spec-prompt.md
 ```
 
-### AGENTS.md
-
-`AGENTS.md` should:
+Execution prompts:
 
 ```text
-make execution-validation.md the primary execution source
-enforce task-scoped reading
-forbid broad task inference from reference catalogs
-define command and validation rules
-define conflict handling
-define execution report rules
+prompts/execution-validation-prompt.md
+prompts/AGENTS-prompt.md
 ```
 
----
-
-## Source-of-Truth Conflict Rules
-
-If documents conflict, use the owner document for the relevant ID type.
-
-Examples:
+Final review prompt:
 
 ```text
-REQ-* conflict -> product-spec.md wins.
-DEC-* conflict -> project-decisions.md wins.
-BR-* conflict -> domain-model.md wins.
-API-* conflict -> data-api-contract.md wins.
-FE-* conflict -> frontend-design.md wins.
-BE-* conflict -> backend-design.md wins.
-ENV-* conflict -> dev-environment.md wins.
-TASK-* / VAL-* conflict -> execution-validation.md wins.
-UI page structure conflict -> UI_PAGE.yaml wins.
-UI token conflict -> UI_TOKENS.yaml wins.
-UI visual rule conflict -> UI_VISUAL_SPEC.yaml wins.
-Runtime policy conflict -> AGENTS.md wins for Codex behavior.
+prompts/cross-document-review-prompt.md
 ```
 
-If a conflict changes product scope, API shape, data model, architecture boundary, validation expectation, or task scope, Codex should stop and ask for a human decision.
+## 18. Ownership Safety Summary
 
----
-
-## Token Efficiency Rules
-
-The document system should reduce Codex runtime context.
-
-Rules:
+The system is safe when:
 
 ```text
-Codex should not read all documents before every task.
-TASK-* entries must list required source references.
-Source references should point to headings, IDs, or YAML keys.
-Reference entries should be short enough to read independently.
-Long reasoning belongs in discovery discussion, not runtime docs.
+review docs connect but do not define final source content
+non-UI reference docs define their own ID families
+UI reference docs define technology-agnostic UI intent
+execution docs define task and validation behavior
+AGENTS.md defines runtime rules
+codex-execution-report.md records runtime work only
 ```
 
----
-
-## Review Expectations
-
-Cross-document review should check:
+The system is unsafe when:
 
 ```text
-reference catalogs are compact
-IDs are heading-addressable
-execution spine covers P0-P10
-TASK-* entries have task-scoped source references
-validation is container-first and task-scoped
-AGENTS.md enforces execution-validation-first execution
-source-of-truth conflicts are visible
-Codex can execute without inferring missing tasks
+reference docs depend on each other for meaning
+UI files define technology-specific implementation
+execution docs redefine source content
+Codex is asked to infer tasks from reference catalogs
+Codex is asked to infer UI field meanings without codex_consumption
+Open Questions leak into final reference, UI, or execution docs
 ```
 
----
+## 19. Final Rule
 
-## Quality Checklist
-
-Before accepting a document set, verify:
+The document system must support this flow:
 
 ```text
-[ ] Discovery context is sufficient or assumptions are explicit.
-[ ] Reference catalogs are compact and ID-first.
-[ ] Markdown IDs are heading-addressable.
-[ ] UI YAML keys are stable enough for task references.
-[ ] execution-validation.md is the primary execution spine.
-[ ] execution-validation.md evaluates P0-P10 phases.
-[ ] TASK-* entries reference specific catalog entries.
-[ ] AGENTS.md says Codex reads only AGENTS.md and execution-validation.md by default.
-[ ] AGENTS.md forbids task inference from reference catalogs.
-[ ] Commands are owned by ENV-* entries.
-[ ] Validation is owned by VAL-* and task mappings.
-[ ] Cross-document review has been run before Codex execution.
+discover decisions
+resolve questions
+define non-UI references
+define UI references
+compose flows
+generate execution tasks
+run Codex with task-scoped reading
+validate claims
+record runtime work
+review consistency
 ```
+
+Each document must make the next step safer, not broader.

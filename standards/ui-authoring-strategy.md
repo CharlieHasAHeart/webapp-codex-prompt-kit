@@ -1,522 +1,469 @@
-# UI Authoring Strategy Standard
+# UI Authoring Strategy
 
 ## Purpose
 
-This standard defines how UI reference files fit into the Codex-ready Web App document system.
+This standard defines how UI documentation should be authored in the WebApp Codex Prompt Kit.
 
-The UI document set is designed to support:
+The goal is to separate UI meaning, UI tokens, and UI visual rules so Codex can implement frontend screens without relying on vague prose or broad design interpretation.
 
-```text
-task-scoped reading
-reference catalog usage
-execution-validation.md task planning
-frontend implementation without UI drift
-```
-
-UI details should be structured into three YAML files:
+The generated target project should use:
 
 ```text
-docs/ui/UI_PAGE.yaml
-docs/ui/UI_TOKENS.yaml
-docs/ui/UI_VISUAL_SPEC.yaml
+docs/
+├── review/
+├── reference/
+└── execution/
 ```
 
-These files are reference sources for `frontend-design.md` and `execution-validation.md`.
+UI reference files belong under:
 
----
+```text
+docs/reference/ui/
+```
 
 ## Core Principle
 
-UI authoring should separate:
+UI documentation should separate three concerns:
 
 ```text
-semantic page structure
-design tokens
-visual usage rules
+what the UI is
+what reusable design tokens exist
+how visual and interaction rules should be applied
 ```
 
-Do not mix these concerns.
-
-| File | Owns |
-|---|---|
-| `UI_PAGE.yaml` | Semantic app shell, routes, pages, sections, actions, and UI states. |
-| `UI_TOKENS.yaml` | Semantic reusable design tokens and token mappings. |
-| `UI_VISUAL_SPEC.yaml` | Visual usage rules for layout, components, states, responsiveness, accessibility, shadcn/ui, and Tailwind. |
-
----
-
-## Runtime Role
-
-Codex should not read all UI files by default.
-
-Codex should read a UI file only when the current `TASK-*` in `docs/execution-validation.md` references a specific UI page, token group, visual rule, or YAML key.
-
-Good task references:
+These concerns are represented by three files:
 
 ```text
-docs/ui/UI_PAGE.yaml#cases_list
-docs/ui/UI_PAGE.yaml#create_case
-docs/ui/UI_TOKENS.yaml#color
-docs/ui/UI_VISUAL_SPEC.yaml#states.error
+docs/reference/ui/UI_PAGE.yaml
+docs/reference/ui/UI_TOKENS.yaml
+docs/reference/ui/UI_VISUAL_SPEC.yaml
+```
+
+Each file has a distinct responsibility.
+
+## UI Reference Files
+
+| File | Owns | Does Not Own |
+|---|---|---|
+| `docs/reference/ui/UI_PAGE.yaml` | Semantic app shell, routes, pages, sections, actions, UI states, route/local state. | Tokens, Tailwind classes, raw CSS, React code, backend logic. |
+| `docs/reference/ui/UI_TOKENS.yaml` | Semantic token names, token mappings, CSS variable mappings, Tailwind/shadcn token compatibility. | Page structure, workflow semantics, visual layout rules, React code. |
+| `docs/reference/ui/UI_VISUAL_SPEC.yaml` | Visual layout rules, component visual rules, interaction state rules, responsive rules, accessibility visual rules. | Token raw values, page structure, API contracts, backend behavior, React code. |
+
+## Why Split UI Documentation
+
+A single UI document tends to mix:
+
+```text
+page structure
+design tokens
+component styling
+states
+accessibility
+implementation notes
+```
+
+That makes it hard for Codex to know which part is the source of truth.
+
+The split avoids ownership drift:
+
+```text
+UI_PAGE.yaml says what appears on the page.
+UI_TOKENS.yaml says what token names and mappings exist.
+UI_VISUAL_SPEC.yaml says how the UI should look and behave visually.
+frontend-design.md says how React implements the UI references.
+execution-validation.md says which UI tasks Codex should implement and validate.
+```
+
+## UI_PAGE.yaml Strategy
+
+`UI_PAGE.yaml` is the semantic UI structure catalog.
+
+It should define:
+
+```text
+app metadata
+workspace or app shell
+navigation
+routes
+pages
+sections
+panels
+forms
+tables
+actions
+states
+route-backed state
+local UI state
+related requirements
+related APIs
+related frontend entries
+```
+
+It should not define:
+
+```text
+Tailwind classes
+CSS values
+raw colors
+React components
+backend services
+API response bodies
+Open Questions
+```
+
+### Example Responsibilities
+
+`UI_PAGE.yaml` may define:
+
+```yaml
+routes:
+  - id: route_proposal_app
+    path: /proposal
+    page: page_proposal_app
+
+pages:
+  - id: page_proposal_app
+    title: Proposal Generator
+    sections:
+      - id: section_input
+        title: Input
+      - id: section_progress
+        title: Run Progress
+      - id: section_artifacts
+        title: Artifacts
+```
+
+It should not define:
+
+```yaml
+className: "bg-slate-950 text-white p-4"
+```
+
+## UI_TOKENS.yaml Strategy
+
+`UI_TOKENS.yaml` is the token reference catalog.
+
+It should define reusable semantic names such as:
+
+```text
+surface tokens
+text tokens
+border tokens
+action tokens
+status tokens
+validation tokens
+typography tokens
+spacing tokens
+radius tokens
+shadow tokens
+motion tokens
+breakpoint tokens
+```
+
+It may also map tokens to implementation-level mechanisms:
+
+```text
+CSS variables
+Tailwind theme keys
+shadcn/ui theme compatibility
+```
+
+It should not define:
+
+```text
+page sections
+route names
+component hierarchy
+workflow logic
+React implementation
+Open Questions
+```
+
+### Token Naming Guidance
+
+Prefer semantic token names:
+
+```text
+color.surface.page
+color.surface.panel
+color.text.primary
+color.status.running
+color.validation.failed
+spacing.page_padding
+radius.card
+```
+
+Avoid one-off names:
+
+```text
+blue_button_1
+proposal_form_red
+left_card_padding_special
+```
+
+## UI_VISUAL_SPEC.yaml Strategy
+
+`UI_VISUAL_SPEC.yaml` defines how visual rules should be applied.
+
+It should define rules for:
+
+```text
+layout
+density
+spacing usage
+component visual behavior
+status presentation
+empty/loading/error/success/blocked states
+responsive behavior
+accessibility
+Tailwind usage
+shadcn/ui usage
+```
+
+It should not define:
+
+```text
+raw token values
+page semantic structure
+API contracts
+business rules
+backend logic
+React code
+Open Questions
+```
+
+### Example Responsibilities
+
+`UI_VISUAL_SPEC.yaml` may say:
+
+```yaml
+states:
+  error:
+    rule: Show an explicit message, affected field or section, and recovery action.
+  blocked:
+    rule: Use text-visible blocked status and do not present blocked output as successful.
+```
+
+It should not say:
+
+```yaml
+error:
+  color: "#ff0000"
+```
+
+Raw or mapped values belong in tokens, not visual rules.
+
+## Relationship to Frontend Design
+
+`docs/reference/frontend-design.md` owns `FE-*` entries.
+
+Frontend design should describe how React/Vite components consume the UI reference files.
+
+Example:
+
+```text
+FE-004 implements the Artifact Viewer section defined by UI_PAGE.yaml#section_artifacts.
+FE-004 uses status and validation display rules from UI_VISUAL_SPEC.yaml.
+FE-004 uses semantic tokens from UI_TOKENS.yaml.
+```
+
+Frontend design should not replace UI YAML ownership with long prose.
+
+## Relationship to Execution Tasks
+
+`docs/execution/execution-validation.md` should reference UI files when generating UI tasks.
+
+Example:
+
+```markdown
+Read before this task:
+| Source | Required? | Why |
+|---|---:|---|
+| `docs/reference/ui/UI_PAGE.yaml#page_proposal_app` | yes | Page structure implemented by this task. |
+| `docs/reference/ui/UI_VISUAL_SPEC.yaml#states` | yes | Required UI state behavior. |
+| `docs/reference/frontend-design.md#FE-004` | yes | Frontend implementation responsibility. |
+```
+
+A task should not tell Codex to infer UI from screenshots or discussion when UI references exist.
+
+## Relationship to Product and API
+
+UI references should connect to product and API catalogs without redefining them.
+
+`UI_PAGE.yaml` may reference:
+
+```text
+REQ-*
+API-*
+ERR-*
+TYPE-*
+FE-*
+```
+
+It should not define request and response fields.
+
+Example:
+
+```yaml
+actions:
+  - id: action_create_run
+    label: Generate Proposal
+    calls_api: API-001
+    related_requirements:
+      - REQ-001
+```
+
+## State Authoring Strategy
+
+UI states should be explicit.
+
+Common states:
+
+```text
+idle
+loading
+submitting
+empty
+success
+failed
+blocked
+validation_failed
+disabled
+unauthorized
+not_found
+```
+
+Each state should make clear:
+
+```text
+when it appears
+what the user sees
+what action is available
+whether it blocks the workflow
+```
+
+Status must not rely on color alone.
+
+Use text-visible labels.
+
+## Accessibility Strategy
+
+UI visual and page specs should support accessibility.
+
+Document:
+
+```text
+form labels
+button text
+status text
+error text
+keyboard reachability
+focus behavior
+disabled behavior
+aria-live behavior where useful
+contrast expectations
+```
+
+Do not rely only on visual color names.
+
+Example:
+
+```text
+Validation failed state must include visible text and issue list, not only red styling.
+```
+
+## Responsive Strategy
+
+Responsive rules belong in `UI_VISUAL_SPEC.yaml`.
+
+They should describe behavior, not implementation-only class strings.
+
+Good:
+
+```text
+On narrow screens, stack workflow panels vertically and keep primary actions visible below the active form section.
 ```
 
 Avoid:
 
 ```text
-read all UI docs
-read UI_PAGE.yaml entirely
-read the visual spec globally
+Use md:grid-cols-2 lg:grid-cols-3.
 ```
 
-Full-file reads are allowed only when a task explicitly requires broad UI integration.
-
----
-
-## Generation Order
-
-Recommended order:
-
-```text
-1. UI_PAGE.yaml
-2. frontend-design.md
-3. UI_TOKENS.yaml
-4. UI_VISUAL_SPEC.yaml
-5. execution-validation.md
-```
-
-Reason:
-
-```text
-UI_PAGE.yaml defines semantic routes, pages, sections, actions, and states before frontend implementation planning.
-frontend-design.md consumes UI_PAGE.yaml.
-UI_TOKENS.yaml and UI_VISUAL_SPEC.yaml refine reusable UI implementation guidance.
-execution-validation.md references all UI sources from TASK-* when needed.
-```
-
----
-
-## UI_PAGE.yaml Responsibility
-
-`UI_PAGE.yaml` owns semantic UI structure.
-
-It may include:
-
-```text
-app shell
-navigation
-routes
-pages
-sections
-actions
-states
-route-backed state
-local UI state
-related REQ/API/ERR references
-```
-
-It must not include:
-
-```text
-JSX
-React hooks
-Tailwind classes
-CSS values
-visual token values
-backend logic
-database schema
-API request/response schemas
-TASK-*
-VAL-*
-FE-*
-BE-*
-```
-
-Good content examples:
-
-```text
-page ID
-route path
-section ID
-action ID
-page state
-route state
-local state
-semantic icon name
-related API ID
-related requirement ID
-```
-
----
-
-## UI_TOKENS.yaml Responsibility
-
-`UI_TOKENS.yaml` owns reusable semantic tokens.
-
-It may include:
-
-```text
-semantic color tokens
-typography tokens
-spacing tokens
-radius tokens
-shadow tokens
-border tokens
-motion tokens
-breakpoint tokens
-CSS variable mapping
-Tailwind token mapping
-shadcn/ui token compatibility
-```
-
-It must not include:
-
-```text
-page structure
-routes
-sections
-actions
-React code
-full Tailwind class strings
-API fields
-database fields
-backend logic
-business workflow rules
-TASK-*
-VAL-*
-```
-
-Good token names are semantic:
-
-```text
-background.default
-surface.card
-text.primary
-text.muted
-border.default
-action.primary
-state.error
-radius.2xl
-shadow.popover
-motion.duration.fast
-```
-
-Avoid raw or page-specific token names unless the authoring spec explicitly allows them.
-
----
-
-## UI_VISUAL_SPEC.yaml Responsibility
-
-`UI_VISUAL_SPEC.yaml` owns visual usage rules.
-
-It may include:
-
-```text
-visual principles
-layout rules
-component visual rules
-state visual rules
-responsive behavior rules
-accessibility visual rules
-shadcn/ui usage boundaries
-Tailwind usage boundaries
-token usage rules
-```
-
-It must not include:
-
-```text
-raw token values that belong in UI_TOKENS.yaml
-page structure that belongs in UI_PAGE.yaml
-React code
-JSX
-React hooks
-full Tailwind class strings
-API schemas
-database schema
-backend logic
-implementation tasks
-validation commands
-```
-
-Visual rules should reference token names from `UI_TOKENS.yaml`.
-
----
-
-## Relationship to frontend-design.md
-
-`frontend-design.md` owns `FE-*` frontend implementation entries.
-
-It should consume UI files as references.
-
-Correct pattern:
-
-```text
-UI_PAGE.yaml defines page/action/state structure.
-UI_TOKENS.yaml defines token names.
-UI_VISUAL_SPEC.yaml defines visual usage rules.
-frontend-design.md defines FE-* entries that implement them.
-execution-validation.md defines TASK-* entries that execute them.
-```
-
-Incorrect pattern:
-
-```text
-frontend-design.md duplicates the full UI_PAGE.yaml structure.
-frontend-design.md defines token values.
-frontend-design.md contains long visual design rules already owned by UI_VISUAL_SPEC.yaml.
-```
-
----
-
-## Relationship to execution-validation.md
-
-`execution-validation.md` should reference UI files only when needed by a task.
-
-Example frontend task:
-
-```markdown
-Read before this task:
-| Source | Required? | Why |
-|---|---:|---|
-| `docs/frontend-design.md#FE-003` | yes | Page implementation rules. |
-| `docs/ui/UI_PAGE.yaml#cases_list` | yes | Page structure and UI states. |
-| `docs/data-api-contract.md#API-001` | yes | Data contract for page loading. |
-| `docs/dev-environment.md#ENV-010` | yes | Frontend test command pattern. |
-```
-
-Example visual task:
-
-```markdown
-Read before this task:
-| Source | Required? | Why |
-|---|---:|---|
-| `docs/ui/UI_TOKENS.yaml#color` | yes | Token names for semantic colors. |
-| `docs/ui/UI_VISUAL_SPEC.yaml#states.error` | yes | Error state visual rules. |
-| `docs/frontend-design.md#FE-005` | yes | Shared state component responsibility. |
-```
-
----
-
-## Modern Web App UI Expectations
-
-When relevant to the project, UI authoring should consider:
-
-```text
-collapsible sidebar
-sidebar navigation groups
-lucide-compatible semantic icon names
-page header
-breadcrumbs
-primary page action
-secondary actions
-filter toolbar
-data table
-detail page
-forms
-dialogs
-drawers/sheets
-loading states
-empty states
-error states
-permission states
-disabled states
-submitting states
-success states
-conflict/stale states
-responsive navigation
-accessibility focus states
-```
-
-These should be represented in the appropriate UI file:
-
-```text
-structure -> UI_PAGE.yaml
-tokens -> UI_TOKENS.yaml
-visual rules -> UI_VISUAL_SPEC.yaml
-implementation entry -> frontend-design.md
-task -> execution-validation.md
-```
-
----
+Implementation classes can be chosen by Codex during frontend implementation, as long as they satisfy the visual spec.
 
 ## shadcn/ui and Tailwind Strategy
 
-Use shadcn/ui and Tailwind as implementation foundations when project decisions select them.
-
-Rules:
+If the project uses shadcn/ui and Tailwind:
 
 ```text
-Use shadcn/ui components as base primitives when available.
-Use Tailwind utilities for layout and state styling where appropriate.
-Use semantic token names and CSS variables when available.
-Do not hardcode raw colors when token-backed values exist.
-Do not encode long Tailwind class strings in UI specs.
-Do not place business-specific feature logic inside generic UI primitives.
+UI_TOKENS.yaml defines token names and mappings.
+UI_VISUAL_SPEC.yaml defines usage rules.
+frontend-design.md defines component implementation responsibilities.
+execution-validation.md defines tasks and validation.
 ```
 
-Exact implementation belongs in frontend code and `FE-*` tasks, not in UI authoring specs.
+Do not put shadcn imports, JSX, or Tailwind class strings into UI YAML.
 
----
+Use `standards/ui-authoring-specs/shadcn-tailwind-implementation-standard.md` for implementation guidance.
 
-## Accessibility Strategy
+## Open Questions Rule
 
-UI authoring should account for accessibility states and behavior.
+UI reference files must not contain Open Questions.
 
-Include visual guidance for:
+Do not include:
 
 ```text
-visible focus states
-keyboard-accessible interactions
-non-color-only status communication
-sufficient contrast
-clear error messages
-disabled/submitting behavior
-permission-denied messaging
-responsive touch targets where relevant
+Should this page have a sidebar?
+Need to decide the route later.
+Maybe use a table here.
 ```
 
-Do not include full accessibility test commands here. Validation belongs in `execution-validation.md`.
+Resolve the question before final UI references are generated.
 
----
-
-## UI State Strategy
-
-Data-driven pages should usually cover:
+The final UI reference should say:
 
 ```text
-loading
-empty
-ready
-error
-permission_denied
-not_found
-disabled
-submitting
-success
-conflict
-stale
+navigation.type: collapsible_app_dock
 ```
 
-`UI_PAGE.yaml` should define states semantically.
-
-`UI_VISUAL_SPEC.yaml` should define visual behavior for states.
-
-`frontend-design.md` should define `FE-*` implementation responsibilities.
-
-`execution-validation.md` should define tasks and validation for required states.
-
----
-
-## Route State vs Local State
-
-Use route-backed state for shareable or bookmarkable UI state.
-
-Examples:
+or:
 
 ```text
-filters
-pagination
-sorting
-selected tab
-search query
+route is deferred
 ```
 
-Use local state for temporary UI-only state.
+not leave the choice open.
 
-Examples:
+## UI Authoring Anti-Patterns
 
-```text
-dialog open
-popover open
-temporary form draft
-expanded local section
-hover state
-submitting flag
-```
-
-This distinction belongs primarily in `UI_PAGE.yaml`.
-
----
-
-## UI Reference Key Rules
-
-UI YAML keys should be stable enough for task references.
-
-Recommended stable key types:
-
-```text
-app shell ID
-navigation item ID
-route ID
-page ID
-section ID
-action ID
-state ID
-token group key
-visual rule key
-```
-
-Avoid unstable auto-generated or overly generic IDs such as:
-
-```text
-page1
-section2
-button3
-thing
-misc
-```
-
----
-
-## UI Review Checklist
-
-During cross-document review, check:
-
-```text
-[ ] UI_PAGE.yaml is semantic and does not include implementation code.
-[ ] UI_PAGE.yaml defines routes, pages, sections, actions, and states where relevant.
-[ ] UI_TOKENS.yaml defines reusable semantic tokens.
-[ ] UI_TOKENS.yaml does not duplicate page structure.
-[ ] UI_VISUAL_SPEC.yaml references token names instead of raw values.
-[ ] UI_VISUAL_SPEC.yaml does not include React code.
-[ ] frontend-design.md references UI files without duplicating them fully.
-[ ] execution-validation.md references UI keys only for relevant tasks.
-[ ] UI-related tasks cover loading, empty, error, permission, and responsive states where relevant.
-[ ] UI specs do not define backend logic or API schemas.
-```
-
----
-
-## Common UI Authoring Failures
-
-Avoid these patterns:
+Avoid:
 
 ```text
 UI_PAGE.yaml contains Tailwind classes
-UI_PAGE.yaml defines API request/response shapes
+UI_PAGE.yaml defines raw colors
 UI_TOKENS.yaml contains page routes
-UI_VISUAL_SPEC.yaml defines raw token values
-UI_VISUAL_SPEC.yaml contains JSX
-frontend-design.md duplicates entire UI_PAGE.yaml
-execution-validation.md asks Codex to read all UI docs for every frontend task
-UI state tasks cover only ready state
-permission behavior exists only as frontend hiding
+UI_VISUAL_SPEC.yaml duplicates token values
+frontend-design.md redefines every UI section in prose
+execution-validation.md asks Codex to design the UI from scratch
+UI YAML includes Open Questions
+UI YAML includes React code
+UI docs define backend behavior
 ```
 
----
+## UI Review Checklist
 
-## Quality Checklist
-
-Before accepting UI documents, verify:
+Before accepting UI reference files, verify:
 
 ```text
-[ ] UI concerns are split across page, token, and visual files.
-[ ] YAML is valid.
-[ ] Stable UI keys exist for task references.
-[ ] UI files are semantic and implementation-light.
-[ ] Token names are semantic and reusable.
-[ ] Visual rules reference token names.
-[ ] Frontend implementation details are in FE-* entries.
-[ ] UI execution work is represented in TASK-* entries.
-[ ] Codex can read UI sources task-by-task, not globally.
+[ ] UI_PAGE.yaml defines semantic routes, pages, sections, actions, and states.
+[ ] UI_TOKENS.yaml defines reusable semantic tokens.
+[ ] UI_VISUAL_SPEC.yaml defines visual and interaction usage rules.
+[ ] UI docs use docs/reference/ui paths.
+[ ] UI docs contain no Open Questions.
+[ ] UI_PAGE.yaml references REQ-* and API-* where useful.
+[ ] UI visual rules include text-visible status requirements.
+[ ] UI accessibility expectations are explicit.
+[ ] Frontend design references UI YAML instead of redefining it.
+[ ] Execution tasks reference UI YAML when implementing UI work.
 ```

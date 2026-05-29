@@ -1,440 +1,284 @@
-# Frontend Backend Boundary Standard
+# Frontend / Backend Boundary Standard
 
-## Purpose
+## 1. Purpose
 
-This standard defines the boundary between frontend and backend code in a Codex-ready Web App project.
+This standard defines how frontend and backend responsibilities must be separated in Codex-ready Web App documentation and implementation.
 
-It supports the v0.4.0 document model:
+It prevents boundary drift where:
+
+- frontend documents define backend contracts
+- backend documents redefine frontend behavior
+- frontend and backend independently invent incompatible API shapes
+- execution tasks mix unrelated frontend and backend work
+- Codex implements cross-boundary shortcuts without an explicit contract
+
+## 2. Scope
+
+This standard applies to:
+
+- `docs/reference/architecture.md`
+- `docs/reference/data-api-contract.md`
+- `docs/reference/frontend-design.md`
+- `docs/reference/backend-design.md`
+- `docs/reference/ui/UI_PAGE.yaml`
+- `docs/execution/execution-validation.md`
+- `docs/execution/AGENTS.md`
+- `docs/review/flow-composition-review.md`
+- `docs/review/cross-document-review-report.md`
+
+It also applies to prompts that generate those documents.
+
+## 3. Core Principle
+
+Frontend and backend communicate through documented contracts.
+
+The primary contract owner is:
 
 ```text
-reference catalogs
-execution spine
-task-scoped reading
+docs/reference/data-api-contract.md
 ```
 
-The goal is to prevent Codex from mixing frontend, backend, shared package, API, and database responsibilities while executing `TASK-*`.
+Frontend implementation consumes API, error, and shared type contracts.
 
----
+Backend implementation fulfills API, error, and shared type contracts.
 
-## Default Repository Layout
+Neither side may invent or redefine the shared contract in its own implementation reference.
 
-The recommended default layout is:
+## 4. Source-of-Truth Ownership
 
-```text
-apps/web
-apps/api
-packages/*
-```
-
-Default responsibilities:
-
-| Path | Responsibility |
+| Area | Owner |
 |---|---|
-| `apps/web` | Frontend Web app, routes, pages, components, frontend API clients, browser-side behavior. |
-| `apps/api` | Backend API app, handlers, services, repositories, data access, server-side auth, business rule enforcement. |
-| `packages/*` | Shared app-agnostic code, such as API types, schemas, shared constants, and shared config. |
-
-Project-specific layout decisions belong in:
-
-```text
-docs/project-decisions.md#DEC-*
-docs/architecture.md#ARCH-*
-```
-
----
-
-## Core Boundary Rules
-
-### Frontend Rules
-
-Frontend code may:
-
-```text
-render UI
-own routes and pages
-own browser-side state
-call backend APIs through API client modules
-use shared app-agnostic contract types
-render loading, empty, error, permission, and success states
-perform client-side validation for UX
-```
-
-Frontend code must not:
-
-```text
-import backend handlers, services, repositories, or database clients
-access the database directly
-own authoritative business rule enforcement
-own authoritative permission enforcement
-define API response contracts
-store server-only secrets
-```
-
----
-
-### Backend Rules
-
-Backend code may:
-
-```text
-own API handlers
-own request validation
-own service/business workflow logic
-own repositories and data access
-own transactions
-own authoritative auth and permission checks
-own structured error generation
-own background jobs and integration adapters
-```
-
-Backend code must not:
-
-```text
-import frontend components
-import frontend routes/pages
-depend on browser-only code
-define UI page structure
-define UI visual tokens
-return frontend component-specific shapes unless documented as API contracts
-```
+| Product behavior | `docs/reference/product-spec.md` |
+| Domain entities, relationships, rules, and states | `docs/reference/domain-model.md` |
+| Architecture boundaries | `docs/reference/architecture.md` |
+| Data objects, API contracts, error contracts, shared types | `docs/reference/data-api-contract.md` |
+| UI semantic structure | `docs/reference/ui/UI_PAGE.yaml` |
+| UI tokens | `docs/reference/ui/UI_TOKENS.yaml` |
+| UI visual rules | `docs/reference/ui/UI_VISUAL_SPEC.yaml` |
+| Frontend implementation responsibilities | `docs/reference/frontend-design.md` |
+| Backend implementation responsibilities | `docs/reference/backend-design.md` |
+| Environment command patterns | `docs/reference/dev-environment.md` |
+| Flow composition analysis | `docs/review/flow-composition-review.md` |
+| Execution tasks and validation | `docs/execution/execution-validation.md` |
+| Codex runtime policy | `docs/execution/AGENTS.md` |
 
----
+## 5. Rule Catalog
 
-### Shared Package Rules
+### FB-RULE-001: API Contracts Belong Only to Data/API Contract
 
-Shared packages may contain:
+Requirement:
+- API routes, request fields, response fields, status codes, error shapes, and shared contract types must be defined in `docs/reference/data-api-contract.md`.
 
-```text
-API contract types
-shared request/response schemas
-shared error envelope types
-shared pagination types
-shared enums/value sets
-shared constants
-shared app-agnostic utilities
-shared test utilities when app-agnostic
-```
+Required:
+- Frontend design references `API-*`, `ERR-*`, and `TYPE-*` entries.
+- Backend design references and implements `API-*`, `ERR-*`, and `TYPE-*` entries.
 
-Shared packages must not contain:
+Forbidden:
+- Defining a new endpoint in `frontend-design.md` or `backend-design.md`.
+- Copying full request/response schemas into frontend or backend design as a new source of truth.
 
-```text
-frontend components
-backend services
-API handlers
-repositories
-database clients
-server-only secrets
-browser-only code unless the package is explicitly browser-only
-business workflows that belong in apps/api
-```
+Check:
+- Every frontend or backend API reference points to an existing `API-*` entry.
+- No frontend/backend document contains an unmatched request or response shape.
 
----
+### FB-RULE-002: Frontend Consumes Contracts
 
-## Source-of-Truth Ownership
+Requirement:
+- Frontend design owns how the browser implements UI behavior, state management, API client usage, error display, feedback, recovery, and accessibility.
 
-The boundary is enforced through these owner documents:
+Required:
+- Reference `UI_PAGE.yaml` for page/action/state semantics.
+- Reference `API-*` for calls.
+- Reference `ERR-*` for error display behavior.
+- Reference `TYPE-*` for contract values such as status, artifact type, or validation issue.
 
-| Concern | Owner |
-|---|---|
-| Product requirements | `docs/product-spec.md` |
-| Project decisions | `docs/project-decisions.md` |
-| Domain rules | `docs/domain-model.md` |
-| Architecture boundaries | `docs/architecture.md` |
-| DB/API/error/shared contracts | `docs/data-api-contract.md` |
-| UI page structure | `docs/ui/UI_PAGE.yaml` |
-| Frontend implementation entries | `docs/frontend-design.md` |
-| Backend implementation entries | `docs/backend-design.md` |
-| Environment commands | `docs/dev-environment.md` |
-| Execution tasks and validation | `docs/execution-validation.md` |
+Forbidden:
+- Defining backend service orchestration.
+- Defining database fields.
+- Defining API response bodies as a frontend-owned contract.
+- Inventing business rules not owned by `domain-model.md`.
 
-Frontend and backend catalogs should reference owner IDs instead of redefining them.
+Check:
+- Frontend entries can be implemented without redefining backend behavior.
 
----
+### FB-RULE-003: Backend Fulfills Contracts
 
-## API Contract Boundary
+Requirement:
+- Backend design owns API handler responsibilities, service orchestration, data/storage access, artifact handling, error production, security enforcement, and recovery support.
 
-`docs/data-api-contract.md` owns:
+Required:
+- Reference `API-*` for endpoint obligations.
+- Reference `DB-*` for persistence or file-backed contracts.
+- Reference `ERR-*` for error production.
+- Reference `TYPE-*` for serialized contract values.
+- Reference `ENT-*`, `BR-*`, and `STATE-*` for domain meaning and rules.
 
-```text
-DB-*
-API-*
-ERR-*
-TYPE-*
-```
+Forbidden:
+- Defining React component behavior.
+- Defining UI page structure.
+- Redefining frontend state management.
+- Redefining API request/response shapes.
 
-Frontend and backend must consume these contracts.
+Check:
+- Backend entries can be implemented without inventing UI behavior.
 
-Frontend must not invent API shapes inside `frontend-design.md`.
+### FB-RULE-004: Error Contracts Are Shared, Display and Production Are Separate
 
-Backend must not redefine API contracts inside `backend-design.md`.
+Requirement:
+- Error contract shape belongs to `ERR-*` entries in `data-api-contract.md`.
 
-Correct pattern:
+Required:
+- Backend design describes when and why an `ERR-*` is returned.
+- Frontend design describes how each relevant `ERR-*` is displayed and recovered from.
 
-```text
-data-api-contract.md#API-001 defines request/response/errors
-frontend-design.md#FE-003 references API-001
-backend-design.md#BE-005 references API-001
-execution-validation.md#TASK-* references API-001, FE-003, and BE-005
-```
+Forbidden:
+- Frontend and backend documents defining separate incompatible error payloads.
 
-Incorrect pattern:
+Check:
+- Every user-visible error flow maps to both backend production and frontend display/recovery behavior.
 
-```text
-frontend-design.md writes a new response shape
-backend-design.md writes a different response shape
-execution-validation.md leaves Codex to reconcile them
-```
+### FB-RULE-005: Shared Types Must Not Drift
 
----
+Requirement:
+- Shared contract values must be defined as `TYPE-*` entries when used across frontend and backend.
 
-## Business Rule Boundary
+Required:
+- Frontend uses `TYPE-*` to render statuses, artifacts, validation issues, and other shared values.
+- Backend serializes responses according to `TYPE-*`.
 
-`docs/domain-model.md` owns business rules as `BR-*`.
+Forbidden:
+- Frontend-only or backend-only enum values that conflict with the contract.
 
-Backend is authoritative for enforcing business rules.
+Check:
+- Status values and artifact values used in UI states match `TYPE-*` exactly.
 
-Frontend may provide UX guardrails but must not be the only enforcement point.
+### FB-RULE-006: UI Semantics Are Not Backend Responsibilities
 
-Correct pattern:
+Requirement:
+- UI routes, pages, sections, actions, and states belong to `UI_PAGE.yaml` and frontend design.
 
-```text
-domain-model.md#BR-001 defines the rule
-backend-design.md#BE-* states where the rule is enforced
-frontend-design.md#FE-* may render disabled states or warnings
-execution-validation.md#TASK-* validates backend enforcement
-```
+Required:
+- Backend may support UI flows through APIs, status values, artifacts, and errors.
+- Backend must not define page layout, navigation hierarchy, or component structure.
 
-Incorrect pattern:
+Forbidden:
+- Backend design entries that prescribe React components, page sections, or visual layout.
 
-```text
-BR-* is only enforced by hiding a frontend button
-```
+Check:
+- Backend references UI only as a consumer of API-supported behavior, not as a structure it owns.
 
----
+### FB-RULE-007: Domain Rules Are Not Invented by Frontend or Backend
 
-## Data Access Boundary
+Requirement:
+- Domain meaning and business rules belong to `domain-model.md`.
 
-Database access belongs to backend by default.
+Required:
+- Backend enforces relevant `BR-*` rules.
+- Frontend reflects relevant `STATE-*` and `BR-*` outcomes through visible UI behavior.
 
-Frontend must never access the database directly.
+Forbidden:
+- Frontend or backend documents becoming the first source of a business rule.
 
-Data access rules should be defined in:
+Check:
+- Business rules appearing in FE/BE docs trace back to `BR-*` or product requirements.
 
-```text
-docs/architecture.md#ARCH-*
-docs/backend-design.md#BE-*
-docs/data-api-contract.md#DB-*
-```
+### FB-RULE-008: Flow-First Execution Must Preserve Boundaries
 
-Correct pattern:
+Requirement:
+- Execution flow slices may include frontend, API, backend, data/storage, artifact, feedback, recovery, and validation work, but they must not blur ownership.
 
-```text
-apps/web -> API client -> apps/api API handler -> service -> repository -> database
-```
+Required:
+- A flow slice references the contract owner for API/data/error/type details.
+- A flow slice references frontend design for browser behavior.
+- A flow slice references backend design for server behavior.
 
-Incorrect patterns:
+Forbidden:
+- A flow slice inventing contracts not present in `data-api-contract.md`.
+- A flow slice mixing broad unrelated frontend and backend work without flow justification.
 
-```text
-apps/web -> database
-apps/web -> apps/api repository import
-packages/shared -> database client
-```
+Check:
+- Each flow slice explains why cross-layer work belongs to one executable flow.
 
----
+### FB-RULE-009: Cross-Cutting Integration Tasks Must Be Explicit
 
-## Error Boundary
+Requirement:
+- Cross-cutting tasks are allowed only when they validate a boundary or an end-to-end flow.
 
-`docs/data-api-contract.md` owns `ERR-*`.
+Allowed:
+- API contract integration checks.
+- Frontend/backend error consistency checks.
+- Artifact download smoke validation.
+- Recovery flow integration validation.
 
-Backend creates structured errors.
+Forbidden:
+- A vague task such as “implement backend and frontend” without a named flow or boundary reason.
 
-Frontend renders documented error behavior.
+Check:
+- Cross-cutting tasks map to a named Execution Flow, contract boundary, or validation claim.
 
-Correct pattern:
+### FB-RULE-010: Validation Commands Belong to Execution Validation
 
-```text
-backend service/handler maps known failure to ERR-*
-frontend API client parses ERR-*
-frontend UI renders state defined by UI_PAGE.yaml and FE-*
-```
+Requirement:
+- Task-specific validation selection belongs in `execution-validation.md`.
+- Reusable command patterns belong in `dev-environment.md`.
 
-Incorrect pattern:
+Required:
+- Frontend/backend design may describe what should be testable conceptually.
+- `VAL-*` entries define final commands and claims proven.
 
-```text
-frontend parses arbitrary backend message strings as business logic
-```
+Forbidden:
+- Frontend or backend design choosing final task-specific validation commands.
 
----
+Check:
+- No FE/BE reference entry owns a validation command that should be a `VAL-*` entry.
 
-## Auth and Permission Boundary
+## 6. Flow-Aware Boundary Pattern
 
-Backend is authoritative for auth and permissions.
+A valid Execution Flow should preserve this separation:
 
-Frontend permission rendering is UX only.
+| Flow Layer | Owner | Example Responsibility |
+|---|---|---|
+| Product goal | `product-spec.md` | User can submit source material and receive a created run. |
+| Domain meaning | `domain-model.md` | A run has a lifecycle state. |
+| API/data contract | `data-api-contract.md` | `API-*` accepts a create-run request and returns documented response fields. |
+| UI semantics | `UI_PAGE.yaml` | Submit action, progress section, artifact section. |
+| Frontend behavior | `frontend-design.md` | Submit form, show pending state, display errors, retry. |
+| Backend behavior | `backend-design.md` | Validate request, create run, persist state, produce errors. |
+| Execution task | `execution-validation.md` | Implement and validate the named flow slice. |
 
-Rules:
+## 7. Required Practices
 
-```text
-Frontend route guards do not replace backend permission checks.
-Frontend disabled buttons do not replace backend permission checks.
-Backend API handlers or services must enforce permission rules when auth is in scope.
-```
+- Use `data-api-contract.md` as the contract bridge between frontend and backend.
+- Reference IDs instead of duplicating owned definitions.
+- Keep frontend and backend responsibilities independently readable.
+- Use flow-first tasks to assemble cross-layer behavior only when the flow requires it.
+- Preserve ownership even inside end-to-end flow slices.
 
-If auth is out of scope for MVP, documents should state the explicit assumption and preserve a path for adding auth later.
+## 8. Forbidden Practices
 
----
+- Do not define API contracts in frontend or backend design.
+- Do not define UI structure in backend design.
+- Do not define backend service behavior in frontend design.
+- Do not create broad “frontend + backend” tasks unless they implement or validate a named flow.
+- Do not let `codex-execution-report.md` introduce new contracts, tasks, requirements, or decisions.
 
-## UI Boundary
+## 9. Prompt Integration
 
-UI page structure belongs to:
+Prompts that generate architecture, data/API contract, frontend design, backend design, flow composition review, execution validation, AGENTS, or cross-document review should use this standard when boundary clarity affects the output.
 
-```text
-docs/ui/UI_PAGE.yaml
-```
+Prompt usage rule:
+- Use this standard when generating documents that reference both frontend and backend responsibilities.
+- Do not load this standard for purely UI token or visual token generation unless frontend/backend boundary concerns are relevant.
 
-UI tokens belong to:
+## 10. Review Checklist
 
-```text
-docs/ui/UI_TOKENS.yaml
-```
+Use this checklist during cross-document review:
 
-UI visual rules belong to:
-
-```text
-docs/ui/UI_VISUAL_SPEC.yaml
-```
-
-Frontend implementation belongs to:
-
-```text
-docs/frontend-design.md#FE-*
-```
-
-Rules:
-
-```text
-UI_PAGE.yaml should not include React code or Tailwind classes.
-UI_TOKENS.yaml should not include page structure.
-UI_VISUAL_SPEC.yaml should not include React code.
-frontend-design.md should consume UI references and define FE-* implementation entries.
-```
-
----
-
-## Task-Level Boundary Requirements
-
-Each `TASK-*` that touches frontend or backend should include task-scoped source references.
-
-Frontend task example:
-
-```markdown
-Read before this task:
-| Source | Required? | Why |
-|---|---:|---|
-| `docs/frontend-design.md#FE-003` | yes | Frontend page implementation rules. |
-| `docs/ui/UI_PAGE.yaml#cases_list` | yes | Page structure and states. |
-| `docs/data-api-contract.md#API-001` | yes | API contract consumed by the page. |
-| `docs/dev-environment.md#ENV-010` | yes | Frontend test command pattern. |
-```
-
-Backend task example:
-
-```markdown
-Read before this task:
-| Source | Required? | Why |
-|---|---:|---|
-| `docs/backend-design.md#BE-005` | yes | Backend API handler rules. |
-| `docs/data-api-contract.md#API-001` | yes | API contract implemented by the handler. |
-| `docs/domain-model.md#BR-002` | yes | Business rule enforced by the service. |
-| `docs/dev-environment.md#ENV-011` | yes | Backend test command pattern. |
-```
-
----
-
-## Code Impact Guidance
-
-Frontend `FE-*` and frontend tasks may reference paths such as:
-
-```text
-apps/web/app/...
-apps/web/components/...
-apps/web/lib/api/...
-apps/web/hooks/...
-apps/web/tests/...
-```
-
-Backend `BE-*` and backend tasks may reference paths such as:
-
-```text
-apps/api/src/routes/...
-apps/api/src/services/...
-apps/api/src/repositories/...
-apps/api/src/schemas/...
-apps/api/src/errors/...
-apps/api/src/jobs/...
-apps/api/src/integrations/...
-apps/api/src/tests/...
-```
-
-Shared package tasks may reference paths such as:
-
-```text
-packages/api-contract/...
-packages/shared/...
-packages/config/...
-```
-
-Paths may vary by project decisions, but boundaries should remain clear.
-
----
-
-## Boundary Review Checklist
-
-During cross-document review, check:
-
-```text
-[ ] frontend-design.md does not define API response shapes.
-[ ] backend-design.md does not define DB schema fields.
-[ ] frontend tasks do not import backend internals.
-[ ] backend tasks do not import frontend code.
-[ ] shared packages remain app-agnostic.
-[ ] database access is backend-only unless explicitly decided otherwise.
-[ ] business rules have backend enforcement tasks.
-[ ] UI YAML files contain no React code or backend logic.
-[ ] TASK-* entries reference both implementation catalog entries and source contracts.
-[ ] validation proves boundary-sensitive behavior where relevant.
-```
-
----
-
-## Common Boundary Failures
-
-Avoid these patterns:
-
-```text
-frontend calls database directly
-frontend imports backend service code
-backend imports frontend component code
-packages/* imports app-specific code
-frontend-design.md defines API payloads
-backend-design.md defines API payloads differently
-business rule exists only as disabled UI
-API errors are arbitrary strings
-UI_PAGE.yaml includes Tailwind classes
-execution-validation.md asks Codex to infer boundary rules from all docs
-```
-
----
-
-## Quality Checklist
-
-Before accepting frontend/backend-related documents, verify:
-
-```text
-[ ] Boundaries are defined in ARCH-* entries.
-[ ] FE-* entries reference API/UI/ARCH sources without redefining them.
-[ ] BE-* entries reference API/DB/domain/ARCH sources without redefining them.
-[ ] TASK-* entries use task-scoped references for boundary-sensitive work.
-[ ] Validation commands prove the relevant frontend/backend behavior.
-[ ] Codex can execute without reading unrelated frontend/backend documents.
-```
+- Are API routes and payloads defined only in `data-api-contract.md`?
+- Do frontend responsibilities consume rather than redefine API contracts?
+- Do backend responsibilities fulfill rather than redefine API contracts?
+- Are shared statuses, error codes, and artifact types traced to `TYPE-*` / `ERR-*`?
+- Does every user-visible error have backend production and frontend display/recovery support?
+- Do flow slice tasks preserve source-of-truth ownership while assembling cross-layer work?
+- Are cross-cutting tasks tied to a named flow, boundary, or validation claim?
+- Are validation commands owned by `execution-validation.md`, not FE/BE reference docs?

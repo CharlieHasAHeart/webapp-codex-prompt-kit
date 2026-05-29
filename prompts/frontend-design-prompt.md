@@ -1,509 +1,481 @@
 # Frontend Design Prompt
 
-## Target File
-
-```text
-docs/frontend-design.md
-```
-
 ## Purpose
 
-Generate a compact frontend implementation reference catalog for a Codex-ready Web App project.
+Use this prompt to generate the frontend implementation responsibility catalog for the current implementation.
 
-`frontend-design.md` owns:
+The frontend design document defines stable `FE-*` entries for frontend responsibilities such as page integration, UI reference consumption, API client consumption, local state handling, form behavior, feedback states, recovery interactions, artifact interactions, and accessibility-related interaction responsibilities.
 
-```text
-FE-* frontend implementation entries
-frontend route/page implementation responsibilities
-frontend API client responsibilities
-frontend state and form responsibilities
-frontend UI document consumption rules
-frontend loading/empty/error/permission behavior
-open frontend questions
-```
+It is a non-UI reference catalog. It must be ownership-decoupled and entry-self-contained.
 
-It exists so `execution-validation.md` can reference precise frontend implementation guidance from `TASK-*`.
+It is not a UI semantic structure file, not a UI token file, not a UI visual specification file, not an API contract file, and not a concrete styling-stack implementation standard.
 
----
+## Target Output
 
-## Source Context
-
-Use the available conversation context and upstream documents already generated in the current conversation.
-
-Recommended upstream context:
+Generate exactly one document:
 
 ```text
-Project Design Brief
-docs/product-spec.md
-docs/project-decisions.md
-docs/domain-model.md
-docs/architecture.md
-docs/data-api-contract.md
-docs/ui/UI_PAGE.yaml
-current project discussion
-uploaded project notes
+docs/reference/frontend-design.md
 ```
 
-Use `product-spec.md` for:
+## Standards to Apply
 
-- `REQ-*`
-- MVP boundary
-- user roles
+Read only the standards listed below.
 
-Use `project-decisions.md` for:
+| Standard | Required? | Use For |
+|---|---:|---|
+| `standards/document-responsibilities.md` | yes | Enforces non-UI reference ownership, entry self-containment, UI/reference boundaries, and traceability without dependency. |
+| `standards/flow-concepts-and-composition.md` | yes | Helps identify frontend responsibilities required by Core User Flows, Side Effect Flows, Feedback Flows, Recovery Flows, artifacts, and completion signals. |
+| `standards/frontend-backend-boundary.md` | yes | Ensures frontend consumes the data/API contract without redefining API or backend behavior. |
+| `standards/ui-reference-system.md` | yes | Defines how frontend design should consume UI references without redefining UI source content. |
+| `standards/open-questions-policy.md` | yes | Prevents unresolved questions from entering final reference docs. |
+| `standards/codex-ready-writing-rules.md` | yes | Ensures stable IDs, resolved wording, and Codex-safe reference entries. |
+| `standards/document-length-budgets.md` | optional | Use to keep frontend entries compact and addressable. |
 
-- `DEC-*`
-- frontend framework
-- package manager
-- UI stack
-- repository layout
-- container-first direction
+Do not read or apply any technology-specific UI implementation standard in this revision.
 
-Use `domain-model.md` for:
+Do not assume Tailwind, shadcn/ui, CSS variables, MUI, Chakra, CSS Modules, Styled Components, or any concrete styling stack.
 
-- `ENT-*`
-- `BR-*`
-- `STATE-*`
-- domain terminology and lifecycle behavior
+## Standard Application Rules
 
-Use `architecture.md` for:
+Standards constrain how this prompt generates its target document. Standards do not create additional output targets.
 
-- `ARCH-*`
-- repository layout
-- frontend/backend boundary
-- dependency direction
-- shared package boundary
-- request lifecycle
-- auth/error boundaries
+Rules:
+1. Read only the standards listed in this prompt.
+2. Do not load all standards by default.
+3. The current prompt defines the target output and required output structure.
+4. Standards define reusable terminology, ownership boundaries, UI consumption rules, quality rules, and review constraints.
+5. Do not copy large sections from standards into the generated document.
+6. Do not generate documents requested by a standard unless this prompt explicitly targets them.
+7. If required context remains unresolved under the standards, output a blocked-generation report instead of inventing missing decisions.
 
-Use `data-api-contract.md` for:
+## Priority Rule
 
-- `DB-*`
-- `API-*`
-- `ERR-*`
-- `TYPE-*`
-- request and response shapes
-- error envelope
-- pagination/filtering/sorting rules
+When generating the target document, use this priority order:
 
-Use `UI_PAGE.yaml` for:
+1. User-confirmed answers and corrections.
+2. This prompt's target output and required output structure.
+3. Required standards listed in this prompt.
+4. Upstream generated project documents.
+5. Prior project discussion.
 
-- routes
-- pages
-- sections
-- actions
-- page states
-- route-backed state
-- local UI state
-- navigation and app shell expectations
+If a conflict involves unresolved blockers, Open Questions leakage, unsafe scope invention, missing required decisions, UI ownership redefinition, styling-stack invention, or reference ownership dependency, output a blocked-generation report instead of generating a normal final document.
 
-If `UI_PAGE.yaml` is unavailable and UI is in scope, ask whether to generate it first or proceed with explicit assumptions.
+## Required Inputs
 
-If upstream documents are unavailable, use available context and state assumptions.
-
-If a frontend design choice is unclear and affects execution tasks, list it under `Open Frontend Questions`.
-
----
-
-## Relevant Standards
-
-Apply only the standards relevant to this document:
+Use these upstream documents when available:
 
 ```text
-standards/document-responsibilities.md
-standards/document-length-budgets.md
-standards/codex-ready-writing-rules.md
-standards/frontend-backend-boundary.md
-standards/ui-authoring-strategy.md
-standards/ui-authoring-specs/shadcn-tailwind-implementation-standard.md
+docs/review/project-decisions.md
+docs/review/question-resolution.md
+
+docs/reference/product-spec.md
+docs/reference/domain-model.md
+docs/reference/architecture.md
+docs/reference/data-api-contract.md
+
+docs/reference/ui/UI_PAGE.yaml
+docs/reference/ui/UI_TOKENS.yaml
+docs/reference/ui/UI_VISUAL_SPEC.yaml
 ```
 
-Do not restate these standards in the generated document.
-
----
-
-## Output Rules
-
-Generate only:
+Optional inputs when available:
 
 ```text
-docs/frontend-design.md
+docs/reference/backend-design.md
 ```
 
-Do not generate other project documents.
+Do not require every reference document to understand this output. The generated frontend entries must be self-contained in their own frontend responsibility layer.
 
-Create only:
+## Frontend Design Ownership
+
+`docs/reference/frontend-design.md` owns:
 
 ```text
 FE-*
+frontend responsibility catalog
+UI reference consumption responsibilities
+page and route integration responsibilities
+API client consumption responsibilities
+frontend state handling
+form and input behavior
+loading, error, success, blocked, and empty states
+artifact interaction behavior
+recovery interaction behavior
+client-side validation responsibilities
+accessibility interaction responsibilities
+frontend testing responsibility seeds
 ```
 
-Do not create:
+It must not own:
 
 ```text
-REQ-*
-DEC-*
-ENT-*
-REL-*
-BR-*
-STATE-*
-ARCH-*
-DB-*
-API-*
-ERR-*
-TYPE-*
-BE-*
+product requirements
+domain source definitions
+architecture source rules
+API request/response source contracts
+database schema
+backend service behavior
+backend repository behavior
+UI_PAGE semantic source structure
+UI_TOKENS token source definitions
+UI_VISUAL_SPEC visual presentation source rules
+concrete styling-stack policy
+CSS variable mappings
+Tailwind mappings
+shadcn/ui compatibility rules
+environment command catalog
+execution task sequencing
+validation commands
+final executable FLOW-*
 TASK-*
 VAL-*
+Open Questions
 ```
 
-You may reference existing:
+## UI Reference Consumption Rules
+
+Frontend design consumes UI references but does not redefine them.
+
+Frontend design may describe:
 
 ```text
-REQ-*
-DEC-*
-ENT-*
-REL-*
-BR-*
-STATE-*
-ARCH-*
-DB-*
-API-*
-ERR-*
-TYPE-*
-UI IDs
+how frontend implementation should consume UI_PAGE surfaces, routes, sections, actions, and states
+how frontend implementation should preserve UI_TOKENS technology-agnostic token intent
+how frontend implementation should apply UI_VISUAL_SPEC visual and interaction presentation intent
+how frontend responsibilities support UI feedback, recovery, artifact, and completion signal behavior
 ```
 
-Every `FE-*` must be heading-addressable.
+Frontend design must not define or modify:
 
-Use this heading format:
+```text
+UI_PAGE routes, pages, sections, actions, states, flow mappings, or completion signals as source content
+UI_TOKENS token roles or token values as source content
+UI_VISUAL_SPEC layout, component visual role, state presentation, status mapping, or accessibility rules as source content
+CSS variable names
+Tailwind classes
+shadcn/ui component requirements
+framework-specific implementation mappings
+```
+
+If UI references are missing content required for frontend responsibility definition, output a blocker instead of inventing UI content.
+
+## Reference Decoupling Rules
+
+Because this is a non-UI reference catalog:
+
+1. Every `FE-*` entry must be entry-self-contained.
+2. Related IDs may be included only for traceability.
+3. Do not write "see UI_PAGE.yaml for details" as a substitute for frontend responsibility content.
+4. Do not copy API request or response tables into frontend design.
+5. Do not redefine API contracts, backend behavior, domain rules, or UI reference source content.
+6. Frontend entries may mention related flow areas, but must not perform full flow composition.
+
+Allowed:
 
 ```markdown
-### FE-001: Frontend Item Name
+Related UI:
+- UI_PAGE page: page_generator
+- UI_PAGE action: action_start_generation
+- UI_VISUAL_SPEC state: failed
+Related Contracts:
+- API-001
 ```
 
-Do not write a long frontend design narrative.
+Forbidden:
 
-Do not include backend service implementation, database schema, API contract definitions, command catalogs, task lists, or validation commands.
+```markdown
+FE-001 defines the UI_PAGE action_start_generation fields.
+```
 
----
+## Flow-Aware Frontend Rules
 
-## Required Document Structure
+The frontend design must support flow-first execution without becoming an execution plan.
 
-Use this structure:
+Required:
+- Identify frontend responsibilities needed by current Core User Flows and Side Effect Flows.
+- Describe how frontend responsibilities consume UI surfaces, actions, states, feedback, recovery paths, artifacts, and completion signals.
+- Describe how the frontend consumes documented API contracts without redefining them.
+- Describe user-visible feedback states: loading, pending, progress, success, failed, blocked, validation failed, empty, not found, and artifact available when relevant.
+- Describe recovery interactions when recoverable errors or invalid input affect the current implementation.
+- Describe artifact interactions such as upload, preview, availability, download, copy, export, or open when relevant.
+- Describe client-side state responsibilities that enable flow completion.
+- Keep final executable `FLOW-*`, `TASK-*`, and `VAL-*` out of this document.
+
+Forbidden:
+- Generating a final flow catalog.
+- Generating backend handlers or services.
+- Generating API source contract fields.
+- Generating UI source structures.
+- Generating concrete styling-stack implementation rules.
+- Generating task order.
+- Generating validation commands.
+
+## Technology-Agnostic UI Implementation Boundary
+
+Frontend design may say:
+
+```text
+The frontend preserves the documented token intent and visual presentation intent using the existing project styling system.
+```
+
+Frontend design must not say:
+
+```text
+Use Tailwind class ...
+Use shadcn/ui Button ...
+Map primary to --primary ...
+```
+
+unless a later project-specific implementation standard or existing codebase explicitly establishes that styling stack and the task scope requires mentioning it.
+
+In this revision, frontend design should stay technology-agnostic.
+
+## Required Output Structure
 
 ```markdown
 # Frontend Design
 
-## Frontend Catalog
+## 1. Frontend Scope
 
-## Open Frontend Questions
-```
+State what this document owns and what it does not own.
 
-Do not add extra sections unless they are necessary for the project.
+## 2. Frontend Summary
 
----
+Summarize the frontend responsibility model in current-scope terms.
 
-## Frontend Catalog
+## 3. UI Reference Consumption Summary
 
-Generate compact `FE-*` entries.
+Summarize how frontend implementation should consume:
 
-Each entry should be independently readable because `TASK-*` items in `execution-validation.md` will reference individual frontend implementation entries directly.
+- `UI_PAGE.yaml`
+- `UI_TOKENS.yaml`
+- `UI_VISUAL_SPEC.yaml`
 
-Recommended format:
+Do not redefine those files.
 
-```markdown
-### FE-001: Case List Page
+## 4. Frontend Responsibility Catalog
 
-Kind: page
+### FE-001: <Frontend Responsibility Name>
 
-Purpose:
-- Implement the case list page using the route and page structure defined in `UI_PAGE.yaml`.
+Type:
+- page_integration / ui_reference_consumption / api_client / form_state / local_state / route_state / feedback_state / recovery_interaction / artifact_interaction / accessibility_interaction / error_handling / data_presentation
 
-Code Impact:
-- `apps/web/app/cases/page.tsx`
-- `apps/web/components/cases/case-filter-bar.tsx`
-- `apps/web/components/cases/case-table.tsx`
-- `apps/web/lib/api/cases-client.ts`
+Responsibility:
+- ...
 
-Inputs:
-- UI page: cases_list
-- API-001
-- ERR-001
-- ERR-003
-- REQ-004
-- ARCH-002
+Allowed:
+- ...
 
-Rules:
-- Filter, pagination, and sorting state must be route-backed when defined by `UI_PAGE.yaml`.
-- Data must be loaded through the cases API client.
-- Loading, empty, error, permission, and ready states must be handled.
-- API response shape must come from API-001.
-- Do not define or change the API contract here.
+Forbidden:
+- ...
+
+Inputs Consumed:
+- ...
+
+Outputs / UI Effects:
+- ...
+
+Related IDs:
+- ...
+
+Related UI References:
+- ...
+
+Flow Support:
+- ...
 
 Out of Scope:
-- Backend implementation.
-- API response shape changes.
-- Database schema changes.
+- ...
+
+## 5. Page, Route, and UI Surface Responsibilities
+
+Describe frontend responsibilities for implementing UI_PAGE pages, routes, sections, actions, and states.
+
+Do not redefine `UI_PAGE.yaml`.
+
+## 6. UI Token and Visual Presentation Responsibilities
+
+Describe frontend responsibilities for preserving UI_TOKENS token intent and UI_VISUAL_SPEC presentation intent using the existing project stack.
+
+Do not define CSS variables, Tailwind mappings, class names, or component library requirements.
+
+## 7. API Client Consumption Responsibilities
+
+Describe how the frontend consumes documented APIs.
+
+Do not redefine request/response payloads.
+
+## 8. Frontend State Responsibilities
+
+Describe client-side state, route-backed state, form state, loading state, and error state responsibilities.
+
+## 9. Feedback and Recovery Responsibilities
+
+Describe required user-visible feedback and recovery behavior.
+
+## 10. Artifact Interaction Responsibilities
+
+Describe frontend handling of uploads, generated artifacts, download availability, or artifact viewers where relevant.
+
+## 11. Accessibility and Interaction Responsibilities
+
+Describe keyboard, focus, disabled, error, status text, and accessibility interaction responsibilities.
+
+Do not define visual tokens.
+
+## 12. Out-of-Scope Frontend Behavior
+
+List frontend responsibilities intentionally excluded from the current implementation.
+
+## 13. Downstream Seeds
+
+List concise seeds for backend, flow composition, execution, and validation documents.
+
+## 14. Final Readiness
+
+Status: ready / blocked
+
+If blocked, list missing decisions and affected downstream documents.
 ```
 
-Rules:
+## FE Entry Requirements
 
-- Use `FE-*` for frontend implementation items that later tasks may execute.
-- Keep entries compact.
-- Include `Kind`.
-- Include `Purpose`.
-- Include `Code Impact` when possible.
-- Include `Inputs`.
-- Include `Rules`.
-- Include `Out of Scope` when useful.
-- Reference source IDs rather than copying full definitions.
-- Do not define API response shapes.
-- Do not define DB fields.
-- Do not define backend service logic.
-- Do not define validation commands.
-
-Recommended `Kind` values:
+Each `FE-*` entry must include:
 
 ```text
-app-shell
-route
-page
-layout
-navigation
-component
-form
-api-client
-state
-error-state
-permission-state
-ui-integration
-test-support
+ID
+name
+type
+responsibility
+allowed
+forbidden
+inputs consumed
+outputs or UI effects
+out-of-scope where useful
 ```
 
----
-
-## Recommended Frontend Entries
-
-Generate entries only when they apply to the project.
-
-Common entries include:
+Optional but useful:
 
 ```text
-FE-001 App Shell
-FE-002 Navigation
-FE-003 Route Skeletons
-FE-004 API Client Base
-FE-005 Shared Loading Empty Error States
-FE-006 Shared Form Behavior
-FE-007 Permission Rendering
-FE-008 Page: <core page>
-FE-009 Page: <core page>
-FE-010 UI Token Consumption
-FE-011 Visual Spec Consumption
+related IDs
+related UI references
+flow support
+accessibility impact
+recovery behavior
+artifact behavior
+downstream seeds
 ```
 
-Do not force all entries if they are not useful.
+## API Boundary Rules
 
----
-
-## Entry Guidance
-
-### App Shell Entry
-
-Should define:
-
-- layout shell responsibility
-- sidebar/top nav responsibility
-- page header responsibility
-- route outlet/content area
-- global actions when relevant
-
-Should reference:
+Frontend design may say:
 
 ```text
-UI_PAGE.yaml shell
-ARCH-* repository/frontend boundary
-DEC-* UI stack
+The frontend calls the documented create-run API and handles success, validation failure, recoverable failure, and blocked responses according to the documented error contract.
 ```
 
-Do not include visual token values.
-
----
-
-### Navigation Entry
-
-Should define:
-
-- navigation groups
-- active route behavior
-- collapsible sidebar behavior if relevant
-- icon usage policy if relevant
-
-Should reference `UI_PAGE.yaml` navigation IDs.
-
-Do not include React code or icon imports.
-
----
-
-### API Client Base Entry
-
-Should define:
-
-- frontend API clients call backend APIs
-- API response shapes come from `data-api-contract.md`
-- structured errors use `ERR-*`
-- frontend must not import backend internals
-
-Should reference:
+Frontend design must not say:
 
 ```text
-API-*
-ERR-*
-TYPE-*
-ARCH-002
-ARCH-005
+The create-run API request has fields ...
 ```
 
-Do not include fetch implementation code unless the project explicitly requires a short pseudocode note.
+unless those fields are only referred to as traceability and are already defined in `data-api-contract.md`.
 
----
+The source of truth for API request/response/error fields is always `docs/reference/data-api-contract.md`.
 
-### Page Entry
+## UI Boundary Examples
 
-Should define:
-
-- route/page responsibility
-- related UI page ID
-- related APIs
-- required UI states
-- expected code impact
-- route state and local state expectations
-
-Should not define API contracts or backend behavior.
-
----
-
-### Form Entry
-
-Should define:
-
-- form rendering responsibility
-- client-side validation purpose
-- submit behavior
-- pending/success/error handling
-- backend validation remains authoritative
-
-Should reference related `API-*` and `ERR-*`.
-
----
-
-### State Entry
-
-Should define:
-
-- loading state
-- empty state
-- error state
-- permission denied state
-- stale/conflict state when relevant
-
-Should reference UI state IDs and `ERR-*` entries.
-
----
-
-### UI Integration Entry
-
-Should define how frontend uses:
+Frontend design may say:
 
 ```text
-UI_PAGE.yaml
-UI_TOKENS.yaml
-UI_VISUAL_SPEC.yaml
-shadcn/ui
-Tailwind
-lucide-react
+The frontend implements the documented generator page surface, exposes the documented start action, preserves documented local form state, shows documented failed and blocked feedback states, and keeps the documented completion signal visible.
 ```
 
-Do not duplicate full UI YAML contents.
+Frontend design must not say:
 
----
+```text
+UI_PAGE.yaml should add a new action named action_export_pdf.
+```
 
-## Open Frontend Questions
+Frontend design may say:
 
-List unresolved frontend questions.
+```text
+The frontend maps technology-agnostic token intent to the existing project styling system.
+```
 
-Recommended format:
+Frontend design must not say:
+
+```text
+The primary token maps to --primary and Tailwind bg-primary.
+```
+
+## Writing Constraints
+
+Use direct, resolved frontend responsibility language.
+
+Prefer:
+
+```text
+The frontend keeps submitted form values available after a recoverable create-run failure and exposes the documented retry action.
+```
+
+Avoid:
+
+```text
+The frontend might handle errors somehow.
+```
+
+Avoid dependency-only wording:
+
+```text
+See UI_PAGE.yaml for the frontend behavior.
+```
+
+Instead, state the frontend responsibility here and use related UI references only as traceability.
+
+## Blocked Generation Rules
+
+Output a blocked-generation report instead of a normal frontend design if:
+
+- required frontend responsibilities are unclear
+- required UI references are missing or contradictory
+- UI references lack `codex_consumption`
+- API contracts required for frontend responsibilities are unresolved
+- recovery behavior affects frontend state but is unresolved
+- artifact interaction behavior is required but undecided
+- concrete styling-stack assumptions would be required to generate the document
+- unresolved Open Questions would enter the final frontend doc
+
+Blocked-generation report structure:
 
 ```markdown
-| Question | Blocking? | Affected Area |
-|---|---:|---|
-| Should case list filters always be URL-backed? | yes | route state, page implementation |
-| Should the sidebar collapse state persist across sessions? | no | app shell |
+# Frontend Design Generation Blocked
+
+## Blocking Issues
+
+| Issue | Decision Needed | Affected Docs | Flow / UI Impact |
+|---|---|---|---|
+
+## Partial Safe Content
+
+## Required User Decisions
 ```
 
-Rules:
-
-- Include only questions that affect frontend implementation entries, UI behavior, or execution tasks.
-- Mark blocking questions clearly.
-- Do not hide uncertainty inside `FE-*` entries.
-
----
-
-## Catalog Design Rules
-
-The generated file should behave like a task-scoped reference catalog.
-
-This means:
-
-- each `FE-*` entry must be short enough to read independently
-- each `FE-*` entry must have a stable Markdown heading
-- each `FE-*` entry should include related upstream IDs when useful
-- task authors should be able to reference entries like:
-
-```text
-docs/frontend-design.md#FE-001
-docs/frontend-design.md#FE-004
-```
-
-Avoid broad narrative sections that Codex would need to read globally.
-
----
-
-## Writing Rules
-
-- Write a reference catalog, not a narrative frontend design document.
-- Use stable heading-addressable `FE-*` IDs.
-- Keep every entry compact and independently readable.
-- Reference existing `REQ-*`, `DEC-*`, `ENT-*`, `BR-*`, `STATE-*`, `ARCH-*`, `API-*`, `ERR-*`, `TYPE-*`, and UI IDs where useful.
-- Include code impact when possible.
-- Consume API contracts from `data-api-contract.md`; do not define them here.
-- Consume UI structure from `UI_PAGE.yaml`; do not duplicate it fully.
-- Do not create non-FE IDs.
-- Do not include DB schema.
-- Do not include backend service implementation.
-- Do not include implementation tasks.
-- Do not include validation commands.
-- Use `Open Frontend Questions` for unresolved frontend decisions.
-
----
-
-## Quality Checklist
+## Final Checks
 
 Before finalizing, verify:
 
-```text
-[ ] The file is a compact frontend reference catalog.
-[ ] Important frontend items have FE-* headings.
-[ ] Every FE-* is independently readable.
-[ ] IDs are heading-addressable.
-[ ] FE entries reference UI page/action/state IDs where useful.
-[ ] FE entries reference API/ERR/TYPE IDs where useful.
-[ ] Code impact is included where possible.
-[ ] Frontend/backend boundary is respected.
-[ ] No DB/API/BE/TASK/VAL IDs are created.
-[ ] No API contracts are defined here.
-[ ] No backend service or database implementation is included.
-[ ] No implementation commands are included.
-[ ] Open frontend questions are marked blocking or non-blocking.
-```
+- No unresolved Open Questions remain.
+- No API request/response source contracts are defined.
+- No backend service behavior is defined.
+- No DB schema is defined.
+- No UI_PAGE source structure is redefined.
+- No UI_TOKENS source tokens are redefined.
+- No UI_VISUAL_SPEC source presentation rules are redefined.
+- No CSS variable mapping, Tailwind mapping, className, JSX, or concrete styling-stack rule is introduced.
+- No `TASK-*`, `VAL-*`, or final executable `FLOW-*` entries are created.
+- Every `FE-*` entry is self-contained.
+- Related IDs and related UI references are traceability hints only.
+- Frontend design supports flow-first execution without becoming a flow composition document.
