@@ -1,6 +1,8 @@
 # WebApp Codex Prompt Kit
 
-A minimal prompt kit for turning Product & UX QA and Technical QA into Codex-ready Web App working documents.
+A minimal prompt kit for turning Product & UX QA and Technical QA into Codex-ready Web App action documents.
+
+The generated project documents are not essays, recommendations, or background notes. They are execution constraints and action records for Codex.
 
 This repository intentionally stays small:
 
@@ -16,10 +18,13 @@ The kit does not ship templates, standards, examples, snippets, or migrations. T
 
 ## Core Direction
 
-The workflow is **QA-driven, UX-first, and Codex-facing**.
+The workflow is **QA-driven, UX-first, and Codex-execution-facing**.
 
 - QA files preserve source memory and help fight ChatGPT forgetting.
-- Working documents are compact record catalogs for Codex.
+- Working documents are action record catalogs for Codex.
+- Product and UX records are execution constraints, not optional background.
+- Technical and implementation records must implement product and UX constraints.
+- Execution records tell Codex exactly what to build, validate, and report.
 - Process checks do not become permanent files.
 - Prompt files stay short and do not hide project rules.
 - Codex reads only the task-relevant records.
@@ -38,21 +43,7 @@ target-webapp/
 ├── docs/
 │   ├── notes/
 │   │   ├── product-ux-qa/
-│   │   │   ├── 00_system.md
-│   │   │   ├── 01_auth.md
-│   │   │   ├── 02_home_navigation.md
-│   │   │   ├── 03_core_workflows.md
-│   │   │   ├── 04_feature_modules.md
-│   │   │   ├── 05_ai_permissions.md
-│   │   │   └── 06_settings_account.md
-│   │   │
 │   │   └── technical-qa/
-│   │       ├── 00_technical_overview.md
-│   │       ├── 01_frontend.md
-│   │       ├── 02_backend_data.md
-│   │       ├── 03_auth_permissions.md
-│   │       ├── 04_ai_files.md
-│   │       └── 05_deployment_validation.md
 │   │
 │   ├── product.md
 │   ├── ux.md
@@ -65,88 +56,93 @@ target-webapp/
 
 ## File Roles
 
-### `docs/notes/product-ux-qa/`
-
-Source QA for product behavior, UX rules, modules, states, permissions, AI behavior, and user control.
-
-Keep it split by module or topic. Do not store all questions in one file.
-
-### `docs/notes/technical-qa/`
-
-Source QA for stack, architecture, data, auth, AI, files, deployment, and validation.
-
-Keep it split by technical area.
-
 ### `docs/product.md`
 
-Codex-facing product records:
+Codex-facing product action records. These records define what Codex must build or must not build.
 
 ```text
-PROD-*   product summary or boundary
-USER-*   user or role
-SCOPE-*  scope item
-REQ-*    requirement
-ENT-*    domain entity
-BR-*     business rule
-DEC-*    decision
+PROD-*   product identity, purpose, boundary, and non-goals
+USER-*   user roles and actor capabilities
+SCOPE-*  first-version inclusion and exclusion scope
+REQ-*    product requirements Codex must implement
+ENT-*    domain entities and business objects
+BR-*     business rules and invariants
+DEC-*    confirmed decisions and decision consequences
 ```
 
 ### `docs/ux.md`
 
-Codex-facing UX records:
+Codex-facing UX action records. These records define how the user-facing behavior must work.
 
 ```text
-UXR-*      UX rule
-PATTERN-*  interaction pattern
-SCREEN-*   screen or route
-STATE-*    state behavior
-VIS-*      visual rule
-A11Y-*     accessibility rule
+UXR-*       UX rules Codex must preserve
+PATTERN-*   reusable interaction patterns
+SCREEN-*    screen, page, route, or major surface definition
+STATE-*     shared state behavior across screens
+PAGESTATE-* page-level state matrix for one screen or module
+VIS-*       visual hierarchy and layout rules
+A11Y-*      accessibility requirements
 ```
 
 ### `docs/technical.md`
 
-Codex-facing technical records:
+Codex-facing technical action records. These records define backend, data, API, permission, runtime, and integration contracts.
 
 ```text
-STACK-*  stack decision
-ARCH-*   architecture record
-DB-*     data/storage record
-API-*    API contract
-ERR-*    error contract
-AUTH-*   auth/permission implementation
-BE-*     backend responsibility
-ENV-*    environment command or setup
+STACK-*   stack and library decisions
+ARCH-*    runtime architecture and service boundaries
+DB-*      field-level database schema, constraints, indexes, ownership, soft delete rules
+API-*     complete API contracts: method, path, auth, request, response, side effects, errors
+ERR-*     error code catalog and frontend handling contract
+AUTH-*    authentication and authorization implementation rules
+PERM-*    permission matrix by actor, resource, operation, and AI visibility state
+BE-*      backend service responsibilities and invariants
+JOB-*     background jobs, cleanup jobs, retries, recovery, idempotency
+ENV-*     environment variables, commands, local runtime, deployment assumptions
+MOCK-*    mock provider contracts for AI, files, extraction, or external services
+SEED-*    seed data, fixtures, demo users, and test data setup
+EXPORT-*  export, import, parser, file transformation, and download-generation strategies
+OBS-*     logging, audit, telemetry, and privacy-safe observability rules
 ```
 
 ### `docs/implementation.md`
 
-Codex-facing implementation records:
+Codex-facing implementation action records. These records define how screens, components, forms, state, integrations, AI, files, and tests are implemented.
 
 ```text
-FE-*        frontend implementation
-COMP-*      component record
-ROUTE-*     route implementation
-FORM-*      form behavior implementation
-STATEIMPL-* state implementation
-AIIMPL-*    AI implementation
-FILEIMPL-*  file implementation
+FE-*          frontend application-level implementation rules
+ROUTE-*       route map and route guard implementation
+SCREEN-*      screen-level implementation record
+PAGESTATE-*   page-level state matrix implementation
+COMP-*        component inventory and responsibilities
+COMPSPEC-*    component-level development spec: props, state, events, API calls, errors
+FORM-*        form behavior, validation, dirty state, submit, reset, and failure handling
+STATEIMPL-*   frontend state management and persistence implementation
+APIIMPL-*     frontend API integration implementation and client hooks
+AIIMPL-*      AI feature implementation: streaming, permissions, write preview, reports
+FILEIMPL-*    file upload, preview, storage, extraction, and library UI implementation
+TESTIMPL-*    test strategy, smoke scripts, mocks, fixtures, and validation automation
 ```
 
 ### `docs/execution.md`
 
-Codex-facing execution records:
+Codex-facing execution plan for building the application.
 
 ```text
-MILESTONE-* milestone
-TASK-*      implementation task
-VAL-*       validation item
-BLOCKER-*   blocker rule
+EXEC-*       overall execution scope and application boundary
+MILESTONE-*  implementation milestone
+SLICE-*      minimal runnable vertical slice
+TASK-*       executable implementation task
+DEP-*        dependency rule between tasks or slices
+VAL-*        validation item or acceptance check
+BLOCKER-*    condition that requires stopping before implementation continues
 ```
+
+Every `TASK-*` should include goal, depends on, read before, scope, deliverables, do not, validation, and blocker conditions.
 
 ### `AGENTS.md`
 
-Runtime policy for Codex. It should tell Codex to start from `AGENTS.md` and `docs/execution.md`, then read only records referenced by the current `TASK-*`.
+Runtime policy for Codex. It should tell Codex to start from `AGENTS.md` and `docs/execution.md`, select exactly one `TASK-*`, then read only records referenced by that task.
 
 ### `codex-execution-report.md`
 
@@ -183,9 +179,9 @@ prompts/
 
 ## Record Style
 
-Working docs are not narrative documents. They are compact record catalogs.
+Working docs are not narrative documents. They are compact action record catalogs.
 
-Each record should be short and stable:
+Each record should be stable and executable:
 
 ```markdown
 ## UXR-001: Unsaved Change Exit Rule
@@ -193,11 +189,11 @@ Each record should be short and stable:
 **Type:** UX Rule  
 **Status:** Active
 
-**Rule:**  
+**Action Rule:**  
 Explicit cancel discards changes directly. Accidental exits require confirmation when unsaved edits exist.
 
-**Related:**  
-- FE-010
+**Related:**
+- FORM-010
 - TASK-020
 ```
 
@@ -216,9 +212,9 @@ Then each task decides which records to read:
 
 ```text
 docs/product.md#REQ-...
-docs/ux.md#UXR-...
+docs/ux.md#PAGESTATE-...
 docs/technical.md#API-...
-docs/implementation.md#FE-...
+docs/implementation.md#COMPSPEC-...
 ```
 
 QA notes are source memory, not default execution context. Codex should only read `docs/notes/...` when a task explicitly permits source lookup or when a blocker requires clarification.
