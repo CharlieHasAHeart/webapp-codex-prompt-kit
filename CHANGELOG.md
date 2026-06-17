@@ -1,25 +1,10 @@
 # Changelog
 
-## v0.7.1
+## v0.6.1
 
 ### Summary
 
-Strengthened execution planning so `docs/execution.md` must be sufficient for complete Web App development.
-
-### Changed
-
-- Added `SPINE-*` records for required development spine areas.
-- Added mandatory coverage gates for `REQ-*`, `SCREEN-*`, `DB-*`, `API-*`, `PERM-*`, `AUTH-*`, `ERR-*`, `PAGESTATE-*`, and `COMPSPEC-*` coverage.
-- Added task budget rules to prevent under-sized execution plans.
-- Required every `TASK-*` to include dependencies, deliverables, validation, and blocker conditions.
-- Required a Coverage Gate Summary at the end of `docs/execution.md`.
-- Updated README to document `SPINE-*` and coverage gate expectations.
-
-## v0.7.0
-
-### Summary
-
-Shifted the kit from Codex-facing working documents to Codex-facing action documents.
+Shifted the kit from Codex-facing working documents to Codex-facing action documents, and strengthened execution planning so `docs/execution.md` must be sufficient for complete Web App development.
 
 ### Changed
 
@@ -39,8 +24,14 @@ Shifted the kit from Codex-facing working documents to Codex-facing action docum
   - `TESTIMPL-*`
 - Updated Technical Consolidation prompt to require complete API contracts, field-level database schema, error code catalog, permission matrix, mock strategy, seed strategy, and component-level implementation specs.
 - Updated Execution Plan prompt to produce complete application development tasks rather than document review tasks.
+- Added `SPINE-*` records for required development spine areas.
 - Added `SLICE-*` and `DEP-*` records for vertical slices and task dependencies.
+- Added mandatory coverage gates for `REQ-*`, `SCREEN-*`, `DB-*`, `API-*`, `PERM-*`, `AUTH-*`, `ERR-*`, `PAGESTATE-*`, and `COMPSPEC-*` coverage.
+- Added task budget rules to prevent under-sized execution plans.
+- Required every `TASK-*` to include dependencies, deliverables, validation, and blocker conditions.
+- Required a Coverage Gate Summary at the end of `docs/execution.md`.
 - Updated AGENTS prompt to position Codex as a task executor that obeys one selected task and its referenced records.
+- Updated README to document action-oriented records, `SPINE-*`, and coverage gate expectations.
 
 ## v0.6.0
 
