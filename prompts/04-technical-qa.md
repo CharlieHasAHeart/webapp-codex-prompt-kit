@@ -236,6 +236,80 @@ Blocked by missing product or UX record
 - Keep QA as source memory, not final execution docs.
 - Keep the prompt and output generic. Do not hard-code domain-specific modules, industries, or product types.
 
+## Note File Shape
+
+Each saved Technical QA note must use this file-level structure.
+
+Use one note file for one coherent technical scope: stack, architecture, frontend, routing, state, forms, backend, database, API, errors, auth, permissions, AI, files, jobs, environment, deployment, observability, mocks, seeds, tests, validation, or another focused technical area. Do not mix unrelated technical scopes in one note file.
+
+```markdown
+# <Technical Area> Technical QA
+
+**QA Type:** Technical  
+**File Scope:** <what this note covers>  
+**File Status:** <Active | Complete | Superseded>  
+**Created:** <YYYY-MM-DD or Unknown>  
+**Last Updated:** <YYYY-MM-DD or Unknown>  
+**Checkpoint:** <CP-001 | CP-002 | ...>  
+**QID Range:** <Q001-Q0xx>  
+**Source Context:** <docs/product.md, docs/ux.md, prior technical note, meeting, file, or conversation section>  
+**Source Product/UX Records:** <record IDs or Cross-Cutting Runtime>  
+**Related Files:** <docs/technical.md, docs/implementation.md, other notes, or None>
+
+---
+
+## Scope
+
+<What this technical note records.>
+
+## Out of Scope
+
+<What this note intentionally does not decide. Use `None` when not applicable.>
+
+## Source Record Summary
+
+- <Record ID or Cross-Cutting Runtime>: <short reason this source affects the technical questions>
+
+## Q/A Records
+
+<Insert Q/A entries using the fixed Output Shape below.>
+
+## Open Questions
+
+- <QID or temporary ID>: <open technical question and why it remains open>
+
+## Blockers
+
+- <QID or temporary ID>: <blocker, missing source record, contradiction, or required decision>
+
+## Superseded Decisions
+
+- <Old QID> superseded by <New QID>: <short reason>
+
+## Conversion Index
+
+| QID | Status | Source Records | Record Targets | Implementation Targets | Conversion Result | Notes |
+|---|---|---|---|---|---|---|
+| Q001 | Confirmed | REQ-* / SCREEN-* | API-* / DB-* | APIIMPL-* | Pending | Convert during Technical Consolidation |
+
+## Checkpoint History
+
+| Checkpoint | Date | Changes |
+|---|---|---|
+| CP-001 | <YYYY-MM-DD or Unknown> | Initial checkpoint |
+```
+
+Rules:
+
+- Keep QIDs stable inside the note file.
+- Do not renumber QIDs after a checkpoint has been shared.
+- If a decision changes, mark the old Q/A as `Superseded` and add a new Q/A.
+- Keep `Source Product/UX Records` and `Source Record Summary` current.
+- Keep `Conversion Index` updated at each checkpoint.
+- Use `Pending` as the default `Conversion Result` during QA.
+- Do not mark Q/A as `Converted` until a consolidation prompt has actually converted it into action records.
+- Use `Blocked` when a technical answer depends on missing or contradictory Product/UX records.
+
 ## Output Shape
 
 ```markdown
