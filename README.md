@@ -152,19 +152,112 @@ Runtime policy for Codex. It should tell Codex to start from `AGENTS.md` and `do
 
 Execution log for completed tasks, validations, blockers, and handoff notes.
 
-## Workflow
+## Workflow and Checkpoint Outputs
+
+This kit uses staged checkpoint outputs to prevent ChatGPT memory loss.
+
+A stage is not complete until its required files have been written or updated in the target project. When working in ChatGPT, the assistant should also provide the updated Markdown document as a downloadable or saveable file at the end of each stage when the environment supports file output.
 
 ```text
 1. Product & UX QA
+   Required output:
+   - docs/notes/product-ux-qa/*.md
+
+   Purpose:
+   - preserve source Q/A memory;
+   - split notes by module, journey, actor, workflow, or product area;
+   - record each confirmed Q/A with conversion metadata.
+
 2. Product & UX Consolidation
+   Required output:
+   - docs/product.md
+   - docs/ux.md
+   - optional: docs/notes/qa-to-record-ledger.md
+
+   Purpose:
+   - convert confirmed Product & UX Q/A into action records;
+   - make product and UX constraints durable before technical QA begins;
+   - track whether each confirmed Q/A was converted, merged, superseded, excluded, or left open.
+
 3. UX Consistency Check
+   Required output:
+   - revised docs/product.md when product constraints change;
+   - revised docs/ux.md when UX constraints change.
+
+   Purpose:
+   - resolve contradictions, duplicate rules, missing states, and inconsistent interaction patterns;
+   - keep product and UX records stable enough for technical QA.
+
 4. Technical QA
+   Required input:
+   - docs/product.md
+   - docs/ux.md
+
+   Required output:
+   - docs/notes/technical-qa/*.md
+
+   Purpose:
+   - preserve technical Q/A memory;
+   - split notes by technical area;
+   - ensure each technical Q/A references the Product or UX records it serves, unless it is cross-cutting runtime infrastructure.
+
 5. Technical Consolidation
+   Required output:
+   - docs/technical.md
+
+   Purpose:
+   - convert confirmed Technical Q/A into technical action records;
+   - define stack, architecture, data, API, auth, permissions, errors, jobs, environment, mocks, seeds, exports, and observability contracts.
+
 6. Reference Alignment
-7. Execution Plan
-8. AGENTS Runtime Policy
-9. Final Readiness Check
+   Required output:
+   - revised docs/product.md when product records need alignment;
+   - revised docs/ux.md when UX records need alignment;
+   - revised docs/technical.md when technical records need alignment.
+
+   Purpose:
+   - align product, UX, and technical records;
+   - remove contradictions between requirement, screen, API, database, permission, and error records;
+   - make cross-references explicit.
+
+7. Implementation Planning
+   Required output:
+   - docs/implementation.md
+
+   Purpose:
+   - derive implementation action records from product, UX, and technical records;
+   - define frontend rules, routes, screens, page states, components, forms, state, API integration, AI implementation, file implementation, and test implementation.
+
+8. Execution Plan
+   Required output:
+   - docs/execution.md
+
+   Purpose:
+   - turn implementation records into Codex-executable tasks;
+   - define development spine, milestones, vertical slices, dependencies, validation items, blockers, and coverage gates.
+
+9. AGENTS Runtime Policy
+   Required output:
+   - AGENTS.md
+
+   Purpose:
+   - tell Codex how to select exactly one task, read only task-relevant records, validate work, and update the execution report.
+
+10. Final Readiness Check
+    Required output:
+    - revised docs/product.md when needed;
+    - revised docs/ux.md when needed;
+    - revised docs/technical.md when needed;
+    - revised docs/implementation.md when needed;
+    - revised docs/execution.md when needed;
+    - initialized or revised codex-execution-report.md.
+
+    Purpose:
+    - verify that all active requirements, screens, page states, database records, APIs, permissions, auth rules, errors, component specs, and execution tasks are covered or explicitly blocked;
+    - ensure Codex can begin implementation without relying on the chat transcript.
 ```
+
+Checkpoint outputs are the memory source of truth. Chat history is not the source of truth after a checkpoint file has been written.
 
 ## Prompt Set
 
