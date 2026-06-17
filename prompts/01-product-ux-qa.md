@@ -194,6 +194,73 @@ Still open
 - Keep QA as source memory, not final execution docs.
 - Keep the prompt and output generic. Do not hard-code domain-specific modules, industries, or product types.
 
+## Note File Shape
+
+Each saved Product & UX QA note must use this file-level structure.
+
+Use one note file for one coherent scope: a module, journey, actor workflow, product area, or global rule area. Do not mix unrelated scopes in one note file.
+
+```markdown
+# <Module, Journey, Actor Workflow, Product Area, or Global Rule Area> Product & UX QA
+
+**QA Type:** Product & UX  
+**File Scope:** <what this note covers>  
+**File Status:** <Active | Complete | Superseded>  
+**Created:** <YYYY-MM-DD or Unknown>  
+**Last Updated:** <YYYY-MM-DD or Unknown>  
+**Checkpoint:** <CP-001 | CP-002 | ...>  
+**QID Range:** <Q001-Q0xx>  
+**Source Context:** <user-provided idea, existing note, meeting, file, or conversation section>  
+**Related Files:** <docs/product.md, docs/ux.md, other notes, or None>
+
+---
+
+## Scope
+
+<What this note records.>
+
+## Out of Scope
+
+<What this note intentionally does not decide. Use `None` when not applicable.>
+
+## Q/A Records
+
+<Insert Q/A entries using the fixed Output Shape below.>
+
+## Open Questions
+
+- <QID or temporary ID>: <open question and why it remains open>
+
+## Blockers
+
+- <QID or temporary ID>: <blocker and what is needed to unblock it>
+
+## Superseded Decisions
+
+- <Old QID> superseded by <New QID>: <short reason>
+
+## Conversion Index
+
+| QID | Status | Decision Layer | Record Targets | Conversion Result | Notes |
+|---|---|---|---|---|---|
+| Q001 | Confirmed | Product+UX | REQ-* / SCREEN-* | Pending | Convert during Product & UX Consolidation |
+
+## Checkpoint History
+
+| Checkpoint | Date | Changes |
+|---|---|---|
+| CP-001 | <YYYY-MM-DD or Unknown> | Initial checkpoint |
+```
+
+Rules:
+
+- Keep QIDs stable inside the note file.
+- Do not renumber QIDs after a checkpoint has been shared.
+- If a decision changes, mark the old Q/A as `Superseded` and add a new Q/A.
+- Keep `Conversion Index` updated at each checkpoint.
+- Use `Pending` as the default `Conversion Result` during QA.
+- Do not mark Q/A as `Converted` until a consolidation prompt has actually converted it into action records.
+
 ## Output Shape
 
 ```markdown
