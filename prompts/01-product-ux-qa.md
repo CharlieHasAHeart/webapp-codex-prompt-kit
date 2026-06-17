@@ -22,6 +22,33 @@ docs/notes/product-ux-qa/
 
 Do not put all questions in one file. Split by module, journey, actor, workflow, or product area.
 
+## QA Session Checkpoints
+
+Product & UX QA must preserve memory during the QA conversation, not only at the end of the full workflow.
+
+During a QA session, output or update a saveable QA note whenever any of these happens:
+
+- a small batch of questions has been answered;
+- a module, journey, actor workflow, or product area has reached a stable stopping point;
+- the conversation is about to move from one topic area to another;
+- an answer supersedes earlier answers and the old decision must not be remembered as active;
+- unresolved questions, blockers, or open decisions have accumulated;
+- the user asks to pause, continue later, or start a new section.
+
+When the environment supports file output, provide the current QA note as a downloadable Markdown file. When file output is not available, print the complete Markdown content that should be saved to the corresponding `docs/notes/product-ux-qa/*.md` file.
+
+Each checkpoint note must preserve:
+
+- all Q/A entries completed since the previous checkpoint;
+- stable QIDs;
+- status markers;
+- supersede relationships;
+- record target hints;
+- conversion notes;
+- open questions and blockers.
+
+Do not wait for the entire Product & UX QA stage to finish before producing saveable notes. The saved QA notes are the memory source of truth for later consolidation.
+
 ## Core Principle
 
 Ask questions in an order that makes the later conversion into action records predictable.
