@@ -154,9 +154,47 @@ Execution log for completed tasks, validations, blockers, and handoff notes.
 
 ## Workflow and Checkpoint Outputs
 
-This kit uses staged checkpoint outputs to prevent ChatGPT memory loss.
+This kit uses checkpoint outputs to prevent ChatGPT memory loss.
 
-A stage is not complete until its required files have been written or updated in the target project. When working in ChatGPT, the assistant should also provide the updated Markdown document as a downloadable or saveable file at the end of each stage when the environment supports file output.
+There are two checkpoint levels:
+
+1. **QA session checkpoints** preserve memory while Product & UX QA or Technical QA is still in progress.
+2. **Workflow stage checkpoints** preserve memory when a major workflow stage is complete and the project is ready to move to the next prompt.
+
+Checkpoint outputs are the memory source of truth. Chat history is not the source of truth after a checkpoint file has been written.
+
+### QA Session Checkpoints
+
+QA sessions must not wait until the whole Product & UX QA or Technical QA stage is complete before saving notes.
+
+During Product & UX QA or Technical QA, the assistant should output or update a saveable Markdown QA note whenever any of these happens:
+
+```text
+- a small batch of questions has been answered;
+- a module, journey, actor workflow, product area, or technical area reaches a stable stopping point;
+- the conversation is about to move from one topic area to another;
+- an answer supersedes earlier answers;
+- blockers or open decisions have accumulated;
+- the user asks to pause, continue later, or start a new section.
+```
+
+When working in ChatGPT, the assistant should provide the current QA note as a downloadable or saveable Markdown file when the environment supports file output. If file output is not available, the assistant should print the complete Markdown content that should be saved.
+
+QA session checkpoint outputs:
+
+```text
+Product & UX QA:
+- docs/notes/product-ux-qa/*.md
+
+Technical QA:
+- docs/notes/technical-qa/*.md
+```
+
+Each QA checkpoint note must preserve stable QIDs, full questions, full answers, statuses, supersede relationships, target record hints, conversion notes, open questions, and blockers.
+
+### Workflow Stage Checkpoints
+
+A workflow stage is not complete until its required files have been written or updated in the target project. When working in ChatGPT, the assistant should also provide the updated Markdown document as a downloadable or saveable file at the end of each stage when the environment supports file output.
 
 ```text
 1. Product & UX QA
@@ -256,8 +294,6 @@ A stage is not complete until its required files have been written or updated in
     - verify that all active requirements, screens, page states, database records, APIs, permissions, auth rules, errors, component specs, and execution tasks are covered or explicitly blocked;
     - ensure Codex can begin implementation without relying on the chat transcript.
 ```
-
-Checkpoint outputs are the memory source of truth. Chat history is not the source of truth after a checkpoint file has been written.
 
 ## Prompt Set
 
