@@ -23,6 +23,36 @@ docs/notes/technical-qa/
 
 Split by technical area. Do not put all technical questions in one file.
 
+## Technical QA Session Checkpoints
+
+Technical QA must preserve memory during the QA conversation, not only at the end of the full workflow.
+
+During a Technical QA session, output or update a saveable technical QA note whenever any of these happens:
+
+- a small batch of technical questions has been answered;
+- a technical area has reached a stable stopping point;
+- the conversation is about to move from one technical area to another;
+- a technical answer supersedes earlier technical answers;
+- a blocker is found because Product or UX source records are missing or inconsistent;
+- open technical decisions have accumulated;
+- the user asks to pause, continue later, or start a new section.
+
+When the environment supports file output, provide the current technical QA note as a downloadable Markdown file. When file output is not available, print the complete Markdown content that should be saved to the corresponding `docs/notes/technical-qa/*.md` file.
+
+Each checkpoint note must preserve:
+
+- all Q/A entries completed since the previous checkpoint;
+- stable QIDs;
+- source record references;
+- status markers;
+- supersede relationships;
+- technical record target hints;
+- implementation target hints;
+- conversion notes;
+- blockers and open questions.
+
+Do not wait for the entire Technical QA stage to finish before producing saveable notes. The saved technical QA notes are the memory source of truth for later technical consolidation.
+
 ## Core Principle
 
 Every technical question must be traceable to confirmed product or UX behavior, unless the question is about cross-cutting runtime infrastructure required by the app as a whole.
