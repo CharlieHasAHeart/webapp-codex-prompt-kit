@@ -1,5 +1,32 @@
 # Changelog
 
+## v0.7.0
+
+### Summary
+
+Shifted the kit from Codex-facing working documents to Codex-facing action documents.
+
+### Changed
+
+- Clarified that `docs/product.md` and `docs/ux.md` are required execution constraints, not optional background context.
+- Expanded `docs/ux.md` taxonomy with `PAGESTATE-*` for page-level state matrices.
+- Expanded `docs/technical.md` taxonomy with:
+  - `PERM-*`
+  - `JOB-*`
+  - `MOCK-*`
+  - `SEED-*`
+  - `EXPORT-*`
+  - `OBS-*`
+- Expanded `docs/implementation.md` taxonomy with:
+  - `PAGESTATE-*`
+  - `COMPSPEC-*`
+  - `APIIMPL-*`
+  - `TESTIMPL-*`
+- Updated Technical Consolidation prompt to require complete API contracts, field-level database schema, error code catalog, permission matrix, mock strategy, seed strategy, and component-level implementation specs.
+- Updated Execution Plan prompt to produce complete application development tasks rather than document review tasks.
+- Added `SLICE-*` and `DEP-*` records for vertical slices and task dependencies.
+- Updated AGENTS prompt to position Codex as a task executor that obeys one selected task and its referenced records.
+
 ## v0.6.0
 
 ### Summary
