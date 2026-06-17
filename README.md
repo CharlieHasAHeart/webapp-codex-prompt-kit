@@ -25,6 +25,7 @@ The workflow is **QA-driven, UX-first, and Codex-execution-facing**.
 - Product and UX records are execution constraints, not optional background.
 - Technical and implementation records must implement product and UX constraints.
 - Execution records tell Codex exactly what to build, validate, and report.
+- Execution records must include a development spine, vertical slices, task dependencies, and coverage gates.
 - Process checks do not become permanent files.
 - Prompt files stay short and do not hide project rules.
 - Codex reads only the task-relevant records.
@@ -130,6 +131,7 @@ Codex-facing execution plan for building the application.
 
 ```text
 EXEC-*       overall execution scope and application boundary
+SPINE-*      required development spine area for a complete Web App
 MILESTONE-*  implementation milestone
 SLICE-*      minimal runnable vertical slice
 TASK-*       executable implementation task
@@ -139,6 +141,8 @@ BLOCKER-*    condition that requires stopping before implementation continues
 ```
 
 Every `TASK-*` should include goal, depends on, read before, scope, deliverables, do not, validation, and blocker conditions.
+
+`docs/execution.md` should include coverage gates so every active `REQ-*`, `SCREEN-*`, `DB-*`, `API-*`, `PERM-*`, `AUTH-*`, `ERR-*`, `PAGESTATE-*`, and `COMPSPEC-*` is covered by implementation tasks or explicitly blocked.
 
 ### `AGENTS.md`
 
