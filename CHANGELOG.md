@@ -1,5 +1,20 @@
 # Changelog
 
+## v0.7.1
+
+### Summary
+
+Strengthened execution planning so `docs/execution.md` must be sufficient for complete Web App development.
+
+### Changed
+
+- Added `SPINE-*` records for required development spine areas.
+- Added mandatory coverage gates for `REQ-*`, `SCREEN-*`, `DB-*`, `API-*`, `PERM-*`, `AUTH-*`, `ERR-*`, `PAGESTATE-*`, and `COMPSPEC-*` coverage.
+- Added task budget rules to prevent under-sized execution plans.
+- Required every `TASK-*` to include dependencies, deliverables, validation, and blocker conditions.
+- Required a Coverage Gate Summary at the end of `docs/execution.md`.
+- Updated README to document `SPINE-*` and coverage gate expectations.
+
 ## v0.7.0
 
 ### Summary
