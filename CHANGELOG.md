@@ -1,5 +1,85 @@
 # Changelog
 
+## v0.6.2
+
+### Summary
+
+Strengthened the QA memory system so Product & UX QA and Technical QA can be saved, resumed, and converted into action records with less risk of ChatGPT memory loss or record omission.
+
+### Changed
+
+- Updated `README.md` to distinguish two checkpoint levels:
+  - QA session checkpoints while Product & UX QA or Technical QA is still in progress.
+  - Workflow stage checkpoints when a major prompt stage is complete.
+- Replaced the old short workflow list with explicit stage outputs for:
+  - Product & UX QA
+  - Product & UX Consolidation
+  - UX Consistency Check
+  - Technical QA
+  - Technical Consolidation
+  - Reference Alignment
+  - Implementation Planning
+  - Execution Plan
+  - AGENTS Runtime Policy
+  - Final Readiness Check
+- Required ChatGPT to output or update saveable Markdown QA notes during QA sessions whenever:
+  - a small batch of questions has been answered;
+  - a module, journey, actor workflow, product area, or technical area reaches a stable stopping point;
+  - the conversation moves to another topic;
+  - an answer supersedes earlier answers;
+  - blockers or open decisions accumulate;
+  - the user pauses or starts a new section.
+- Updated `prompts/01-product-ux-qa.md` with fixed Q/A metadata for Product & UX decisions:
+  - `Module / Area`
+  - `Question Type`
+  - `Decision Layer`
+  - `Record Targets`
+  - `Status`
+  - `Depends On`
+  - `Supersedes`
+  - `Superseded By`
+  - `Question`
+  - `Answer`
+  - `Conversion Notes`
+- Updated `prompts/04-technical-qa.md` with fixed Q/A metadata for Technical decisions:
+  - `Technical Area`
+  - `Source Records`
+  - `Question Type`
+  - `Record Targets`
+  - `Implementation Targets`
+  - `Status`
+  - `Depends On`
+  - `Supersedes`
+  - `Superseded By`
+  - `Question`
+  - `Answer`
+  - `Conversion Notes`
+- Added `Note File Shape` to `prompts/01-product-ux-qa.md`, requiring each saved Product & UX QA note to include:
+  - file metadata;
+  - scope;
+  - out of scope;
+  - Q/A records;
+  - open questions;
+  - blockers;
+  - superseded decisions;
+  - conversion index;
+  - checkpoint history.
+- Added `Note File Shape` to `prompts/04-technical-qa.md`, requiring each saved Technical QA note to include:
+  - file metadata;
+  - scope;
+  - out of scope;
+  - source record summary;
+  - Q/A records;
+  - open questions;
+  - blockers;
+  - superseded decisions;
+  - conversion index;
+  - checkpoint history.
+- Required stable QIDs inside each QA note and prohibited renumbering after a checkpoint has been shared.
+- Required superseded answers to remain in the QA note as `Superseded` instead of being overwritten or deleted.
+- Required `Conversion Index` to stay updated at each QA checkpoint and default to `Pending` until a consolidation prompt actually converts the Q/A into action records.
+- Clarified that checkpoint outputs, not chat history, become the memory source of truth after they are written.
+
 ## v0.6.1
 
 ### Summary
